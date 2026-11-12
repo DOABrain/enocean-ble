@@ -65,7 +65,11 @@ async def test_discovery_shows_method_menu(hass: Any) -> None:
     assert result["type"] == FlowResultType.MENU
     assert result["step_id"] == "bluetooth_method"
     assert result["menu_options"] == ["qr_scan", "qr_text", "commissioning"]
-    assert result["description_placeholders"]["mac"] == MAC
+    placeholders = result["description_placeholders"]
+    assert placeholders is not None
+    assert placeholders["mac"] == MAC
+    # The menu links to the in-app add page right away (all methods on one page).
+    assert placeholders["scan_url"] == "/enocean-ble-scan?flow_id=test-flow"
 
 
 async def test_qr_text_creates_entry(hass: Any) -> None:

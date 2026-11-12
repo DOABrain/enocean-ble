@@ -3,7 +3,7 @@
     "step": {
       "bluetooth_method": {
         "title": "EnOcean-BLE-Schalter hinzufügen",
-        "description": "Schalter {name} ({mac}) wurde erkannt. Wie möchtest du ihn hinzufügen?\n\nDer QR-Code befindet sich auf dem Etikett des EnOcean-Moduls, hinter der Wippe.",
+        "description": "**[Hinzufügen-Seite öffnen]({scan_url})**: QR-Code scannen, ein Foto verwenden, den Text einfügen oder die Tastenfolge nutzen, alles auf einer Seite. Oder wähle unten eine Methode.\n\nSchalter {name} ({mac}) wurde erkannt. Wie möchtest du ihn hinzufügen?\n\nDer QR-Code befindet sich auf dem Etikett des EnOcean-Moduls, hinter der Wippe.",
         "menu_options": {
           "qr_scan": "QR-Code mit der Kamera scannen",
           "qr_text": "Text des QR-Codes eingeben",

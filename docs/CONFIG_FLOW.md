@@ -50,6 +50,11 @@ menu comes when it ends.
 - Validation errors are returned on the `qr_text` form; the page shows them with the
   integration's translations (`config.error.<code>`).
 - Opened without `flow_id`, the page lists the EnOcean BLE flows in progress to pick one.
+- The `bluetooth_method` menu links to the same page (`{scan_url}`), which offers every method:
+  scan / photo / paste (via `qr_text`) and manual commissioning. For commissioning the page returns
+  to the menu (empty `qr_text`), selects `commissioning`, follows the progress step
+  (`data_entry_flow_progressed` events, with polling as a fallback), then shows
+  `bluetooth_confirm` or the `commissioning_retry` choice, all with the integration's translations.
 
 Validation (`validate_qr_for_device`), each failure has its own error code:
 - `invalid_qr`: not a module label QR code (`30S<MAC>+Z<key>…`) nor free text with MAC + key.

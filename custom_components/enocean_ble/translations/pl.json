@@ -3,7 +3,7 @@
     "step": {
       "bluetooth_method": {
         "title": "Dodaj przełącznik EnOcean BLE",
-        "description": "Wykryto przełącznik {name} ({mac}). Jak chcesz go dodać?\n\nKod QR znajduje się na etykiecie modułu EnOcean, pod klawiszem.",
+        "description": "**[Otwórz stronę dodawania]({scan_url})**: zeskanuj kod QR, użyj zdjęcia, wklej tekst lub użyj sekwencji przycisków, wszystko na jednej stronie. Albo wybierz metodę poniżej.\n\nWykryto przełącznik {name} ({mac}). Jak chcesz go dodać?\n\nKod QR znajduje się na etykiecie modułu EnOcean, pod klawiszem.",
         "menu_options": {
           "qr_scan": "Zeskanuj kod QR aparatem",
           "qr_text": "Wpisz tekst kodu QR",

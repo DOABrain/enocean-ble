@@ -171,12 +171,20 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_bluetooth_method(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Let the user pick how to add the discovered switch."""
+        """Let the user pick how to add the discovered switch.
+
+        The description links to the in-app add page (scan, photo, text or button
+        sequence); the menu options do the same in this dialog.
+        """
         self._shown_steps.clear()
+        await async_register_scan_panel(self.hass)
         return self.async_show_menu(
             step_id=METHOD_MENU_STEP_ID,
             menu_options=METHOD_MENU_OPTIONS,
-            description_placeholders=self._name_placeholders(),
+            description_placeholders={
+                **self._name_placeholders(),
+                "scan_url": scan_panel_path(self.flow_id),
+            },
         )
 
     async def async_step_qr_text(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:

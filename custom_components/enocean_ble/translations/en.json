@@ -3,7 +3,7 @@
     "step": {
       "bluetooth_method": {
         "title": "Add EnOcean BLE switch",
-        "description": "Switch {name} ({mac}) was discovered. How do you want to add it?\n\nThe QR code is on the label of the EnOcean module, behind the rocker.",
+        "description": "**[Open the add page]({scan_url})**: scan the QR code, use a photo, paste the text or use the button sequence, all on one page. Or pick a method below.\n\nSwitch {name} ({mac}) was discovered. How do you want to add it?\n\nThe QR code is on the label of the EnOcean module, behind the rocker.",
         "menu_options": {
           "qr_scan": "Scan the QR code with the camera",
           "qr_text": "Enter the QR code text",

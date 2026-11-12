@@ -3,7 +3,7 @@
     "step": {
       "bluetooth_method": {
         "title": "Añadir interruptor EnOcean BLE",
-        "description": "Se ha descubierto el interruptor {name} ({mac}). ¿Cómo quieres añadirlo?\n\nEl código QR está en la etiqueta del módulo EnOcean, detrás de la tecla.",
+        "description": "**[Abre la página para añadir]({scan_url})**: escanea el código QR, usa una foto, pega el texto o usa la secuencia de botones, todo en una página. O elige un método abajo.\n\nSe ha descubierto el interruptor {name} ({mac}). ¿Cómo quieres añadirlo?\n\nEl código QR está en la etiqueta del módulo EnOcean, detrás de la tecla.",
         "menu_options": {
           "qr_scan": "Escanear el código QR con la cámara",
           "qr_text": "Introducir el texto del código QR",

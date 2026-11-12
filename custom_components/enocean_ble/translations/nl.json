@@ -3,7 +3,7 @@
     "step": {
       "bluetooth_method": {
         "title": "EnOcean BLE-schakelaar toevoegen",
-        "description": "Schakelaar {name} ({mac}) is ontdekt. Hoe wil je hem toevoegen?\n\nDe QR-code staat op het label van de EnOcean-module, achter de wip.",
+        "description": "**[Open de toevoegpagina]({scan_url})**: QR-code scannen, een foto gebruiken, de tekst plakken of de knoppenreeks gebruiken, alles op één pagina. Of kies hieronder een methode.\n\nSchakelaar {name} ({mac}) is ontdekt. Hoe wil je hem toevoegen?\n\nDe QR-code staat op het label van de EnOcean-module, achter de wip.",
         "menu_options": {
           "qr_scan": "QR-code scannen met de camera",
           "qr_text": "Tekst van de QR-code invoeren",

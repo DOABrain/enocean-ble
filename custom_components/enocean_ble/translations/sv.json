@@ -3,7 +3,7 @@
     "step": {
       "bluetooth_method": {
         "title": "Lägg till EnOcean BLE-brytare",
-        "description": "Brytaren {name} ({mac}) har upptäckts. Hur vill du lägga till den?\n\nQR-koden sitter på EnOcean-modulens etikett, bakom vippan.",
+        "description": "**[Öppna sidan för att lägga till]({scan_url})**: skanna QR-koden, använd ett foto, klistra in texten eller använd knappsekvensen, allt på en sida. Eller välj en metod nedan.\n\nBrytaren {name} ({mac}) har upptäckts. Hur vill du lägga till den?\n\nQR-koden sitter på EnOcean-modulens etikett, bakom vippan.",
         "menu_options": {
           "qr_scan": "Skanna QR-koden med kameran",
           "qr_text": "Ange QR-kodens text",

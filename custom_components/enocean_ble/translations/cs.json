@@ -3,7 +3,7 @@
     "step": {
       "bluetooth_method": {
         "title": "Přidat spínač EnOcean BLE",
-        "description": "Byl nalezen spínač {name} ({mac}). Jak ho chcete přidat?\n\nQR kód je na štítku modulu EnOcean, pod kolébkou.",
+        "description": "**[Otevřete stránku pro přidání]({scan_url})**: naskenujte QR kód, použijte fotografii, vložte text nebo použijte sekvenci tlačítek, vše na jedné stránce. Nebo níže zvolte metodu.\n\nByl nalezen spínač {name} ({mac}). Jak ho chcete přidat?\n\nQR kód je na štítku modulu EnOcean, pod kolébkou.",
         "menu_options": {
           "qr_scan": "Naskenovat QR kód kamerou",
           "qr_text": "Zadat text QR kódu",

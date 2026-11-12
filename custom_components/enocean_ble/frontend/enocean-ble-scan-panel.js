@@ -97,6 +97,7 @@ class EnOceanBleScanPanel extends HTMLElement {
   set route(_route) {}
 
   disconnectedCallback() {
+    this._stopWatching();
     this._stopCamera();
     this._releaseNative();
     if (this._worker) this._worker.terminate();
@@ -166,9 +167,8 @@ class EnOceanBleScanPanel extends HTMLElement {
     }
     const content = this._content(`
       <div class="card">
-        <h2>Discovered EnOcean switches</h2>
-        <p>Pick the switch whose label you want to scan. A switch appears here after you press
-          one of its buttons.</p>
+        <h2>Add an EnOcean switch</h2>
+        <p>Pick the switch to add. A switch appears here after you press one of its buttons.</p>
         <ul id="flows"></ul>
       </div>`);
     const list = content.querySelector("#flows");
@@ -193,36 +193,81 @@ class EnOceanBleScanPanel extends HTMLElement {
     }
   }
 
-  async _openFlow(flowId) {
-    let step;
-    try {
-      step = await this._hass.callApi("GET", `config/config_entries/flow/${flowId}`);
-      if (step.type === "menu" && MENU_STEPS.includes(step.step_id)) {
-        step = await this._hass.callApi("POST", `config/config_entries/flow/${flowId}`, {
-          next_step_id: TEXT_STEP,
-        });
-      }
-    } catch (_err) {
-      this._content(`
-        <div class="card"><h2>Nothing to scan</h2>
-          <p>This switch is no longer waiting to be added (already added, or the setup was closed).</p>
-          <p><a href="/${"enocean-ble-scan"}">Show discovered switches</a></p></div>`);
-      return;
-    }
-    if (step.handler !== DOMAIN || step.type !== "form" || step.step_id !== TEXT_STEP) {
-      this._content(`
-        <div class="card"><h2>Not waiting for a QR code</h2>
-          <p>This switch is busy with another way of adding it (for example manual commissioning).
-            In the setup dialog, go back to the methods and choose the QR code.</p>
-          <p><a href="/enocean-ble-scan">Show discovered switches</a></p></div>`);
-      return;
-    }
-    this._flow = step;
-    this._showScan();
+  _flowUrl() {
+    return `config/config_entries/flow/${this._flowId}`;
   }
 
-  _showScan() {
-    const ph = this._flow.description_placeholders || {};
+  async _openFlow(flowId) {
+    this._flowId = flowId;
+    try {
+      await this._handleStep(await this._hass.callApi("GET", this._flowUrl()));
+    } catch (_err) {
+      this._showGone();
+    }
+  }
+
+  _showGone() {
+    this._stopWatching();
+    this._content(`
+      <div class="card"><h2>Nothing to add</h2>
+        <p>This switch is no longer waiting to be added (already added, or the setup was closed).</p>
+        <p><a href="/enocean-ble-scan">Show discovered switches</a></p></div>`);
+  }
+
+  // Show the view for wherever the config flow is. The page drives the same flow as the
+  // setup dialog: menus -> qr_text (scan / photo / paste), commissioning (progress),
+  // bluetooth_confirm, commissioning_retry, create_entry.
+  async _handleStep(step) {
+    if (step.handler && step.handler !== DOMAIN) {
+      this._showGone();
+      return;
+    }
+    if (step.type === "create_entry") {
+      this._stopWatching();
+      this._showDone(step);
+      return;
+    }
+    if (step.type === "abort") {
+      this._stopWatching();
+      this._content(`<div class="card"><h2>Not added</h2><p id="reason"></p>
+        <p><a href="/enocean-ble-scan">Show discovered switches</a></p></div>`);
+      this._el("reason").textContent =
+        this._hass.localize(`component.${DOMAIN}.config.abort.${step.reason}`) || step.reason;
+      return;
+    }
+    if (step.description_placeholders) this._placeholders = step.description_placeholders;
+    if (step.type === "menu" && MENU_STEPS.includes(step.step_id)) {
+      await this._handleStep(
+        await this._hass.callApi("POST", this._flowUrl(), { next_step_id: TEXT_STEP })
+      );
+      return;
+    }
+    if (step.type === "form" && step.step_id === TEXT_STEP) {
+      this._stopWatching();
+      this._flow = step;
+      this._showMethods();
+      return;
+    }
+    if (step.type === "progress") {
+      this._showWaiting();
+      this._watch();
+      return;
+    }
+    if (step.type === "form" && step.step_id === "bluetooth_confirm") {
+      this._stopWatching();
+      this._showConfirm();
+      return;
+    }
+    if (step.type === "menu" && step.step_id === "commissioning_retry") {
+      this._stopWatching();
+      this._showRetry();
+      return;
+    }
+    this._showGone();
+  }
+
+  _showMethods() {
+    const ph = this._placeholders || {};
     const content = this._content(`
       <div class="card">
         <h2 id="name"></h2>
@@ -240,13 +285,141 @@ class EnOceanBleScanPanel extends HTMLElement {
         <textarea id="text" autocomplete="off" autocapitalize="off" spellcheck="false"
           placeholder="30SE215…+Z…+30P…"></textarea>
         <button id="add">Add switch</button>
+      </div>
+      <div class="card">
+        <h2>Or use the button sequence</h2>
+        <p>Manual commissioning, for switches whose label you cannot reach. Some OEM switches
+          (for example Busch-Jaeger, Jung) do not support it; use the QR code for those.</p>
+        <button id="commission" class="secondary">Start manual commissioning</button>
       </div>`);
-    content.querySelector("#name").textContent = ph.name || "EnOcean switch";
+    content.querySelector("#name").textContent = `Add ${ph.name || "EnOcean switch"}`;
     content.querySelector("#mac").textContent = ph.mac || "";
     content.querySelector("#scan").addEventListener("click", () => this._scan());
     content.querySelector("#photo").addEventListener("click", () => content.querySelector("#file").click());
     content.querySelector("#file").addEventListener("change", (ev) => this._scanPhoto(ev));
     content.querySelector("#add").addEventListener("click", () => this._submit(content.querySelector("#text").value));
+    content.querySelector("#commission").addEventListener("click", () => this._startCommissioning());
+  }
+
+  // ---------------------------------------------------------------- manual commissioning
+
+  _localizeStep(key, fallback) {
+    const ph = this._placeholders || {};
+    const text = this._hass.localize(`component.${DOMAIN}.config.${key}`, ph);
+    return text || fallback;
+  }
+
+  async _startCommissioning() {
+    if (this._busy) return;
+    this._busy = true;
+    try {
+      // From the text step, an empty submission returns to the method menu.
+      const menu = await this._hass.callApi("POST", this._flowUrl(), { qr_code: "" });
+      if (menu.type !== "menu") {
+        await this._handleStep(menu);
+        return;
+      }
+      await this._handleStep(
+        await this._hass.callApi("POST", this._flowUrl(), { next_step_id: "commissioning" })
+      );
+    } catch (err) {
+      this._status("error", `Could not start manual commissioning: ${errorMessage(err)}`);
+    } finally {
+      this._busy = false;
+    }
+  }
+
+  _showWaiting() {
+    const content = this._content(`
+      <div class="card">
+        <h2>Manual commissioning</h2>
+        <p id="steps"></p>
+        <div class="status info">Waiting for the switch… (up to 2 minutes)</div>
+      </div>`);
+    content.querySelector("#steps").innerText = this._localizeStep(
+      "step.commissioning.description",
+      "Hold button 1 for 7 seconds, press it briefly, then hold it again for 7 seconds."
+    );
+  }
+
+  _watch() {
+    if (this._unsubProgress || this._pollTimer) return;
+    const refresh = async () => {
+      try {
+        const step = await this._hass.callApi("GET", this._flowUrl());
+        if (step.type !== "progress") await this._handleStep(step);
+      } catch (_err) {
+        this._showGone();
+      }
+    };
+    this._hass.connection
+      .subscribeEvents((ev) => {
+        if (ev.data && ev.data.flow_id === this._flowId) refresh();
+      }, "data_entry_flow_progressed")
+      .then((unsub) => {
+        if (this._pollTimer) this._unsubProgress = unsub;
+        else unsub();
+      })
+      .catch(() => {});
+    // Fallback in case an event is missed.
+    this._pollTimer = setInterval(refresh, 5000);
+  }
+
+  _stopWatching() {
+    if (this._unsubProgress) this._unsubProgress();
+    this._unsubProgress = null;
+    clearInterval(this._pollTimer);
+    this._pollTimer = null;
+  }
+
+  _showConfirm() {
+    const content = this._content(`
+      <div class="card">
+        <h2>Commissioned</h2>
+        <p id="text"></p>
+        <button id="confirm">Add switch</button>
+        <div id="status" class="status"></div>
+      </div>`);
+    content.querySelector("#text").innerText = this._localizeStep(
+      "step.bluetooth_confirm.description",
+      "The switch was commissioned. Press another button to leave commissioning mode, then add it."
+    );
+    content.querySelector("#confirm").addEventListener("click", async () => {
+      try {
+        await this._handleStep(await this._hass.callApi("POST", this._flowUrl(), {}));
+      } catch (err) {
+        this._status("error", `Could not add the switch: ${errorMessage(err)}`);
+      }
+    });
+  }
+
+  _showRetry() {
+    const content = this._content(`
+      <div class="card">
+        <h2 id="title"></h2>
+        <p id="text"></p>
+        <div class="actions">
+          <button id="retry"></button>
+          <button id="back" class="secondary"></button>
+        </div>
+      </div>`);
+    content.querySelector("#title").textContent = this._localizeStep(
+      "step.commissioning_retry.title", "Commissioning did not succeed");
+    content.querySelector("#text").innerText = this._localizeStep(
+      "step.commissioning_retry.description", "No valid commissioning telegram was received.");
+    content.querySelector("#retry").textContent = this._localizeStep(
+      "step.commissioning_retry.menu_options.commissioning", "Try again");
+    content.querySelector("#back").textContent = this._localizeStep(
+      "step.commissioning_retry.menu_options.bluetooth_method", "Back to the methods");
+    const choose = async (next) => {
+      try {
+        await this._handleStep(await this._hass.callApi("POST", this._flowUrl(), { next_step_id: next }));
+      } catch (_err) {
+        this._showGone();
+      }
+    };
+    content.querySelector("#retry").addEventListener("click", () => choose("commissioning"));
+    content.querySelector("#back").addEventListener("click", () => choose("bluetooth_method"));
   }
 
   _status(kind, message) {
@@ -258,19 +431,13 @@ class EnOceanBleScanPanel extends HTMLElement {
 
   async _submit(raw) {
     const text = String(raw || "").trim();
-    if (!text || this._busy || !this._flow) return;
+    if (!text || this._busy || !this._flowId) return;
     this._busy = true;
     this._status("info", "Checking the QR code…");
     try {
-      const result = await this._hass.callApi("POST", `config/config_entries/flow/${this._flow.flow_id}`, {
-        qr_code: text,
-      });
-      if (result.type === "create_entry") {
-        this._showDone(result);
-        return;
-      }
-      if (result.type === "abort") {
-        this._status("error", this._hass.localize(`component.${DOMAIN}.config.abort.${result.reason}`) || result.reason);
+      const result = await this._hass.callApi("POST", this._flowUrl(), { qr_code: text });
+      if (result.type !== "form" || result.step_id !== TEXT_STEP) {
+        await this._handleStep(result);
         return;
       }
       this._flow = result;

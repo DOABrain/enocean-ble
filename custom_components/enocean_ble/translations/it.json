@@ -3,7 +3,7 @@
     "step": {
       "bluetooth_method": {
         "title": "Aggiungi interruttore EnOcean BLE",
-        "description": "È stato rilevato l'interruttore {name} ({mac}). Come vuoi aggiungerlo?\n\nIl codice QR si trova sull'etichetta del modulo EnOcean, dietro il bilanciere.",
+        "description": "**[Apri la pagina di aggiunta]({scan_url})**: scansiona il codice QR, usa una foto, incolla il testo o usa la sequenza di pulsanti, tutto in una pagina. Oppure scegli un metodo qui sotto.\n\nÈ stato rilevato l'interruttore {name} ({mac}). Come vuoi aggiungerlo?\n\nIl codice QR si trova sull'etichetta del modulo EnOcean, dietro il bilanciere.",
         "menu_options": {
           "qr_scan": "Scansiona il codice QR con la fotocamera",
           "qr_text": "Inserisci il testo del codice QR",
