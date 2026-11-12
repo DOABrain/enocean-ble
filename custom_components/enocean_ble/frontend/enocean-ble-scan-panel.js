@@ -8,8 +8,9 @@
  * Reading the code, in order of preference:
  *  1. Home Assistant app: its native scanner (external bus "bar_code/scan").
  *  2. Live camera, decoded with the browser BarcodeDetector API or, where that is
- *     missing (Safari), with the QR decoder worker the HA frontend already serves
- *     (/static/js/qr-scanner-worker.min.js). No third-party code is bundled.
+ *     missing (Safari, desktop Chrome on Windows), with the QR decoder the HA
+ *     frontend already serves (/static/js/qr-scanner-worker.min.js, an ES module
+ *     exporting createWorker()). No third-party code is bundled.
  *  3. A photo of the label (camera or gallery), decoded the same way.
  *  4. Pasting the text.
  *
@@ -401,7 +402,13 @@ class EnOceanBleScanPanel extends HTMLElement {
     this._status("info", "Reading the photo…");
     try {
       const bitmap = await createImageBitmap(file);
-      const value = await this._decode(bitmap, document.createElement("canvas"), 1600);
+      const canvas = document.createElement("canvas");
+      let value = null;
+      // The label can be small or large in the photo: try a few sizes.
+      for (const maxSide of [1600, 1024, 2400]) {
+        value = await this._decode(bitmap, canvas, maxSide);
+        if (value || this._detector) break;
+      }
       if (value && QR_FORMAT_RE.test(value)) this._submit(value);
       else this._status("error", "No EnOcean module QR code found in this photo. Try again closer, without glare.");
     } catch (err) {
@@ -438,9 +445,12 @@ class EnOceanBleScanPanel extends HTMLElement {
     return Boolean(this._detector);
   }
 
-  _workerDecode(imageData) {
+  // HA's qr-scanner worker file is an ES module exporting createWorker(); the worker it
+  // returns takes {id, type: "decode", data: ImageData} and answers {id, type: "qrResult", data}.
+  async _workerDecode(imageData) {
     if (!this._worker) {
-      this._worker = new Worker(HA_QR_WORKER);
+      const module = await import(HA_QR_WORKER);
+      this._worker = module.createWorker();
       this._worker.onmessage = (ev) => {
         const job = this._workerJobs.get(ev.data && ev.data.id);
         if (!job || ev.data.type !== "qrResult") return;
@@ -454,7 +464,7 @@ class EnOceanBleScanPanel extends HTMLElement {
       this._worker.postMessage({ id, type: "decode", data: imageData }, [imageData.data.buffer]);
       setTimeout(() => {
         if (this._workerJobs.delete(id)) resolve(null);
-      }, 3000);
+      }, 8000);
     });
   }
 }
