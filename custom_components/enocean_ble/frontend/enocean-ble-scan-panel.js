@@ -21,8 +21,10 @@
  */
 
 const DOMAIN = "enocean_ble";
-const SCAN_STEPS = ["qr_scan", "qr_text"];
-const MENU_STEP = "bluetooth_method";
+// The code is always submitted to qr_text; from the method menu or the scan step's
+// menu, the page first selects qr_text.
+const TEXT_STEP = "qr_text";
+const MENU_STEPS = ["bluetooth_method", "qr_scan"];
 const HA_QR_WORKER = "/static/js/qr-scanner-worker.min.js";
 const QR_FORMAT_RE = /30S[0-9A-Fa-f]{12}.*\+Z[0-9A-Fa-f]{32}|E2:15(:[0-9A-Fa-f]{2}){4}[\s\S]*\b[0-9A-Fa-f]{32}\b/;
 
@@ -195,9 +197,9 @@ class EnOceanBleScanPanel extends HTMLElement {
     let step;
     try {
       step = await this._hass.callApi("GET", `config/config_entries/flow/${flowId}`);
-      if (step.type === "menu" && step.step_id === MENU_STEP) {
+      if (step.type === "menu" && MENU_STEPS.includes(step.step_id)) {
         step = await this._hass.callApi("POST", `config/config_entries/flow/${flowId}`, {
-          next_step_id: "qr_scan",
+          next_step_id: TEXT_STEP,
         });
       }
     } catch (_err) {
@@ -207,8 +209,12 @@ class EnOceanBleScanPanel extends HTMLElement {
           <p><a href="/${"enocean-ble-scan"}">Show discovered switches</a></p></div>`);
       return;
     }
-    if (step.handler !== DOMAIN || step.type !== "form" || !SCAN_STEPS.includes(step.step_id)) {
-      this._content(`<div class="card"><p>This setup is not waiting for a QR code.</p></div>`);
+    if (step.handler !== DOMAIN || step.type !== "form" || step.step_id !== TEXT_STEP) {
+      this._content(`
+        <div class="card"><h2>Not waiting for a QR code</h2>
+          <p>This switch is busy with another way of adding it (for example manual commissioning).
+            In the setup dialog, go back to the methods and choose the QR code.</p>
+          <p><a href="/enocean-ble-scan">Show discovered switches</a></p></div>`);
       return;
     }
     this._flow = step;

@@ -17,14 +17,15 @@
           "qr_code": "QR code text"
         },
         "data_description": {
-          "qr_code": "Example: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215"
+          "qr_code": "Example: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215\nLeave empty and submit to go back to the methods."
         }
       },
       "qr_scan": {
         "title": "Scan the QR code",
-        "description": "[Open the scan page]({scan_url}) to scan the QR code on the module label of {name} with the camera (in the Home Assistant app: its own scanner) or from a photo. The switch is added as soon as the code is accepted.\n\nYou can also paste the QR code text below. Its address must be {mac}.",
-        "data": {
-          "qr_code": "QR code text (optional)"
+        "description": "[Open the scan page]({scan_url}) to scan the QR code on the module label of {name} with the camera (in the Home Assistant app: its own scanner) or from a photo. The switch is added as soon as the code is accepted.",
+        "menu_options": {
+          "qr_text": "Enter the QR code text instead",
+          "bluetooth_method": "Back"
         }
       },
       "commissioning": {
@@ -34,6 +35,14 @@
       "bluetooth_confirm": {
         "title": "Confirm EnOcean BLE Device",
         "description": "EnOcean switch with address {mac} was commissioned successfully.\n\n⚠️ Press another button to disable commissioning mode, then click Submit."
+      },
+      "commissioning_retry": {
+        "title": "Commissioning did not succeed",
+        "description": "No valid commissioning telegram was received from {name}. Try again, or go back and add it from the QR code on its module label. If commissioning keeps failing, read the factory reset disclaimer in the documentation first.",
+        "menu_options": {
+          "commissioning": "Try again",
+          "bluetooth_method": "Back to the methods"
+        }
       }
     },
     "progress": {

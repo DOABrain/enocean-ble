@@ -17,14 +17,15 @@
           "qr_code": "Tekst van de QR-code"
         },
         "data_description": {
-          "qr_code": "Voorbeeld: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215"
+          "qr_code": "Voorbeeld: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215\nLaat leeg en verstuur om terug te gaan naar de methoden."
         }
       },
       "qr_scan": {
         "title": "QR-code scannen",
-        "description": "[Open de scanpagina]({scan_url}) om de QR-code op het modulelabel van {name} te scannen met de camera (in de Home Assistant-app: de eigen scanner) of vanaf een foto. De schakelaar wordt toegevoegd zodra de code is geaccepteerd.\n\nJe kunt de tekst van de QR-code ook hieronder plakken. Het adres moet {mac} zijn.",
-        "data": {
-          "qr_code": "Tekst van de QR-code (optioneel)"
+        "description": "[Open de scanpagina]({scan_url}) om de QR-code op het modulelabel van {name} te scannen met de camera (in de Home Assistant-app: de eigen scanner) of vanaf een foto. De schakelaar wordt toegevoegd zodra de code is geaccepteerd.",
+        "menu_options": {
+          "qr_text": "In plaats daarvan de tekst van de QR-code invoeren",
+          "bluetooth_method": "Terug"
         }
       },
       "commissioning": {
@@ -34,6 +35,14 @@
       "bluetooth_confirm": {
         "title": "Bevestig EnOcean BLE-apparaat",
         "description": "EnOcean-schakelaar met adres {mac} is succesvol gecommissioned.\n\n⚠️ Druk op een andere knop om de commissioningmodus uit te schakelen en klik daarna op Verzenden."
+      },
+      "commissioning_retry": {
+        "title": "Commissioning is niet gelukt",
+        "description": "Er is geen geldig commissioning-telegram van {name} ontvangen. Probeer het opnieuw, of ga terug en voeg hem toe via de QR-code op het modulelabel. Blijft commissioning mislukken, lees dan eerst de resetdisclaimer in de documentatie.",
+        "menu_options": {
+          "commissioning": "Opnieuw proberen",
+          "bluetooth_method": "Terug naar de methoden"
+        }
       }
     },
     "progress": {

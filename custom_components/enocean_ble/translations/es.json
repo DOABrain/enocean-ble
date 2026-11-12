@@ -17,14 +17,15 @@
           "qr_code": "Texto del código QR"
         },
         "data_description": {
-          "qr_code": "Ejemplo: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215"
+          "qr_code": "Ejemplo: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215\nDéjalo vacío y envía para volver a los métodos."
         }
       },
       "qr_scan": {
         "title": "Escanear el código QR",
-        "description": "[Abre la página de escaneo]({scan_url}) para escanear el código QR de la etiqueta del módulo de {name} con la cámara (en la app de Home Assistant: su propio escáner) o desde una foto. El interruptor se añade en cuanto se acepta el código.\n\nTambién puedes pegar el texto del código QR abajo. Su dirección debe ser {mac}.",
-        "data": {
-          "qr_code": "Texto del código QR (opcional)"
+        "description": "[Abre la página de escaneo]({scan_url}) para escanear el código QR de la etiqueta del módulo de {name} con la cámara (en la app de Home Assistant: su propio escáner) o desde una foto. El interruptor se añade en cuanto se acepta el código.",
+        "menu_options": {
+          "qr_text": "Introducir el texto del código QR en su lugar",
+          "bluetooth_method": "Atrás"
         }
       },
       "commissioning": {
@@ -34,6 +35,14 @@
       "bluetooth_confirm": {
         "title": "Confirmar dispositivo EnOcean BLE",
         "description": "El interruptor EnOcean con dirección {mac} se comisionó correctamente.\n\n⚠️ Pulsa otro botón para desactivar el modo de comisionado y luego haz clic en Enviar."
+      },
+      "commissioning_retry": {
+        "title": "La puesta en marcha no tuvo éxito",
+        "description": "No se recibió ningún telegrama de puesta en marcha válido de {name}. Inténtalo de nuevo, o vuelve atrás y añádelo con el código QR de la etiqueta del módulo. Si sigue fallando, lee primero el aviso sobre el restablecimiento de fábrica en la documentación.",
+        "menu_options": {
+          "commissioning": "Intentar de nuevo",
+          "bluetooth_method": "Volver a los métodos"
+        }
       }
     },
     "progress": {

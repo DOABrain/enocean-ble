@@ -53,8 +53,12 @@ it the way to add OEM switches whose radio commissioning is disabled (for exampl
   uses the app's own barcode scanner; in a browser it uses the camera, or reads a **photo** of the
   label (taken with the camera or picked from the gallery). The switch is added as soon as the code
   is accepted. Live camera access in a browser needs **HTTPS**; the app scanner, photos and pasting
-  work without it. The text field of the step is there as a fallback too.
+  work without it. The step also offers **Enter the QR code text instead** and **Back**.
 - **Text:** type or paste the QR code text (for example read with your phone's camera app).
+  Submit it empty to go back to the methods.
+
+If manual commissioning times out, you can **try again** or go **back to the methods** (for
+example to use the QR code instead).
 
 The scan page is a regular, admin-only Home Assistant page (no extra web endpoint, nothing
 reachable without logging in) and decodes QR codes with the browser's `BarcodeDetector` or the

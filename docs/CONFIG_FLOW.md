@@ -26,20 +26,24 @@ Bluetooth discovery (press any button on it).
 `qr_text` (form, field `qr_code`)
 - Validates the text with `qr_onboarding.validate_qr_for_device()`, then creates the entry.
 
-`qr_scan` (form, optional field `qr_code`)
+"Back" in every branch returns to the `bluetooth_method` menu, i.e. restarts adding the switch.
+
+`qr_text` (form, field `qr_code`)
+- Submitting the field empty goes back to `bluetooth_method`.
+
+`qr_scan` (menu: `qr_text` = enter the text instead, `bluetooth_method` = back)
 - Its description links to the scan page `/enocean-ble-scan?flow_id=<flow_id>` (relative link:
   it opens inside the frontend, and inside the HA app, not in a new window). The page is a hidden,
   admin-only frontend panel (`panel.py`, `frontend/enocean-ble-scan-panel.js`), registered once.
-- A flow continued from a discovery is not deleted when the dialog closes, so the page submits the
-  scanned code to this step with the standard, authenticated config flow API
-  (`POST /api/config/config_entries/flow/<flow_id>` `{"qr_code": …}`). From the menu step it first
-  selects `qr_scan`.
+- A flow continued from a discovery is not deleted when the dialog closes, so the page moves the
+  flow to `qr_text` (from either menu) and submits the scanned code there with the standard,
+  authenticated config flow API (`POST /api/config/config_entries/flow/<flow_id>`).
 - Reading the code, in order: the Companion app's native scanner (external bus `bar_code/scan`),
   the live camera, a photo of the label, the text field. Camera frames and photos are decoded with
   `BarcodeDetector`, else the decoder worker the HA frontend serves
   (`/static/js/qr-scanner-worker.min.js`). No third-party code is bundled.
-- Validation is the same as `qr_text`; errors are returned on the `qr_scan` form and the page shows
-  them with the integration's translations (`config.error.<code>`).
+- Validation errors are returned on the `qr_text` form; the page shows them with the
+  integration's translations (`config.error.<code>`).
 - Opened without `flow_id`, the page lists the EnOcean BLE flows in progress to pick one.
 
 Validation (`validate_qr_for_device`), each failure has its own error code:
@@ -57,7 +61,9 @@ The scan page design is adapted from hass-pronote (delphiki/hass-pronote#229, MI
 - Shows progress instructions to the user.
 - Waits for a commissioning telegram (`len=26`) with a `120s` timeout.
 - On success, parses and validates payload MAC and stores `security_key`.
-- On timeout/invalid payload, returns a retry form on the same step.
+- On timeout/invalid payload, ends with `show_progress_done` -> `commissioning_retry` (menu:
+  `commissioning` = try again, `bluetooth_method` = back to the methods). A running progress step
+  cannot be interrupted from the frontend; the choice comes when it ends.
 
 4. `bluetooth_confirm` (explicit submit)
 - Shows final confirmation once commissioning data is ready.

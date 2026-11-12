@@ -17,14 +17,15 @@
           "qr_code": "QR-kodens text"
         },
         "data_description": {
-          "qr_code": "Exempel: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215"
+          "qr_code": "Exempel: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215\nLämna tomt och skicka för att gå tillbaka till metoderna."
         }
       },
       "qr_scan": {
         "title": "Skanna QR-koden",
-        "description": "[Öppna skanningssidan]({scan_url}) för att skanna QR-koden på modulens etikett för {name} med kameran (i Home Assistant-appen: dess egen skanner) eller från ett foto. Brytaren läggs till så snart koden godkänns.\n\nDu kan också klistra in QR-kodens text nedan. Adressen måste vara {mac}.",
-        "data": {
-          "qr_code": "QR-kodens text (valfritt)"
+        "description": "[Öppna skanningssidan]({scan_url}) för att skanna QR-koden på modulens etikett för {name} med kameran (i Home Assistant-appen: dess egen skanner) eller från ett foto. Brytaren läggs till så snart koden godkänns.",
+        "menu_options": {
+          "qr_text": "Ange QR-kodens text i stället",
+          "bluetooth_method": "Tillbaka"
         }
       },
       "commissioning": {
@@ -34,6 +35,14 @@
       "bluetooth_confirm": {
         "title": "Bekräfta EnOcean BLE-enhet",
         "description": "EnOcean-brytaren med adress {mac} har provisionerats.\n\n⚠️ Tryck på en annan knapp för att stänga av commissioning-läget och klicka sedan på Skicka."
+      },
+      "commissioning_retry": {
+        "title": "Driftsättningen lyckades inte",
+        "description": "Inget giltigt driftsättningstelegram togs emot från {name}. Försök igen, eller gå tillbaka och lägg till den med QR-koden på modulens etikett. Om det fortsätter att misslyckas, läs först informationen om fabriksåterställning i dokumentationen.",
+        "menu_options": {
+          "commissioning": "Försök igen",
+          "bluetooth_method": "Tillbaka till metoderna"
+        }
       }
     },
     "progress": {

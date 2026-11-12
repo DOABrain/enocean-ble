@@ -17,14 +17,15 @@
           "qr_code": "Tekst kodu QR"
         },
         "data_description": {
-          "qr_code": "Przykład: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215"
+          "qr_code": "Przykład: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215\nPozostaw puste i wyślij, aby wrócić do metod."
         }
       },
       "qr_scan": {
         "title": "Zeskanuj kod QR",
-        "description": "[Otwórz stronę skanowania]({scan_url}), aby zeskanować kod QR z etykiety modułu {name} aparatem (w aplikacji Home Assistant: jej własnym skanerem) lub ze zdjęcia. Przełącznik zostanie dodany, gdy kod zostanie zaakceptowany.\n\nMożesz też wkleić tekst kodu QR poniżej. Jego adres musi być {mac}.",
-        "data": {
-          "qr_code": "Tekst kodu QR (opcjonalnie)"
+        "description": "[Otwórz stronę skanowania]({scan_url}), aby zeskanować kod QR z etykiety modułu {name} aparatem (w aplikacji Home Assistant: jej własnym skanerem) lub ze zdjęcia. Przełącznik zostanie dodany, gdy kod zostanie zaakceptowany.",
+        "menu_options": {
+          "qr_text": "Zamiast tego wpisz tekst kodu QR",
+          "bluetooth_method": "Wstecz"
         }
       },
       "commissioning": {
@@ -34,6 +35,14 @@
       "bluetooth_confirm": {
         "title": "Potwierdź urządzenie EnOcean BLE",
         "description": "Przełącznik EnOcean o adresie {mac} został pomyślnie skonfigurowany.\n\n⚠️ Naciśnij inny przycisk, aby wyłączyć tryb commissioning, a następnie kliknij Prześlij."
+      },
+      "commissioning_retry": {
+        "title": "Uruchomienie nie powiodło się",
+        "description": "Nie odebrano prawidłowego telegramu uruchomienia z {name}. Spróbuj ponownie lub wróć i dodaj go za pomocą kodu QR z etykiety modułu. Jeśli nadal się nie udaje, najpierw przeczytaj w dokumentacji uwagę o przywracaniu ustawień fabrycznych.",
+        "menu_options": {
+          "commissioning": "Spróbuj ponownie",
+          "bluetooth_method": "Wróć do metod"
+        }
       }
     },
     "progress": {

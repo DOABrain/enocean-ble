@@ -17,14 +17,15 @@
           "qr_code": "Text QR kódu"
         },
         "data_description": {
-          "qr_code": "Příklad: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215"
+          "qr_code": "Příklad: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215\nPonechte prázdné a odešlete pro návrat k metodám."
         }
       },
       "qr_scan": {
         "title": "Naskenovat QR kód",
-        "description": "[Otevřete stránku skenování]({scan_url}) a naskenujte QR kód ze štítku modulu {name} fotoaparátem (v aplikaci Home Assistant: jejím vlastním skenerem) nebo z fotografie. Spínač se přidá, jakmile je kód přijat.\n\nText QR kódu můžete také vložit níže. Adresa musí být {mac}.",
-        "data": {
-          "qr_code": "Text QR kódu (volitelné)"
+        "description": "[Otevřete stránku skenování]({scan_url}) a naskenujte QR kód ze štítku modulu {name} fotoaparátem (v aplikaci Home Assistant: jejím vlastním skenerem) nebo z fotografie. Spínač se přidá, jakmile je kód přijat.",
+        "menu_options": {
+          "qr_text": "Místo toho zadat text QR kódu",
+          "bluetooth_method": "Zpět"
         }
       },
       "commissioning": {
@@ -34,6 +35,14 @@
       "bluetooth_confirm": {
         "title": "Potvrdit zařízení EnOcean BLE",
         "description": "Přepínač EnOcean s adresou {mac} byl úspěšně uveden do provozu.\n\n⚠️ Stiskněte jiné tlačítko pro vypnutí režimu commissioning a poté klikněte na Odeslat."
+      },
+      "commissioning_retry": {
+        "title": "Uvedení do provozu se nezdařilo",
+        "description": "Od {name} nebyl přijat žádný platný telegram pro uvedení do provozu. Zkuste to znovu, nebo se vraťte a přidejte jej pomocí QR kódu na štítku modulu. Pokud to stále selhává, přečtěte si nejprve upozornění k obnovení továrního nastavení v dokumentaci.",
+        "menu_options": {
+          "commissioning": "Zkusit znovu",
+          "bluetooth_method": "Zpět k metodám"
+        }
       }
     },
     "progress": {

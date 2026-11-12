@@ -17,14 +17,15 @@
           "qr_code": "Texto do código QR"
         },
         "data_description": {
-          "qr_code": "Exemplo: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215"
+          "qr_code": "Exemplo: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215\nDeixe vazio e envie para voltar aos métodos."
         }
       },
       "qr_scan": {
         "title": "Escanear o código QR",
-        "description": "[Abra a página de escaneamento]({scan_url}) para escanear o código QR da etiqueta do módulo de {name} com a câmera (no app Home Assistant: o próprio leitor) ou a partir de uma foto. O interruptor é adicionado assim que o código for aceito.\n\nVocê também pode colar o texto do código QR abaixo. O endereço deve ser {mac}.",
-        "data": {
-          "qr_code": "Texto do código QR (opcional)"
+        "description": "[Abra a página de escaneamento]({scan_url}) para escanear o código QR da etiqueta do módulo de {name} com a câmera (no app Home Assistant: o próprio leitor) ou a partir de uma foto. O interruptor é adicionado assim que o código for aceito.",
+        "menu_options": {
+          "qr_text": "Inserir o texto do código QR em vez disso",
+          "bluetooth_method": "Voltar"
         }
       },
       "commissioning": {
@@ -34,6 +35,14 @@
       "bluetooth_confirm": {
         "title": "Confirmar dispositivo EnOcean BLE",
         "description": "O interruptor EnOcean com endereço {mac} foi comissionado com sucesso.\n\n⚠️ Pressione outro botão para desativar o modo de comissionamento e depois clique em Enviar."
+      },
+      "commissioning_retry": {
+        "title": "O comissionamento não teve sucesso",
+        "description": "Nenhum telegrama de comissionamento válido foi recebido de {name}. Tente novamente, ou volte e adicione-o pelo código QR da etiqueta do módulo. Se continuar falhando, leia primeiro o aviso sobre a redefinição de fábrica na documentação.",
+        "menu_options": {
+          "commissioning": "Tentar novamente",
+          "bluetooth_method": "Voltar aos métodos"
+        }
       }
     },
     "progress": {

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from types import SimpleNamespace
 from typing import Any
 from unittest.mock import AsyncMock, patch
@@ -107,14 +108,16 @@ async def test_qr_text_without_any_telegram(hass: Any) -> None:
     assert result["errors"] == {"base": "qr_no_telegram"}
 
 
-async def test_qr_scan_shows_form_with_in_app_scan_link(hass: Any) -> None:
+async def test_qr_scan_menu_with_in_app_link_text_and_back(hass: Any) -> None:
     flow, _ = await _discovered_flow(hass, [_service_info()])
     register = AsyncMock()
     with patch.object(config_flow_module, "async_register_scan_panel", register):
         result = await flow.async_step_qr_scan()
     register.assert_awaited_once()
-    assert result["type"] == FlowResultType.FORM
+    assert result["type"] == FlowResultType.MENU
     assert result["step_id"] == "qr_scan"
+    # Enter the text instead, or back to the method menu.
+    assert result["menu_options"] == ["qr_text", "bluetooth_method"]
     placeholders = result["description_placeholders"]
     assert placeholders is not None
     # Relative link: it opens inside the frontend (and inside the HA app), never a new window.
@@ -122,33 +125,25 @@ async def test_qr_scan_shows_form_with_in_app_scan_link(hass: Any) -> None:
     assert placeholders["mac"] == MAC
 
 
-async def test_qr_scan_submitted_code_creates_entry(hass: Any) -> None:
-    """The scan page (or the text field of the step) submits the code to qr_scan."""
+async def test_qr_text_empty_goes_back_to_method_menu(hass: Any) -> None:
     flow, _ = await _discovered_flow(hass, [_service_info()])
-    with patch.object(config_flow_module, "async_discovered_service_info", return_value=[_service_info()]):
-        result = await flow.async_step_qr_scan({"qr_code": QR})
-    assert result["type"] == FlowResultType.CREATE_ENTRY
-    assert result["data"] == {CONF_MAC_ADDRESS: MAC, CONF_SECURITY_KEY: KEY}
+    for empty in ({}, {"qr_code": ""}, {"qr_code": "   "}):
+        result = await flow.async_step_qr_text(empty)
+        assert result["type"] == FlowResultType.MENU
+        assert result["step_id"] == "bluetooth_method"
 
 
-@pytest.mark.parametrize(
-    ("raw", "error"),
-    [
-        ("not a qr code", "invalid_qr"),
-        (OTHER_SWITCH_QR, "qr_mac_mismatch"),
-        (OTHER_KEY_QR, "qr_key_invalid"),
-    ],
-)
-async def test_qr_scan_errors_stay_on_scan_step(hass: Any, raw: str, error: str) -> None:
+async def test_commissioning_timeout_offers_retry_or_back(hass: Any) -> None:
     flow, _ = await _discovered_flow(hass, [_service_info()])
-    with (
-        patch.object(config_flow_module, "async_discovered_service_info", return_value=[_service_info()]),
-        patch.object(config_flow_module, "async_register_scan_panel", AsyncMock()),
-    ):
-        result = await flow.async_step_qr_scan({"qr_code": raw})
-    assert result["type"] == FlowResultType.FORM
-    assert result["step_id"] == "qr_scan"
-    assert result["errors"] == {"base": error}
+    failed: asyncio.Future[None] = hass.loop.create_future()
+    failed.set_exception(TimeoutError())
+    flow._stage_task = failed  # type: ignore[assignment]
+    result = await flow.async_step_commissioning()
+    assert result["type"] == FlowResultType.SHOW_PROGRESS_DONE
+    assert result["step_id"] == "commissioning_retry"
+    result = await flow.async_step_commissioning_retry()
+    assert result["type"] == FlowResultType.MENU
+    assert result["menu_options"] == ["commissioning", "bluetooth_method"]
 
 
 def test_device_payloads_filters_by_address() -> None:

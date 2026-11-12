@@ -17,14 +17,15 @@
           "qr_code": "Testo del codice QR"
         },
         "data_description": {
-          "qr_code": "Esempio: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215"
+          "qr_code": "Esempio: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215\nLascia vuoto e invia per tornare ai metodi."
         }
       },
       "qr_scan": {
         "title": "Scansiona il codice QR",
-        "description": "[Apri la pagina di scansione]({scan_url}) per scansionare il codice QR sull'etichetta del modulo di {name} con la fotocamera (nell'app Home Assistant: il suo scanner) o da una foto. L'interruttore viene aggiunto appena il codice è accettato.\n\nPuoi anche incollare il testo del codice QR qui sotto. L'indirizzo deve essere {mac}.",
-        "data": {
-          "qr_code": "Testo del codice QR (facoltativo)"
+        "description": "[Apri la pagina di scansione]({scan_url}) per scansionare il codice QR sull'etichetta del modulo di {name} con la fotocamera (nell'app Home Assistant: il suo scanner) o da una foto. L'interruttore viene aggiunto appena il codice è accettato.",
+        "menu_options": {
+          "qr_text": "Inserisci invece il testo del codice QR",
+          "bluetooth_method": "Indietro"
         }
       },
       "commissioning": {
@@ -34,6 +35,14 @@
       "bluetooth_confirm": {
         "title": "Conferma dispositivo EnOcean BLE",
         "description": "Lo switch EnOcean con indirizzo {mac} è stato commissionato con successo.\n\n⚠️ Premi un altro pulsante per disattivare la modalità di commissioning, poi fai clic su Invia."
+      },
+      "commissioning_retry": {
+        "title": "La messa in servizio non è riuscita",
+        "description": "Non è stato ricevuto alcun telegramma di messa in servizio valido da {name}. Riprova, oppure torna indietro e aggiungilo con il codice QR sull'etichetta del modulo. Se continua a fallire, leggi prima l'avvertenza sul ripristino di fabbrica nella documentazione.",
+        "menu_options": {
+          "commissioning": "Riprova",
+          "bluetooth_method": "Torna ai metodi"
+        }
       }
     },
     "progress": {

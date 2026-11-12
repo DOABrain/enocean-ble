@@ -40,6 +40,10 @@ FLOW_TRACE_TAG = "FLOW_TRACE_V3"
 COMMISSIONING_TIMEOUT = 120.0
 METHOD_MENU_STEP_ID = "bluetooth_method"
 METHOD_MENU_OPTIONS = ["qr_scan", "qr_text", "commissioning"]
+# "Back" everywhere = return to the method menu, i.e. restart adding the switch.
+SCAN_MENU_OPTIONS = ["qr_text", METHOD_MENU_STEP_ID]
+COMMISSIONING_RETRY_STEP_ID = "commissioning_retry"
+COMMISSIONING_RETRY_OPTIONS = ["commissioning", METHOD_MENU_STEP_ID]
 CONF_QR_CODE = "qr_code"
 
 
@@ -170,11 +174,17 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def async_step_qr_text(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        """Add the switch from the QR code text, typed or pasted."""
+        """Add the switch from the QR code text, typed, pasted or sent by the scan page.
+
+        Submitting the field empty goes back to the method menu.
+        """
         errors: dict[str, str] = {}
         if user_input is not None:
+            raw = str(user_input.get(CONF_QR_CODE) or "").strip()
+            if not raw:
+                return await self.async_step_bluetooth_method()
             try:
-                onboarding = self._validate_qr(str(user_input.get(CONF_QR_CODE, "")))
+                onboarding = self._validate_qr(raw)
             except QrValidationError as err:
                 errors["base"] = err.code
                 self._log_qr_rejected(step="qr_text", code=err.code)
@@ -184,40 +194,38 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="qr_text",
             # HA 2026.x maps voluptuous onto probatio at runtime; only the type stubs differ.
-            data_schema=vol.Schema({vol.Required(CONF_QR_CODE): str}),  # type: ignore[arg-type,unused-ignore]
+            data_schema=vol.Schema({vol.Optional(CONF_QR_CODE): str}),  # type: ignore[arg-type,unused-ignore]
             errors=errors,
             description_placeholders=self._name_placeholders(),
         )
 
     async def async_step_qr_scan(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        """Point to the in-app scan page; the page (or the user) submits the code here.
+        """Point to the in-app scan page, with "enter the text" and "back" options.
 
         The scan page is a hidden, admin-only Home Assistant panel. A link in this
         step opens it inside the frontend (in the HA app: inside the app, with its
         native scanner). A flow continued from a discovery survives the dialog
-        closing, so the page can submit the scanned code to this step through the
-        authenticated config flow API. The text field is the fallback on the spot.
+        closing, so the page moves the flow to qr_text and submits the scanned code
+        there through the authenticated config flow API.
         """
-        errors: dict[str, str] = {}
-        if user_input is not None:
-            try:
-                onboarding = self._validate_qr(str(user_input.get(CONF_QR_CODE, "")))
-            except QrValidationError as err:
-                errors["base"] = err.code
-                self._log_qr_rejected(step="qr_scan", code=err.code)
-            else:
-                return self._create_entry_from_qr(onboarding, method="scan")
-
         await async_register_scan_panel(self.hass)
-        return self.async_show_form(
+        return self.async_show_menu(
             step_id="qr_scan",
-            # HA 2026.x maps voluptuous onto probatio at runtime; only the type stubs differ.
-            data_schema=vol.Schema({vol.Optional(CONF_QR_CODE): str}),  # type: ignore[arg-type,unused-ignore]
-            errors=errors,
+            menu_options=SCAN_MENU_OPTIONS,
             description_placeholders={
                 **self._name_placeholders(),
                 "scan_url": scan_panel_path(self.flow_id),
             },
+        )
+
+    async def async_step_commissioning_retry(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """After a failed commissioning attempt: try again, or back to the method menu."""
+        return self.async_show_menu(
+            step_id=COMMISSIONING_RETRY_STEP_ID,
+            menu_options=COMMISSIONING_RETRY_OPTIONS,
+            description_placeholders=self._name_placeholders(),
         )
 
     def _validate_qr(self, raw: str) -> OnboardingData:
@@ -430,11 +438,8 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 error,
                 self._pending_mac,
             )
-            return self.async_show_form(
-                step_id=step_id,
-                errors={"base": error},
-                description_placeholders={"name": self._pending_title or self._pending_mac or DOMAIN},
-            )
+            # Offer "try again" or "back to the methods" instead of a retry-only form.
+            return self.async_show_progress_done(next_step_id=COMMISSIONING_RETRY_STEP_ID)
 
         self._trace_event(
             "FLOW_STAGE_EXIT",

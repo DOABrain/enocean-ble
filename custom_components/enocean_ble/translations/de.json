@@ -17,14 +17,15 @@
           "qr_code": "Text des QR-Codes"
         },
         "data_description": {
-          "qr_code": "Beispiel: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215"
+          "qr_code": "Beispiel: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215\nLeer lassen und absenden, um zu den Methoden zurückzukehren."
         }
       },
       "qr_scan": {
         "title": "QR-Code scannen",
-        "description": "[Scan-Seite öffnen]({scan_url}), um den QR-Code auf dem Modulaufkleber von {name} mit der Kamera (in der Home Assistant App: deren eigener Scanner) oder von einem Foto zu scannen. Der Schalter wird hinzugefügt, sobald der Code akzeptiert ist.\n\nDu kannst den Text des QR-Codes auch unten einfügen. Die Adresse muss {mac} sein.",
-        "data": {
-          "qr_code": "Text des QR-Codes (optional)"
+        "description": "[Scan-Seite öffnen]({scan_url}), um den QR-Code auf dem Modulaufkleber von {name} mit der Kamera (in der Home Assistant App: deren eigener Scanner) oder von einem Foto zu scannen. Der Schalter wird hinzugefügt, sobald der Code akzeptiert ist.",
+        "menu_options": {
+          "qr_text": "Stattdessen den Text des QR-Codes eingeben",
+          "bluetooth_method": "Zurück"
         }
       },
       "commissioning": {
@@ -34,6 +35,14 @@
       "bluetooth_confirm": {
         "title": "EnOcean BLE-Gerät bestätigen",
         "description": "EnOcean-Schalter mit Adresse {mac} wurde erfolgreich kommissioniert.\n\n⚠️ Drücken Sie eine andere Taste, um den Kommissionierungsmodus zu beenden, und klicken Sie dann auf Senden."
+      },
+      "commissioning_retry": {
+        "title": "Inbetriebnahme nicht erfolgreich",
+        "description": "Von {name} wurde kein gültiges Inbetriebnahme-Telegramm empfangen. Versuche es erneut oder gehe zurück und füge ihn über den QR-Code auf dem Modulaufkleber hinzu. Schlägt die Inbetriebnahme weiter fehl, lies zuerst den Hinweis zum Werksreset in der Dokumentation.",
+        "menu_options": {
+          "commissioning": "Erneut versuchen",
+          "bluetooth_method": "Zurück zu den Methoden"
+        }
       }
     },
     "progress": {
