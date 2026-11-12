@@ -75,6 +75,11 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._stage_stats: dict[str, dict[str, Any]] = {}
         # Payload that triggered the discovery, kept to validate a QR code key.
         self._discovery_payload: bytes | None = None
+        # Method steps already shown since the method menu. Reopening the dialog
+        # (closing it with X, then opening the discovered switch again) re-runs the
+        # current step without input; a step shown a second time that way restarts
+        # adding the switch from the method menu.
+        self._shown_steps: set[str] = set()
 
     def async_remove(self) -> None:
         """Cleanup when flow is aborted/cancelled/finished by HA."""
@@ -167,6 +172,7 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Let the user pick how to add the discovered switch."""
+        self._shown_steps.clear()
         return self.async_show_menu(
             step_id=METHOD_MENU_STEP_ID,
             menu_options=METHOD_MENU_OPTIONS,
@@ -178,6 +184,8 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         Submitting the field empty goes back to the method menu.
         """
+        if user_input is None and self._reopened("qr_text"):
+            return await self.async_step_bluetooth_method()
         errors: dict[str, str] = {}
         if user_input is not None:
             raw = str(user_input.get(CONF_QR_CODE) or "").strip()
@@ -208,6 +216,8 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         closing, so the page moves the flow to qr_text and submits the scanned code
         there through the authenticated config flow API.
         """
+        if self._reopened("qr_scan"):
+            return await self.async_step_bluetooth_method()
         await async_register_scan_panel(self.hass)
         return self.async_show_menu(
             step_id="qr_scan",
@@ -222,6 +232,8 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """After a failed commissioning attempt: try again, or back to the method menu."""
+        if self._reopened(COMMISSIONING_RETRY_STEP_ID):
+            return await self.async_step_bluetooth_method()
         return self.async_show_menu(
             step_id=COMMISSIONING_RETRY_STEP_ID,
             menu_options=COMMISSIONING_RETRY_OPTIONS,
@@ -274,12 +286,21 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             code,
         )
 
+    def _reopened(self, step_id: str) -> bool:
+        """True if ``step_id`` is shown again without input (dialog reopened)."""
+        if step_id in self._shown_steps:
+            return True
+        self._shown_steps.add(step_id)
+        return False
+
     def _name_placeholders(self) -> dict[str, str]:
         mac = self._pending_mac or ""
         return {"name": self._pending_title or mac or DOMAIN, "mac": mac}
 
     async def async_step_commissioning(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Show commissioning instructions and wait for L26 telegram."""
+        # A new attempt: its retry menu must show again rather than count as reopened.
+        self._shown_steps.discard(COMMISSIONING_RETRY_STEP_ID)
         # If the commissioning telegram is already known (ex: cached discovery payload),
         # continue to the explicit user confirmation step.
         if self._pending_security_key is not None and self._stage_task is None:

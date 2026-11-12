@@ -27,6 +27,11 @@ Bluetooth discovery (press any button on it).
 - Validates the text with `qr_onboarding.validate_qr_for_device()`, then creates the entry.
 
 "Back" in every branch returns to the `bluetooth_method` menu, i.e. restarts adding the switch.
+Closing the dialog (X) does the same: a flow continued from a discovery is not deleted, and
+reopening it re-runs the current step without input (`GET` on the flow). `qr_scan`, `qr_text` and
+`commissioning_retry` treat being shown a second time that way as "reopened" and return to the
+method menu (`_reopened()`). A running `commissioning` progress step cannot be reset; its retry
+menu comes when it ends.
 
 `qr_text` (form, field `qr_code`)
 - Submitting the field empty goes back to `bluetooth_method`.

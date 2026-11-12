@@ -133,6 +133,24 @@ async def test_qr_text_empty_goes_back_to_method_menu(hass: Any) -> None:
         assert result["step_id"] == "bluetooth_method"
 
 
+async def test_reopening_the_dialog_restarts_at_the_method_menu(hass: Any) -> None:
+    """Closing the dialog with X and reopening re-runs the current step without input."""
+    flow, _ = await _discovered_flow(hass, [_service_info()])
+    with patch.object(config_flow_module, "async_register_scan_panel", AsyncMock()):
+        # Picked "scan", then reopened: back at the method menu.
+        assert (await flow.async_step_qr_scan())["step_id"] == "qr_scan"
+        assert (await flow.async_step_qr_scan())["step_id"] == "bluetooth_method"
+        # Picked "text" (fresh after the menu), a failed attempt keeps the form...
+        assert (await flow.async_step_qr_text())["step_id"] == "qr_text"
+        result = await flow.async_step_qr_text({"qr_code": "not a qr code"})
+        assert result["step_id"] == "qr_text"
+        assert result["errors"] == {"base": "invalid_qr"}
+        # ...and reopening it restarts too.
+        assert (await flow.async_step_qr_text())["step_id"] == "bluetooth_method"
+        # After the menu, each method shows normally again.
+        assert (await flow.async_step_qr_scan())["step_id"] == "qr_scan"
+
+
 async def test_commissioning_timeout_offers_retry_or_back(hass: Any) -> None:
     flow, _ = await _discovered_flow(hass, [_service_info()])
     failed: asyncio.Future[None] = hass.loop.create_future()
@@ -144,6 +162,8 @@ async def test_commissioning_timeout_offers_retry_or_back(hass: Any) -> None:
     result = await flow.async_step_commissioning_retry()
     assert result["type"] == FlowResultType.MENU
     assert result["menu_options"] == ["commissioning", "bluetooth_method"]
+    # Reopened after the failure: back to the method menu.
+    assert (await flow.async_step_commissioning_retry())["step_id"] == "bluetooth_method"
 
 
 def test_device_payloads_filters_by_address() -> None:
