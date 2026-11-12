@@ -23,9 +23,14 @@ from .const import (
     ENOCEAN_MANUFACTURER_ID,
     STATUS_BIT_ENERGY_BOW,
 )
+from .panel import async_register_scan_panel, scan_panel_path
 from .parser import OnboardingData, parse_commissioning_telegram
-from .qr_onboarding import ERROR_NO_TELEGRAM, QrValidationError, validate_qr_for_device
-from .qr_scan import CONF_QR_CODE, async_scan_url, async_setup_scan, device_payloads
+from .qr_onboarding import (
+    ERROR_NO_TELEGRAM,
+    QrValidationError,
+    device_payloads,
+    validate_qr_for_device,
+)
 
 _LOGGER = logging.getLogger(__name__)
 FLOW_TAG = "[ENOCEAN_FLOW]"
@@ -35,7 +40,7 @@ FLOW_TRACE_TAG = "FLOW_TRACE_V3"
 COMMISSIONING_TIMEOUT = 120.0
 METHOD_MENU_STEP_ID = "bluetooth_method"
 METHOD_MENU_OPTIONS = ["qr_scan", "qr_text", "commissioning"]
-ERROR_SCAN_HTTPS_REQUIRED = "scan_https_required"
+CONF_QR_CODE = "qr_code"
 
 
 class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -66,8 +71,6 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._stage_stats: dict[str, dict[str, Any]] = {}
         # Payload that triggered the discovery, kept to validate a QR code key.
         self._discovery_payload: bytes | None = None
-        # Error to show on the QR text form when it is opened after a failed scan.
-        self._qr_error: str | None = None
 
     def async_remove(self) -> None:
         """Cleanup when flow is aborted/cancelled/finished by HA."""
@@ -169,9 +172,6 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_qr_text(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Add the switch from the QR code text, typed or pasted."""
         errors: dict[str, str] = {}
-        if self._qr_error is not None:
-            errors["base"] = self._qr_error
-            self._qr_error = None
         if user_input is not None:
             try:
                 onboarding = self._validate_qr(str(user_input.get(CONF_QR_CODE, "")))
@@ -190,42 +190,34 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def async_step_qr_scan(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        """Open the scan page (external step); it posts the QR code back here."""
+        """Point to the in-app scan page; the page (or the user) submits the code here.
+
+        The scan page is a hidden, admin-only Home Assistant panel. A link in this
+        step opens it inside the frontend (in the HA app: inside the app, with its
+        native scanner). A flow continued from a discovery survives the dialog
+        closing, so the page can submit the scanned code to this step through the
+        authenticated config flow API. The text field is the fallback on the spot.
+        """
+        errors: dict[str, str] = {}
         if user_input is not None:
             try:
                 onboarding = self._validate_qr(str(user_input.get(CONF_QR_CODE, "")))
             except QrValidationError as err:
-                # The page validates before posting, so this is a race (e.g. the
-                # telegram cache changed): fall back on the text form with the error.
-                self._qr_error = err.code
+                errors["base"] = err.code
                 self._log_qr_rejected(step="qr_scan", code=err.code)
-                return self.async_external_step_done(next_step_id="qr_text")
-            self._pending_security_key = onboarding.security_key_hex
-            return self.async_external_step_done(next_step_id="qr_scan_done")
+            else:
+                return self._create_entry_from_qr(onboarding, method="scan")
 
-        await async_setup_scan(self.hass)
-        url = async_scan_url(self.hass, self.flow_id)
-        if url is None:
-            self._qr_error = ERROR_SCAN_HTTPS_REQUIRED
-            return await self.async_step_qr_text()
-        return self.async_external_step(
+        await async_register_scan_panel(self.hass)
+        return self.async_show_form(
             step_id="qr_scan",
-            url=url,
-            description_placeholders={**self._name_placeholders(), "url": url},
-        )
-
-    async def async_step_qr_scan_done(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
-        """Create the entry once the scanned QR code has been validated."""
-        if self._pending_mac is None or self._pending_security_key is None:
-            return self.async_abort(reason="no_bluetooth_discovery")
-        return self._create_entry_from_qr(
-            OnboardingData(
-                mac_address=self._pending_mac,
-                security_key_hex=self._pending_security_key,
-            ),
-            method="scan",
+            # HA 2026.x maps voluptuous onto probatio at runtime; only the type stubs differ.
+            data_schema=vol.Schema({vol.Optional(CONF_QR_CODE): str}),  # type: ignore[arg-type,unused-ignore]
+            errors=errors,
+            description_placeholders={
+                **self._name_placeholders(),
+                "scan_url": scan_panel_path(self.flow_id),
+            },
         )
 
     def _validate_qr(self, raw: str) -> OnboardingData:

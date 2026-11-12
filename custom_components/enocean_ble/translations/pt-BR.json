@@ -22,7 +22,10 @@
       },
       "qr_scan": {
         "title": "Escanear o código QR",
-        "description": "Abra a página de escaneamento e aponte para o código QR da etiqueta do módulo de {name}. Em um computador, a página mostra um código QR para abri-la no celular. Esta janela continua sozinha assim que o código é aceito."
+        "description": "[Abra a página de escaneamento]({scan_url}) para escanear o código QR da etiqueta do módulo de {name} com a câmera (no app Home Assistant: o próprio leitor) ou a partir de uma foto. O interruptor é adicionado assim que o código for aceito.\n\nVocê também pode colar o texto do código QR abaixo. O endereço deve ser {mac}.",
+        "data": {
+          "qr_code": "Texto do código QR (opcional)"
+        }
       },
       "commissioning": {
         "title": "Auto-comissionamento EnOcean BLE",
@@ -48,8 +51,7 @@
       "invalid_qr": "Nenhum endereço de interruptor EnOcean (30SE215…) e chave de segurança de 32 caracteres (+Z…) foram encontrados neste texto.",
       "qr_mac_mismatch": "Este código QR pertence a outro interruptor, diferente do descoberto.",
       "qr_key_invalid": "A chave deste código QR não corresponde aos telegramas recebidos deste interruptor. Ele pode ter sido reconfigurado (por exemplo, por outro sistema).",
-      "qr_no_telegram": "Nenhum telegrama foi recebido deste interruptor ainda. Pressione um dos botões e tente novamente.",
-      "scan_https_required": "O escaneamento com a câmera exige que o Home Assistant esteja acessível por HTTPS. Digite o texto do código QR em vez disso."
+      "qr_no_telegram": "Nenhum telegrama foi recebido deste interruptor ainda. Pressione um dos botões e tente novamente."
     }
   }
 }

@@ -22,7 +22,10 @@
       },
       "qr_scan": {
         "title": "Zeskanuj kod QR",
-        "description": "Otwórz stronę skanowania i skieruj aparat na kod QR na etykiecie modułu {name}. Na komputerze strona wyświetla kod QR, aby otworzyć ją w telefonie. To okno przejdzie dalej samo, gdy kod zostanie zaakceptowany."
+        "description": "[Otwórz stronę skanowania]({scan_url}), aby zeskanować kod QR z etykiety modułu {name} aparatem (w aplikacji Home Assistant: jej własnym skanerem) lub ze zdjęcia. Przełącznik zostanie dodany, gdy kod zostanie zaakceptowany.\n\nMożesz też wkleić tekst kodu QR poniżej. Jego adres musi być {mac}.",
+        "data": {
+          "qr_code": "Tekst kodu QR (opcjonalnie)"
+        }
       },
       "commissioning": {
         "title": "Automatyczne commissioning EnOcean BLE",
@@ -48,8 +51,7 @@
       "invalid_qr": "W tym tekście nie znaleziono adresu przełącznika EnOcean (30SE215…) ani 32-znakowego klucza bezpieczeństwa (+Z…).",
       "qr_mac_mismatch": "Ten kod QR należy do innego przełącznika niż wykryty.",
       "qr_key_invalid": "Klucz w tym kodzie QR nie pasuje do telegramów odebranych z tego przełącznika. Mógł zostać ponownie skonfigurowany (na przykład przez inny system).",
-      "qr_no_telegram": "Nie odebrano jeszcze żadnego telegramu z tego przełącznika. Naciśnij jeden z jego przycisków i spróbuj ponownie.",
-      "scan_https_required": "Skanowanie aparatem wymaga dostępu do Home Assistant przez HTTPS. Zamiast tego wpisz tekst kodu QR."
+      "qr_no_telegram": "Nie odebrano jeszcze żadnego telegramu z tego przełącznika. Naciśnij jeden z jego przycisków i spróbuj ponownie."
     }
   }
 }

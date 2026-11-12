@@ -22,7 +22,10 @@
       },
       "qr_scan": {
         "title": "Scan the QR code",
-        "description": "Open the scan page and aim at the QR code on the module label of {name}. On a computer, the page shows a QR code to open it on your phone. This dialog continues by itself once the code is accepted."
+        "description": "[Open the scan page]({scan_url}) to scan the QR code on the module label of {name} with the camera (in the Home Assistant app: its own scanner) or from a photo. The switch is added as soon as the code is accepted.\n\nYou can also paste the QR code text below. Its address must be {mac}.",
+        "data": {
+          "qr_code": "QR code text (optional)"
+        }
       },
       "commissioning": {
         "title": "EnOcean BLE Auto-Commissioning",
@@ -48,8 +51,7 @@
       "invalid_commissioning": "A commissioning telegram was received but could not be validated. Try again. If this keeps failing, review the factory reset disclaimer in the documentation before resetting.",
       "qr_mac_mismatch": "This QR code belongs to another switch than the one that was discovered.",
       "qr_key_invalid": "The key in this QR code does not match the telegrams received from this switch. It may have been reconfigured (for example by another system).",
-      "qr_no_telegram": "No telegram has been received from this switch yet. Press one of its buttons, then try again.",
-      "scan_https_required": "Scanning with the camera needs Home Assistant to be reachable over HTTPS. Enter the QR code text instead."
+      "qr_no_telegram": "No telegram has been received from this switch yet. Press one of its buttons, then try again."
     }
   }
 }

@@ -12,6 +12,13 @@ CONF_SECURITY_KEY = "security_key"
 ENOCEAN_MANUFACTURER_ID = 0x03DA
 ENOCEAN_MAC_PREFIX = "E2:15:"
 
+# Hidden (no sidebar entry), admin-only frontend page that scans a module label QR code
+# and hands it to a waiting config flow: /enocean-ble-scan?flow_id=<flow_id>
+SCAN_PANEL_URL_PATH = "enocean-ble-scan"
+SCAN_PANEL_ELEMENT = "enocean-ble-scan-panel"
+SCAN_PANEL_FILENAME = "enocean-ble-scan-panel.js"
+SCAN_PANEL_STATIC_URL = "/enocean_ble_static"
+
 EVENT_BUTTON_EVENT = "enocean_ble_button_event"
 # Backward compatibility with existing automations.
 EVENT_BUTTON_ACTION = "enocean_ble_button_action"

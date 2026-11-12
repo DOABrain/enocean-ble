@@ -22,7 +22,10 @@
       },
       "qr_scan": {
         "title": "Scanner le QR code",
-        "description": "Ouvrez la page de scan et visez le QR code de l'étiquette du module de {name}. Sur un ordinateur, la page affiche un QR code pour l'ouvrir sur votre téléphone. Cette fenêtre continue toute seule dès que le code est accepté."
+        "description": "[Ouvrir la page de scan]({scan_url}) pour scanner le QR code de l'étiquette du module de {name} avec la caméra (dans l'app Home Assistant : son propre scanner) ou depuis une photo. L'interrupteur est ajouté dès que le code est accepté.\n\nVous pouvez aussi coller le texte du QR code ci-dessous. Son adresse doit être {mac}.",
+        "data": {
+          "qr_code": "Texte du QR code (facultatif)"
+        }
       },
       "commissioning": {
         "title": "Auto-commissioning EnOcean BLE",
@@ -48,8 +51,7 @@
       "invalid_qr": "Aucune adresse de switch EnOcean (30SE215…) ni clé de sécurité de 32 caractères (+Z…) n'a été trouvée dans ce texte.",
       "qr_mac_mismatch": "Ce QR code correspond à un autre switch que celui qui a été découvert.",
       "qr_key_invalid": "La clé de ce QR code ne correspond pas aux télégrammes reçus de ce switch. Il a peut-être été reconfiguré (par exemple par un autre système).",
-      "qr_no_telegram": "Aucun télégramme n'a encore été reçu de ce switch. Appuyez sur un de ses boutons, puis réessayez.",
-      "scan_https_required": "Le scan par caméra nécessite que Home Assistant soit accessible en HTTPS. Saisissez plutôt le texte du QR code."
+      "qr_no_telegram": "Aucun télégramme n'a encore été reçu de ce switch. Appuyez sur un de ses boutons, puis réessayez."
     }
   }
 }

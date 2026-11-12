@@ -49,10 +49,17 @@ its security key, for example `30SE215…+Z…+30P…`. No button sequence is ne
 it the way to add OEM switches whose radio commissioning is disabled (for example Busch-Jaeger
 6716 UBT and Jung BLE switches).
 
-- **Scan:** a scan page opens. On a phone it uses the camera (it can also read a photo of the
-  label). On a computer it shows a QR code to open the page on your phone. Camera access needs
-  Home Assistant to be reached over **HTTPS**; without it, enter the text instead.
+- **Scan:** the step links to a scan page inside Home Assistant. In the Home Assistant app it
+  uses the app's own barcode scanner; in a browser it uses the camera, or reads a **photo** of the
+  label (taken with the camera or picked from the gallery). The switch is added as soon as the code
+  is accepted. Live camera access in a browser needs **HTTPS**; the app scanner, photos and pasting
+  work without it. The text field of the step is there as a fallback too.
 - **Text:** type or paste the QR code text (for example read with your phone's camera app).
+
+The scan page is a regular, admin-only Home Assistant page (no extra web endpoint, nothing
+reachable without logging in) and decodes QR codes with the browser's `BarcodeDetector` or the
+QR decoder Home Assistant's frontend already ships. You can also open it directly at
+`/enocean-ble-scan` to pick from the discovered switches, handy to add several in a row.
 
 Before the switch is added, the integration checks that:
 - the text is an EnOcean module QR code,
@@ -439,9 +446,8 @@ pytest -q
   parsing and the work on OEM switches whose radio commissioning is disabled
   (Busch-Jaeger, Jung), tested on real devices.
 - [hass-pronote](https://github.com/delphiki/hass-pronote) by [@delphiki](https://github.com/delphiki):
-  the QR code scan is inspired by its approach: scanning with the phone camera from a config flow
-  through an external step and a page served by the integration
-  ([delphiki/hass-pronote#229](https://github.com/delphiki/hass-pronote/pull/229)).
+  the QR code scan is inspired by its approach of scanning with the phone camera from a config
+  flow ([delphiki/hass-pronote#229](https://github.com/delphiki/hass-pronote/pull/229)).
 
 ## References
 

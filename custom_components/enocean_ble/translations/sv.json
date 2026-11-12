@@ -22,7 +22,10 @@
       },
       "qr_scan": {
         "title": "Skanna QR-koden",
-        "description": "Öppna skanningssidan och rikta kameran mot QR-koden på modulens etikett för {name}. På en dator visar sidan en QR-kod för att öppna den på telefonen. Den här dialogen fortsätter av sig själv när koden har godkänts."
+        "description": "[Öppna skanningssidan]({scan_url}) för att skanna QR-koden på modulens etikett för {name} med kameran (i Home Assistant-appen: dess egen skanner) eller från ett foto. Brytaren läggs till så snart koden godkänns.\n\nDu kan också klistra in QR-kodens text nedan. Adressen måste vara {mac}.",
+        "data": {
+          "qr_code": "QR-kodens text (valfritt)"
+        }
       },
       "commissioning": {
         "title": "EnOcean BLE automatisk provisionering",
@@ -48,8 +51,7 @@
       "invalid_qr": "Ingen EnOcean-brytaradress (30SE215…) och säkerhetsnyckel på 32 tecken (+Z…) hittades i den här texten.",
       "qr_mac_mismatch": "Den här QR-koden tillhör en annan brytare än den som upptäcktes.",
       "qr_key_invalid": "Nyckeln i den här QR-koden matchar inte de telegram som tagits emot från brytaren. Den kan ha konfigurerats om (till exempel av ett annat system).",
-      "qr_no_telegram": "Inget telegram har tagits emot från den här brytaren än. Tryck på en av dess knappar och försök igen.",
-      "scan_https_required": "Skanning med kameran kräver att Home Assistant nås via HTTPS. Ange QR-kodens text i stället."
+      "qr_no_telegram": "Inget telegram har tagits emot från den här brytaren än. Tryck på en av dess knappar och försök igen."
     }
   }
 }

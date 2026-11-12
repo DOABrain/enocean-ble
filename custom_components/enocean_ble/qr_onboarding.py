@@ -14,7 +14,9 @@ This module has no Home Assistant dependency so it can be unit tested on its own
 from __future__ import annotations
 
 from collections.abc import Iterable
+from typing import Any
 
+from .const import ENOCEAN_MANUFACTURER_ID
 from .parser import OnboardingData, parse_data_telegram, parse_qr_code
 
 COMMISSIONING_TELEGRAM_LENGTH = 26
@@ -25,6 +27,22 @@ ERROR_INVALID_QR = "invalid_qr"
 ERROR_MAC_MISMATCH = "qr_mac_mismatch"
 ERROR_KEY_INVALID = "qr_key_invalid"
 ERROR_NO_TELEGRAM = "qr_no_telegram"
+
+
+def device_payloads(service_infos: Iterable[Any], mac_address: str) -> list[bytes]:
+    """Return the EnOcean payloads currently known for ``mac_address``.
+
+    ``service_infos`` are Bluetooth service infos (address + manufacturer_data), e.g.
+    from ``homeassistant.components.bluetooth.async_discovered_service_info``.
+    """
+    payloads: list[bytes] = []
+    for info in service_infos:
+        if info.address.upper() != mac_address.upper():
+            continue
+        payload = info.manufacturer_data.get(ENOCEAN_MANUFACTURER_ID)
+        if payload is not None:
+            payloads.append(bytes(payload))
+    return payloads
 
 
 class QrValidationError(ValueError):

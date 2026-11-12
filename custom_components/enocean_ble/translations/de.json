@@ -22,7 +22,10 @@
       },
       "qr_scan": {
         "title": "QR-Code scannen",
-        "description": "Öffne die Scan-Seite und richte die Kamera auf den QR-Code auf dem Modul-Etikett von {name}. Auf einem Computer zeigt die Seite einen QR-Code an, um sie auf dem Smartphone zu öffnen. Dieser Dialog geht automatisch weiter, sobald der Code akzeptiert wurde."
+        "description": "[Scan-Seite öffnen]({scan_url}), um den QR-Code auf dem Modulaufkleber von {name} mit der Kamera (in der Home Assistant App: deren eigener Scanner) oder von einem Foto zu scannen. Der Schalter wird hinzugefügt, sobald der Code akzeptiert ist.\n\nDu kannst den Text des QR-Codes auch unten einfügen. Die Adresse muss {mac} sein.",
+        "data": {
+          "qr_code": "Text des QR-Codes (optional)"
+        }
       },
       "commissioning": {
         "title": "EnOcean BLE Auto-Kommissionierung",
@@ -48,8 +51,7 @@
       "invalid_qr": "In diesem Text wurden keine EnOcean-Schalteradresse (30SE215…) und kein 32-stelliger Sicherheitsschlüssel (+Z…) gefunden.",
       "qr_mac_mismatch": "Dieser QR-Code gehört zu einem anderen Schalter als dem erkannten.",
       "qr_key_invalid": "Der Schlüssel in diesem QR-Code passt nicht zu den Telegrammen dieses Schalters. Er wurde möglicherweise neu konfiguriert (z. B. von einem anderen System).",
-      "qr_no_telegram": "Von diesem Schalter wurde noch kein Telegramm empfangen. Drücke eine seiner Tasten und versuche es erneut.",
-      "scan_https_required": "Das Scannen mit der Kamera erfordert, dass Home Assistant über HTTPS erreichbar ist. Gib stattdessen den Text des QR-Codes ein."
+      "qr_no_telegram": "Von diesem Schalter wurde noch kein Telegramm empfangen. Drücke eine seiner Tasten und versuche es erneut."
     }
   }
 }

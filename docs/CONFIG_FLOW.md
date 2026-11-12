@@ -26,16 +26,21 @@ Bluetooth discovery (press any button on it).
 `qr_text` (form, field `qr_code`)
 - Validates the text with `qr_onboarding.validate_qr_for_device()`, then creates the entry.
 
-`qr_scan` (external step)
-- Opens the scan page `/api/enocean_ble/qr_scan/<flow_id>` (`qr_scan.py`,
-  `qr_scan_static/scan.html`). Needs an HTTPS URL; without one, falls back on `qr_text` with
-  error `scan_https_required`.
-- The page decodes the QR code with `BarcodeDetector`, else the embedded jsQR (Safari iOS), live
-  or from a photo. On a computer it shows its own URL as a QR code (embedded qrcode-generator).
-- The view (no auth, like an OAuth callback) only answers for an EnOcean BLE flow waiting on
-  `qr_scan` (else 404). It validates the QR code first and returns `400 {"code": …}` on error,
-  shown on the phone; a valid code is fed to the flow (`async_configure`).
-- `qr_scan` then ends with `external_step_done` -> `qr_scan_done`, which creates the entry.
+`qr_scan` (form, optional field `qr_code`)
+- Its description links to the scan page `/enocean-ble-scan?flow_id=<flow_id>` (relative link:
+  it opens inside the frontend, and inside the HA app, not in a new window). The page is a hidden,
+  admin-only frontend panel (`panel.py`, `frontend/enocean-ble-scan-panel.js`), registered once.
+- A flow continued from a discovery is not deleted when the dialog closes, so the page submits the
+  scanned code to this step with the standard, authenticated config flow API
+  (`POST /api/config/config_entries/flow/<flow_id>` `{"qr_code": …}`). From the menu step it first
+  selects `qr_scan`.
+- Reading the code, in order: the Companion app's native scanner (external bus `bar_code/scan`),
+  the live camera, a photo of the label, the text field. Camera frames and photos are decoded with
+  `BarcodeDetector`, else the decoder worker the HA frontend serves
+  (`/static/js/qr-scanner-worker.min.js`). No third-party code is bundled.
+- Validation is the same as `qr_text`; errors are returned on the `qr_scan` form and the page shows
+  them with the integration's translations (`config.error.<code>`).
+- Opened without `flow_id`, the page lists the EnOcean BLE flows in progress to pick one.
 
 Validation (`validate_qr_for_device`), each failure has its own error code:
 - `invalid_qr`: not a module label QR code (`30S<MAC>+Z<key>…`) nor free text with MAC + key.

@@ -22,7 +22,10 @@
       },
       "qr_scan": {
         "title": "Naskenovat QR kód",
-        "description": "Otevřete stránku pro skenování a namiřte na QR kód na štítku modulu {name}. Na počítači stránka zobrazí QR kód, abyste ji otevřeli v telefonu. Toto okno pokračuje samo, jakmile je kód přijat."
+        "description": "[Otevřete stránku skenování]({scan_url}) a naskenujte QR kód ze štítku modulu {name} fotoaparátem (v aplikaci Home Assistant: jejím vlastním skenerem) nebo z fotografie. Spínač se přidá, jakmile je kód přijat.\n\nText QR kódu můžete také vložit níže. Adresa musí být {mac}.",
+        "data": {
+          "qr_code": "Text QR kódu (volitelné)"
+        }
       },
       "commissioning": {
         "title": "Automatické uvedení EnOcean BLE do provozu",
@@ -48,8 +51,7 @@
       "invalid_qr": "V tomto textu nebyla nalezena adresa spínače EnOcean (30SE215…) ani 32znakový bezpečnostní klíč (+Z…).",
       "qr_mac_mismatch": "Tento QR kód patří jinému spínači, než který byl nalezen.",
       "qr_key_invalid": "Klíč v tomto QR kódu neodpovídá telegramům přijatým z tohoto spínače. Mohl být překonfigurován (například jiným systémem).",
-      "qr_no_telegram": "Z tohoto spínače zatím nebyl přijat žádný telegram. Stiskněte některé z jeho tlačítek a zkuste to znovu.",
-      "scan_https_required": "Skenování kamerou vyžaduje, aby byl Home Assistant dostupný přes HTTPS. Zadejte místo toho text QR kódu."
+      "qr_no_telegram": "Z tohoto spínače zatím nebyl přijat žádný telegram. Stiskněte některé z jeho tlačítek a zkuste to znovu."
     }
   }
 }

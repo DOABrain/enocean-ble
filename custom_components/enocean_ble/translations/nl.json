@@ -22,7 +22,10 @@
       },
       "qr_scan": {
         "title": "QR-code scannen",
-        "description": "Open de scanpagina en richt op de QR-code op het modulelabel van {name}. Op een computer toont de pagina een QR-code om haar op je telefoon te openen. Dit venster gaat vanzelf verder zodra de code is geaccepteerd."
+        "description": "[Open de scanpagina]({scan_url}) om de QR-code op het modulelabel van {name} te scannen met de camera (in de Home Assistant-app: de eigen scanner) of vanaf een foto. De schakelaar wordt toegevoegd zodra de code is geaccepteerd.\n\nJe kunt de tekst van de QR-code ook hieronder plakken. Het adres moet {mac} zijn.",
+        "data": {
+          "qr_code": "Tekst van de QR-code (optioneel)"
+        }
       },
       "commissioning": {
         "title": "EnOcean BLE auto-commissioning",
@@ -48,8 +51,7 @@
       "invalid_commissioning": "Er is een commissioning-telegram ontvangen, maar dit kon niet worden gevalideerd. Probeer opnieuw. Als dit blijft mislukken, lees dan eerst de resetdisclaimer in de documentatie.",
       "qr_mac_mismatch": "Deze QR-code hoort bij een andere schakelaar dan de ontdekte.",
       "qr_key_invalid": "De sleutel in deze QR-code past niet bij de telegrammen van deze schakelaar. Mogelijk is hij opnieuw geconfigureerd (bijvoorbeeld door een ander systeem).",
-      "qr_no_telegram": "Er is nog geen telegram van deze schakelaar ontvangen. Druk op een van de knoppen en probeer het opnieuw.",
-      "scan_https_required": "Scannen met de camera vereist dat Home Assistant via HTTPS bereikbaar is. Voer in plaats daarvan de tekst van de QR-code in."
+      "qr_no_telegram": "Er is nog geen telegram van deze schakelaar ontvangen. Druk op een van de knoppen en probeer het opnieuw."
     }
   }
 }

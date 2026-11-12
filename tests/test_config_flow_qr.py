@@ -7,7 +7,7 @@ from typing import Any
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from homeassistant.data_entry_flow import FlowResultType, UnknownFlow
+from homeassistant.data_entry_flow import FlowResultType
 
 from custom_components.enocean_ble import config_flow as config_flow_module
 from custom_components.enocean_ble.config_flow import EnOceanBleConfigFlow
@@ -17,7 +17,7 @@ from custom_components.enocean_ble.const import (
     DOMAIN,
     ENOCEAN_MANUFACTURER_ID,
 )
-from custom_components.enocean_ble.qr_scan import _waiting_flow_mac, device_payloads
+from custom_components.enocean_ble.qr_onboarding import device_payloads
 
 # PTM 215B User Manual v2.2, Appendix C.3.1: address, key and a real data telegram.
 MAC = "E2:15:00:00:19:B8"
@@ -107,47 +107,48 @@ async def test_qr_text_without_any_telegram(hass: Any) -> None:
     assert result["errors"] == {"base": "qr_no_telegram"}
 
 
-async def test_qr_scan_without_https_falls_back_on_text(hass: Any) -> None:
+async def test_qr_scan_shows_form_with_in_app_scan_link(hass: Any) -> None:
     flow, _ = await _discovered_flow(hass, [_service_info()])
-    with (
-        patch.object(config_flow_module, "async_setup_scan", AsyncMock()),
-        patch.object(config_flow_module, "async_scan_url", return_value=None),
-    ):
+    register = AsyncMock()
+    with patch.object(config_flow_module, "async_register_scan_panel", register):
         result = await flow.async_step_qr_scan()
+    register.assert_awaited_once()
     assert result["type"] == FlowResultType.FORM
-    assert result["step_id"] == "qr_text"
-    assert result["errors"] == {"base": "scan_https_required"}
+    assert result["step_id"] == "qr_scan"
+    placeholders = result["description_placeholders"]
+    assert placeholders is not None
+    # Relative link: it opens inside the frontend (and inside the HA app), never a new window.
+    assert placeholders["scan_url"] == "/enocean-ble-scan?flow_id=test-flow"
+    assert placeholders["mac"] == MAC
 
 
-async def test_qr_scan_external_step_then_entry(hass: Any) -> None:
+async def test_qr_scan_submitted_code_creates_entry(hass: Any) -> None:
+    """The scan page (or the text field of the step) submits the code to qr_scan."""
     flow, _ = await _discovered_flow(hass, [_service_info()])
-    url = "https://ha.example/api/enocean_ble/qr_scan/test-flow"
-    with (
-        patch.object(config_flow_module, "async_setup_scan", AsyncMock()),
-        patch.object(config_flow_module, "async_scan_url", return_value=url),
-    ):
-        result = await flow.async_step_qr_scan()
-    assert result["type"] == FlowResultType.EXTERNAL_STEP
-    assert result["url"] == url
-
     with patch.object(config_flow_module, "async_discovered_service_info", return_value=[_service_info()]):
         result = await flow.async_step_qr_scan({"qr_code": QR})
-    assert result["type"] == FlowResultType.EXTERNAL_STEP_DONE
-    assert result["step_id"] == "qr_scan_done"
-
-    result = await flow.async_step_qr_scan_done()
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["data"] == {CONF_MAC_ADDRESS: MAC, CONF_SECURITY_KEY: KEY}
 
 
-async def test_qr_scan_invalid_result_falls_back_on_text(hass: Any) -> None:
+@pytest.mark.parametrize(
+    ("raw", "error"),
+    [
+        ("not a qr code", "invalid_qr"),
+        (OTHER_SWITCH_QR, "qr_mac_mismatch"),
+        (OTHER_KEY_QR, "qr_key_invalid"),
+    ],
+)
+async def test_qr_scan_errors_stay_on_scan_step(hass: Any, raw: str, error: str) -> None:
     flow, _ = await _discovered_flow(hass, [_service_info()])
-    with patch.object(config_flow_module, "async_discovered_service_info", return_value=[_service_info()]):
-        result = await flow.async_step_qr_scan({"qr_code": OTHER_KEY_QR})
-    assert result["type"] == FlowResultType.EXTERNAL_STEP_DONE
-    assert result["step_id"] == "qr_text"
-    result = await flow.async_step_qr_text()
-    assert result["errors"] == {"base": "qr_key_invalid"}
+    with (
+        patch.object(config_flow_module, "async_discovered_service_info", return_value=[_service_info()]),
+        patch.object(config_flow_module, "async_register_scan_panel", AsyncMock()),
+    ):
+        result = await flow.async_step_qr_scan({"qr_code": raw})
+    assert result["type"] == FlowResultType.FORM
+    assert result["step_id"] == "qr_scan"
+    assert result["errors"] == {"base": error}
 
 
 def test_device_payloads_filters_by_address() -> None:
@@ -157,20 +158,4 @@ def test_device_payloads_filters_by_address() -> None:
         _service_info(None),
     ]
     assert device_payloads(infos, MAC) == [DATA_TELEGRAM]
-
-
-def _hass_with_flow(flow: dict[str, Any] | None) -> SimpleNamespace:
-    def async_get(flow_id: str) -> dict[str, Any]:
-        if flow is None:
-            raise UnknownFlow
-        return flow
-
-    return SimpleNamespace(config_entries=SimpleNamespace(flow=SimpleNamespace(async_get=async_get)))
-
-
-def test_scan_page_only_serves_a_flow_waiting_on_the_scan_step() -> None:
-    waiting = {"handler": DOMAIN, "step_id": "qr_scan", "context": {"unique_id": MAC}}
-    assert _waiting_flow_mac(_hass_with_flow(waiting), "f") == MAC
-    assert _waiting_flow_mac(_hass_with_flow(None), "f") is None
-    assert _waiting_flow_mac(_hass_with_flow({**waiting, "step_id": "qr_text"}), "f") is None
-    assert _waiting_flow_mac(_hass_with_flow({**waiting, "handler": "other"}), "f") is None
+    assert device_payloads(infos, MAC.lower()) == [DATA_TELEGRAM]
