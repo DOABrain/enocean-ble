@@ -1,4 +1,4 @@
-"""Admin-only frontend page (sidebar "EnOcean BLE") to add switches.
+"""Hidden, admin-only frontend page that scans a module label QR code.
 
 The page is a regular Home Assistant frontend panel, so it runs inside the HA app
 (native barcode scanner) and every request it makes is authenticated. It reads the QR
@@ -17,9 +17,7 @@ from .const import (
     DOMAIN,
     SCAN_PANEL_ELEMENT,
     SCAN_PANEL_FILENAME,
-    SCAN_PANEL_ICON,
     SCAN_PANEL_STATIC_URL,
-    SCAN_PANEL_TITLE,
     SCAN_PANEL_URL_PATH,
 )
 
@@ -29,10 +27,8 @@ FRONTEND_DIR = Path(__file__).parent / "frontend"
 DATA_PANEL_REGISTERED = "scan_panel_registered"
 
 
-def scan_panel_path(flow_id: str | None) -> str:
-    """In-app path of the add page: for a discovered switch's flow, or to scan a new one."""
-    if flow_id is None:
-        return f"/{SCAN_PANEL_URL_PATH}?scan=1"
+def scan_panel_path(flow_id: str) -> str:
+    """In-app path of the scan page for a flow."""
     return f"/{SCAN_PANEL_URL_PATH}?flow_id={flow_id}"
 
 
@@ -62,8 +58,8 @@ async def async_register_scan_panel(hass: Any) -> None:
         webcomponent_name=SCAN_PANEL_ELEMENT,
         frontend_url_path=SCAN_PANEL_URL_PATH,
         module_url=f"{SCAN_PANEL_STATIC_URL}/{SCAN_PANEL_FILENAME}?v={digest}",
-        sidebar_title=SCAN_PANEL_TITLE,
-        sidebar_icon=SCAN_PANEL_ICON,
+        sidebar_title=None,
+        sidebar_icon=None,
         require_admin=True,
         config={},
     )

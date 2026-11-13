@@ -42,13 +42,8 @@ It provides:
    - **Enter the QR code text**
    - **Manual commissioning (button sequence)**
 
-**Scan first, no button press needed:** open **EnOcean BLE** in the sidebar (or **Add device** on
-the integration page) and scan the QR code of a switch that was never pressed yet. If Home
-Assistant has not received anything from it yet, its first button press confirms the key; if the
-key does not match, a **Repairs** issue tells you so.
-
-For a discovered switch, the QR code is checked against a telegram really received from it before
-it is added.
+Switches are always added from their discovery: this guarantees the switch is present, and lets the
+integration check the QR code against a telegram really received from it.
 
 ### From the QR code (scan or text)
 

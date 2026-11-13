@@ -8,22 +8,13 @@ PLATFORMS = ["event", "sensor"]
 
 CONF_MAC_ADDRESS = "mac_address"
 CONF_SECURITY_KEY = "security_key"
-# False when a switch was added from its QR code before any telegram of it was received:
-# the key is then verified by its first data telegram (absent = verified).
-CONF_KEY_VERIFIED = "key_verified"
-# Consecutive MIC failures of an unverified key before a Repairs issue is raised.
-KEY_MISMATCH_THRESHOLD = 3
-ISSUE_KEY_MISMATCH = "key_mismatch"
 
 ENOCEAN_MANUFACTURER_ID = 0x03DA
 ENOCEAN_MAC_PREFIX = "E2:15:"
 
-# Admin-only frontend page (sidebar "EnOcean BLE") to add switches: scan a module
-# label QR code (no button press needed), or finish adding a discovered switch:
-# /enocean-ble-scan, ?scan=1 (start the camera), ?flow_id=<discovery flow>
+# Hidden (no sidebar entry), admin-only frontend page that scans a module label QR code
+# and hands it to a waiting config flow: /enocean-ble-scan?flow_id=<flow_id>
 SCAN_PANEL_URL_PATH = "enocean-ble-scan"
-SCAN_PANEL_TITLE = "EnOcean BLE"
-SCAN_PANEL_ICON = "mdi:qrcode-scan"
 SCAN_PANEL_ELEMENT = "enocean-ble-scan-panel"
 SCAN_PANEL_FILENAME = "enocean-ble-scan-panel.js"
 SCAN_PANEL_STATIC_URL = "/enocean_ble_static"

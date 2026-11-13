@@ -16,7 +16,6 @@ from .const import (
     ATTR_MAC_ADDRESS,
     ATTR_RSSI,
     ATTR_SEQUENCE_COUNTER,
-    CONF_KEY_VERIFIED,
     CONF_MAC_ADDRESS,
     CONF_SECURITY_KEY,
     DATA_TELEGRAM_MIN_LENGTH,
@@ -25,8 +24,6 @@ from .const import (
     ENOCEAN_MANUFACTURER_ID,
     EVENT_BUTTON_ACTION,
     EVENT_BUTTON_EVENT,
-    ISSUE_KEY_MISMATCH,
-    KEY_MISMATCH_THRESHOLD,
     LONG_PRESS_SECONDS,
     PLATFORMS,
     RELEASE_TIMEOUT_SECONDS,
@@ -64,8 +61,6 @@ async def async_setup_entry(hass: Any, entry: Any) -> bool:
         CONF_SECURITY_KEY: security_key,
         "last_sequence_counter": -1,
         "buttons": {},
-        CONF_KEY_VERIFIED: bool(entry.data.get(CONF_KEY_VERIFIED, True)),
-        "key_failures": 0,
     }
     _LOGGER.debug(
         "setup_entry entry_id=%s mac=%s security_key_present=%s security_key_fingerprint=%s",
@@ -220,11 +215,8 @@ def _process_advertisement(
             str(err),
             len(manufacturer_data),
         )
-        if "MIC verification failed" in str(err):
-            _note_key_failure(hass, entry, entry_data)
         return
 
-    _note_key_success(hass, entry, entry_data)
     _LOGGER.debug(
         "telegram_parse_success entry_id=%s mac=%s buttons=%s event_type=%s sequence_counter=%s",
         entry.entry_id,
@@ -466,48 +458,6 @@ async def async_unload_entry(hass: Any, entry: Any) -> bool:
     hass.data[DOMAIN].pop(entry.entry_id, None)
     _LOGGER.debug("unload_entry entry_id=%s", entry.entry_id)
     return True
-
-
-def _issue_id(entry: Any) -> str:
-    return f"{ISSUE_KEY_MISMATCH}_{entry.entry_id}"
-
-
-def _note_key_failure(hass: Any, entry: Any, entry_data: dict[str, Any]) -> None:
-    """A telegram failed the MIC check. For a key added from a QR code and not yet
-    verified, raise a Repairs issue after a few consecutive failures."""
-    if entry_data.get(CONF_KEY_VERIFIED, True):
-        return
-    entry_data["key_failures"] = int(entry_data.get("key_failures", 0)) + 1
-    if entry_data["key_failures"] != KEY_MISMATCH_THRESHOLD:
-        return
-    from homeassistant.helpers import issue_registry as ir
-
-    _LOGGER.warning(
-        "EnOcean BLE switch %s: the security key from its QR code does not match its telegrams",
-        entry_data[CONF_MAC_ADDRESS],
-    )
-    ir.async_create_issue(
-        hass,
-        DOMAIN,
-        _issue_id(entry),
-        is_fixable=False,
-        severity=ir.IssueSeverity.ERROR,
-        translation_key=ISSUE_KEY_MISMATCH,
-        translation_placeholders={"name": entry.title, "mac": str(entry_data[CONF_MAC_ADDRESS])},
-    )
-
-
-def _note_key_success(hass: Any, entry: Any, entry_data: dict[str, Any]) -> None:
-    """A telegram passed the MIC check: an unverified key is now verified."""
-    entry_data["key_failures"] = 0
-    if entry_data.get(CONF_KEY_VERIFIED, True):
-        return
-    from homeassistant.helpers import issue_registry as ir
-
-    entry_data[CONF_KEY_VERIFIED] = True
-    hass.config_entries.async_update_entry(entry, data={**entry.data, CONF_KEY_VERIFIED: True})
-    ir.async_delete_issue(hass, DOMAIN, _issue_id(entry))
-    _LOGGER.info("EnOcean BLE switch %s: security key verified by its first telegram", entry_data[CONF_MAC_ADDRESS])
 
 
 def _fingerprint_key(key_hex: str) -> str:

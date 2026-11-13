@@ -43,16 +43,6 @@
           "commissioning": "Zkusit znovu",
           "bluetooth_method": "Zpět k metodám"
         }
-      },
-      "user": {
-        "title": "Přidat spínač EnOcean BLE",
-        "description": "**[Otevřete stránku pro přidání]({scan_url})** a naskenujte QR kód ze štítku modulu fotoaparátem (v aplikaci Home Assistant: jejím vlastním skenerem) nebo z fotografie. Není třeba nic mačkat: první stisk spínače potvrdí jeho klíč.\n\nNebo níže vložte text QR kódu.",
-        "data": {
-          "qr_code": "Text QR kódu"
-        },
-        "data_description": {
-          "qr_code": "Příklad: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215"
-        }
       }
     },
     "progress": {
@@ -61,7 +51,8 @@
     "abort": {
       "no_bluetooth_discovery": "Toto nastavení musí začít z objeveného Bluetooth zařízení.",
       "not_enocean_prefix": "Toto objevené zařízení nepoužívá MAC prefix EnOcean BLE (E2:15).",
-      "already_configured": "Tento spínač je již nastaven."
+      "already_configured": "Tento spínač je již nastaven.",
+      "discovery_required": "Stiskněte libovolné tlačítko spínače: objeví se jako nalezené zařízení v Nastavení → Zařízení a služby, odkud ho můžete přidat."
     },
     "error": {
       "commissioning_not_detected": "Během 2 minut nebyl přijat commissioning telegram. Zkuste to znovu. Pokud to po více pokusech stále nefunguje, můžete zkusit tovární reset. Nejprve si přečtěte upozornění k resetu v dokumentaci.",
@@ -70,12 +61,6 @@
       "qr_mac_mismatch": "Tento QR kód patří jinému spínači, než který byl nalezen.",
       "qr_key_invalid": "Klíč v tomto QR kódu neodpovídá telegramům přijatým z tohoto spínače. Mohl být překonfigurován (například jiným systémem).",
       "qr_no_telegram": "Z tohoto spínače zatím nebyl přijat žádný telegram. Stiskněte některé z jeho tlačítek a zkuste to znovu."
-    }
-  },
-  "issues": {
-    "key_mismatch": {
-      "title": "Spínač EnOcean {name}: bezpečnostní klíč nesouhlasí",
-      "description": "Bezpečnostní klíč z QR kódu {name} ({mac}) neodpovídá telegramům tohoto spínače, proto jsou jeho stisky ignorovány. Spínač mohl být překonfigurován (například jiným systémem) nebo QR kód patří jinému modulu. Smažte spínač a přidejte jej znovu pomocí sekvence tlačítek nebo správného QR kódu."
     }
   }
 }

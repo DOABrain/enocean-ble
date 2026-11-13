@@ -16,7 +16,6 @@ from homeassistant.components.bluetooth import (
 from homeassistant.config_entries import ConfigFlowResult
 
 from .const import (
-    CONF_KEY_VERIFIED,
     CONF_MAC_ADDRESS,
     CONF_SECURITY_KEY,
     DOMAIN,
@@ -25,9 +24,8 @@ from .const import (
     STATUS_BIT_ENERGY_BOW,
 )
 from .panel import async_register_scan_panel, scan_panel_path
-from .parser import OnboardingData, parse_commissioning_telegram, parse_qr_code
+from .parser import OnboardingData, parse_commissioning_telegram
 from .qr_onboarding import (
-    ERROR_INVALID_QR,
     ERROR_NO_TELEGRAM,
     QrValidationError,
     device_payloads,
@@ -111,48 +109,13 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._cancel_stage_task(reason="flow_removed")
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        """Add a switch from its module label QR code, before any button is pressed.
+        """Manual start is not supported: a switch is added from its discovery.
 
-        Used by "Add device" on the integration page and by the add page (sidebar),
-        which scans the label and submits the text here. If a telegram of the switch
-        is already known, the key is checked now; otherwise the entry is created
-        with ``key_verified: False`` and the first telegram verifies the key (a
-        Repairs issue is raised if it does not match).
+        Pressing any button makes the switch appear as a discovered device. Starting
+        from the discovery guarantees the switch is present and lets the QR code key
+        be checked against a telegram really received from it.
         """
-        errors: dict[str, str] = {}
-        if user_input is not None:
-            raw = str(user_input.get(CONF_QR_CODE) or "").strip()
-            try:
-                onboarding = parse_qr_code(raw)
-            except ValueError:
-                errors["base"] = ERROR_INVALID_QR
-                self._log_qr_rejected(step="user", code=ERROR_INVALID_QR)
-            else:
-                await self.async_set_unique_id(onboarding.mac_address)
-                self._abort_if_unique_id_configured()
-                self._pending_mac = onboarding.mac_address
-                verified = False
-                payloads = device_payloads(
-                    async_discovered_service_info(self.hass), onboarding.mac_address
-                )
-                try:
-                    validate_qr_for_device(raw, mac_address=onboarding.mac_address, payloads=payloads)
-                    verified = True
-                except QrValidationError as err:
-                    if err.code != ERROR_NO_TELEGRAM:
-                        errors["base"] = err.code
-                        self._log_qr_rejected(step="user", code=err.code)
-                if not errors:
-                    return self._create_entry_from_qr(onboarding, method="user", verified=verified)
-
-        await async_register_scan_panel(self.hass)
-        return self.async_show_form(
-            step_id="user",
-            # HA 2026.x maps voluptuous onto probatio at runtime; only the type stubs differ.
-            data_schema=vol.Schema({vol.Optional(CONF_QR_CODE): str}),  # type: ignore[arg-type,unused-ignore]
-            errors=errors,
-            description_placeholders={"scan_url": scan_panel_path(None)},
-        )
+        return self.async_abort(reason="discovery_required")
 
     async def async_step_bluetooth(self, discovery_info: BluetoothServiceInfoBleak) -> ConfigFlowResult:
         """Handle Bluetooth discovery and start commissioning."""
@@ -294,42 +257,31 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             payloads.append(self._discovery_payload)
         return validate_qr_for_device(raw, mac_address=self._pending_mac, payloads=payloads)
 
-    def _create_entry_from_qr(
-        self, onboarding: OnboardingData, *, method: str, verified: bool = True
-    ) -> ConfigFlowResult:
-        """Create the config entry from a QR code.
-
-        ``verified`` is False when no telegram of the switch was known yet: the first
-        telegram then verifies the key.
-        """
+    def _create_entry_from_qr(self, onboarding: OnboardingData, *, method: str) -> ConfigFlowResult:
+        """Create the config entry from a validated QR code."""
         self._pending_security_key = onboarding.security_key_hex
         self._entry_created = True
         title = self._pending_title or onboarding.mac_address
         self._trace_event(
             "FLOW_CREATE_ENTRY",
             step=f"qr_{method}",
-            note=(
-                "QR code key verified against a telegram; entry is being created."
-                if verified
-                else "No telegram known yet; entry is created and the first telegram verifies the key."
-            ),
+            note="QR code validated against the discovered switch; entry is being created.",
             title=title,
         )
         _LOGGER.info(
-            "%s QR_CREATE_ENTRY flow_id=%s mac=%s method=%s key_verified=%s",
+            "%s QR_CREATE_ENTRY flow_id=%s mac=%s method=%s",
             FLOW_TAG,
             getattr(self, "flow_id", "unknown"),
             onboarding.mac_address,
             method,
-            verified,
         )
-        data: dict[str, Any] = {
-            CONF_MAC_ADDRESS: onboarding.mac_address,
-            CONF_SECURITY_KEY: onboarding.security_key_hex,
-        }
-        if not verified:
-            data[CONF_KEY_VERIFIED] = False
-        return self.async_create_entry(title=title, data=data)
+        return self.async_create_entry(
+            title=title,
+            data={
+                CONF_MAC_ADDRESS: onboarding.mac_address,
+                CONF_SECURITY_KEY: onboarding.security_key_hex,
+            },
+        )
 
     def _log_qr_rejected(self, *, step: str, code: str) -> None:
         """Log a rejected QR code (never the key)."""
