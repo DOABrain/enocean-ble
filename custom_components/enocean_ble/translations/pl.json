@@ -3,49 +3,46 @@
     "step": {
       "bluetooth_method": {
         "title": "Dodaj {name}",
-        "description": "**[Skanuj aparatem]({scan_url})** · **[Wybierz zdjęcie]({photo_url})** kodu QR z etykiety modułu EnOcean, za klawiszem. Jego adres musi być {mac}.\n\nLub wklej tekst kodu QR, albo użyj sekwencji przycisków.",
+        "description": "Adres urządzenia: `{mac}`\nKod QR uruchomienia: z tyłu modułu.\n\n**[Skanuj kod QR]({scan_url})** · **[Wybierz obraz QR]({photo_url})**\n\nNiektóre moduły OEM są ograniczone do metod uruchomienia określonych przez producenta. Ręczne i/lub QR uruchomienie może być niedostępne w zależności od modułu i oprogramowania.",
         "data": {
-          "qr_code": "Lub wklej tekst kodu QR",
-          "button_sequence": "Lub użyj sekwencji przycisków (ręczne uruchomienie)"
-        },
-        "data_description": {
-          "button_sequence": "Dla przełącznika, którego etykieta jest niedostępna. Niektóre przełączniki OEM (np. Busch-Jaeger, Jung) tego nie obsługują."
+          "qr_code": "Wklej dane QR",
+          "button_sequence": "Ręczne uruchomienie (sekwencja przycisków)"
         }
       },
       "commissioning": {
-        "title": "Automatyczne commissioning EnOcean BLE",
-        "description": "Włącz auto-commissioning dla {name}:\n\n1. Przytrzymaj przycisk 1 przez 7 sekund\n2. Naciśnij krótko przycisk 1\n3. Ponownie przytrzymaj przycisk 1 przez 7 sekund\n\nMasz 2 minuty. W razie potrzeby spróbuj ponownie."
+        "title": "Ręczne uruchomienie",
+        "description": "Sekwencja uruchomienia na {name}: przytrzymaj przycisk 1 przez 7 s, krótko naciśnij, ponownie przytrzymaj 7 s. Limit czasu: 2 min."
       },
       "bluetooth_confirm": {
-        "title": "Potwierdź urządzenie EnOcean BLE",
-        "description": "Przełącznik EnOcean o adresie {mac} został pomyślnie skonfigurowany.\n\n⚠️ Naciśnij inny przycisk, aby wyłączyć tryb commissioning, a następnie kliknij Prześlij."
+        "title": "Odebrano telegram uruchomienia",
+        "description": "Urządzenie {mac} uruchomione. Naciśnij inny przycisk, aby wyjść z trybu uruchomienia, a następnie zatwierdź."
       },
       "commissioning_retry": {
         "title": "Uruchomienie nie powiodło się",
-        "description": "Nie odebrano prawidłowego telegramu uruchomienia z {name}. Spróbuj ponownie lub wróć i dodaj go za pomocą kodu QR z etykiety modułu. Jeśli nadal się nie udaje, najpierw przeczytaj w dokumentacji uwagę o przywracaniu ustawień fabrycznych.",
+        "description": "Nie odebrano prawidłowego telegramu uruchomienia od {name}. Przed resetem fabrycznym zapoznaj się z zastrzeżeniem w dokumentacji.",
         "menu_options": {
-          "commissioning": "Spróbuj ponownie",
-          "bluetooth_method": "Wróć do metod"
+          "commissioning": "Ponów",
+          "bluetooth_method": "Metody uruchomienia"
         }
       }
     },
     "progress": {
-      "waiting_commissioning": "Przytrzymaj przycisk 1 przez 7 sekund, następnie naciśnij go krótko i ponownie przytrzymaj przez 7 sekund."
+      "waiting_commissioning": "Oczekiwanie na telegram uruchomienia (limit 2 min). Sekwencja: przycisk 1 przytrzymany 7 s, krótkie naciśnięcie, przytrzymany 7 s."
     },
     "abort": {
       "no_bluetooth_discovery": "Ta konfiguracja musi zostać uruchomiona z wykrytego urządzenia Bluetooth.",
       "not_enocean_prefix": "To wykryte urządzenie nie używa prefiksu MAC EnOcean BLE (E2:15).",
       "already_configured": "Ten przełącznik jest już skonfigurowany.",
-      "discovery_required": "Naciśnij dowolny przycisk przełącznika: pojawi się on jako wykryte urządzenie w Ustawienia → Urządzenia i usługi, skąd możesz go dodać."
+      "discovery_required": "Urządzenia są dodawane z wykrywania Bluetooth. Naciśnij przycisk przełącznika; pojawi się jako wykryty w Ustawienia → Urządzenia i usługi."
     },
     "error": {
-      "commissioning_not_detected": "Nie odebrano telegramu commissioning w ciągu 2 minut. Spróbuj ponownie. Jeśli po kilku próbach nadal nie działa, możesz wykonać reset fabryczny. Najpierw przeczytaj ostrzeżenie dotyczące resetu w dokumentacji.",
-      "invalid_commissioning": "Odebrano telegram commissioning, ale nie udało się go zweryfikować. Spróbuj ponownie. Jeśli problem się powtarza, przeczytaj ostrzeżenie dotyczące resetu w dokumentacji przed resetem.",
-      "invalid_qr": "W tym tekście nie znaleziono adresu przełącznika EnOcean (30SE215…) ani 32-znakowego klucza bezpieczeństwa (+Z…).",
-      "qr_mac_mismatch": "Ten kod QR należy do innego przełącznika niż wykryty.",
-      "qr_key_invalid": "Klucz w tym kodzie QR nie pasuje do telegramów odebranych z tego przełącznika. Mógł zostać ponownie skonfigurowany (na przykład przez inny system).",
-      "qr_no_telegram": "Nie odebrano jeszcze żadnego telegramu z tego przełącznika. Naciśnij jeden z jego przycisków i spróbuj ponownie.",
-      "choose_method": "Zeskanuj lub wklej kod QR albo włącz sekwencję przycisków."
+      "commissioning_not_detected": "Nie odebrano telegramu uruchomienia w ciągu 2 min.",
+      "invalid_commissioning": "Odebrano telegram uruchomienia, ale walidacja nie powiodła się.",
+      "invalid_qr": "Nieprawidłowe dane QR uruchomienia: nie rozpoznano adresu urządzenia (30SE215…) ani 32-znakowego klucza bezpieczeństwa (+Z…).",
+      "qr_mac_mismatch": "Adres urządzenia w danych QR nie zgadza się z wykrytym urządzeniem.",
+      "qr_key_invalid": "Klucz bezpieczeństwa nie uwierzytelnia telegramów odebranych z tego urządzenia. Moduł mógł zostać przekluczowany przez inny system.",
+      "qr_no_telegram": "Nie odebrano jeszcze żadnego telegramu z tego urządzenia. Naciśnij przycisk modułu i zatwierdź ponownie.",
+      "choose_method": "Nie wybrano metody uruchomienia."
     }
   }
 }

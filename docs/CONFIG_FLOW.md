@@ -17,10 +17,11 @@ Bluetooth discovery (press any button on it).
 - Stores discovered MAC/title, the discovery payload, and initializes trace state.
 
 2. `bluetooth_method` (form, one screen laid out like the add page)
-- Description links: **Scan with the camera** (`/enocean-ble-scan?flow_id=<flow_id>`) and
-  **Pick a photo** (same with `&photo=1`, opens the photo picker). Relative links: they open
+- Description: device address, QR code location, the OEM restriction notice, and links
+  **Scan QR code** (`/enocean-ble-scan?flow_id=<flow_id>`) and **Select QR image** (same with
+  `&photo=1`, opens the image picker). Relative links: they open
   inside the frontend, and inside the HA app, not in a new window.
-- Field `qr_code`: paste the QR code text and submit; validated with
+- Field `qr_code` (Paste QR data): submit; validated with
   `qr_onboarding.validate_qr_for_device()`, errors are shown on this form.
 - Field `button_sequence`: turn on and submit to start manual commissioning (below).
 - Neither: error `choose_method`.

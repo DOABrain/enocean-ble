@@ -3,49 +3,46 @@
     "step": {
       "bluetooth_method": {
         "title": "Lägg till {name}",
-        "description": "**[Skanna med kameran]({scan_url})** · **[Välj ett foto]({photo_url})** av QR-koden på EnOcean-modulens etikett, bakom vippan. Adressen måste vara {mac}.\n\nEller klistra in QR-kodens text, eller använd knappsekvensen.",
+        "description": "Enhetsadress: `{mac}`\nQR-kod för driftsättning: på modulens baksida.\n\n**[Skanna QR-kod]({scan_url})** · **[Välj QR-bild]({photo_url})**\n\nVissa OEM-moduler är begränsade till tillverkarspecifika driftsättningsmetoder. Manuell och/eller QR-driftsättning kan vara otillgänglig beroende på modul och firmware.",
         "data": {
-          "qr_code": "Eller klistra in QR-kodens text",
-          "button_sequence": "Eller använd knappsekvensen (manuell driftsättning)"
-        },
-        "data_description": {
-          "button_sequence": "För en brytare vars etikett du inte kommer åt. Vissa OEM-brytare (till exempel Busch-Jaeger, Jung) stöder det inte."
+          "qr_code": "Klistra in QR-data",
+          "button_sequence": "Manuell driftsättning (knappsekvens)"
         }
       },
       "commissioning": {
-        "title": "EnOcean BLE automatisk provisionering",
-        "description": "Aktivera automatisk provisionering på {name}:\n\n1. Håll knapp 1 intryckt i 7 sekunder\n2. Tryck kort på knapp 1\n3. Håll knapp 1 intryckt igen i 7 sekunder\n\nDu har 2 minuter. Försök igen vid behov."
+        "title": "Manuell driftsättning",
+        "description": "Driftsättningssekvens på {name}: håll knapp 1 i 7 s, kort tryck, håll igen i 7 s. Tidsgräns: 2 min."
       },
       "bluetooth_confirm": {
-        "title": "Bekräfta EnOcean BLE-enhet",
-        "description": "EnOcean-brytaren med adress {mac} har provisionerats.\n\n⚠️ Tryck på en annan knapp för att stänga av commissioning-läget och klicka sedan på Skicka."
+        "title": "Driftsättningstelegram mottaget",
+        "description": "Enhet {mac} driftsatt. Tryck på en annan knapp för att lämna driftsättningsläget och skicka sedan."
       },
       "commissioning_retry": {
-        "title": "Driftsättningen lyckades inte",
-        "description": "Inget giltigt driftsättningstelegram togs emot från {name}. Försök igen, eller gå tillbaka och lägg till den med QR-koden på modulens etikett. Om det fortsätter att misslyckas, läs först informationen om fabriksåterställning i dokumentationen.",
+        "title": "Driftsättningen misslyckades",
+        "description": "Inget giltigt driftsättningstelegram mottaget från {name}. Läs ansvarsfriskrivningen i dokumentationen före en fabriksåterställning.",
         "menu_options": {
           "commissioning": "Försök igen",
-          "bluetooth_method": "Tillbaka till metoderna"
+          "bluetooth_method": "Driftsättningsmetoder"
         }
       }
     },
     "progress": {
-      "waiting_commissioning": "Håll knapp 1 i 7 sekunder, tryck sedan kort på knapp 1 och håll igen i 7 sekunder."
+      "waiting_commissioning": "Väntar på driftsättningstelegrammet (tidsgräns 2 min). Sekvens: knapp 1 hålls 7 s, kort tryck, hålls 7 s."
     },
     "abort": {
       "no_bluetooth_discovery": "Denna konfiguration måste startas från en upptäckt Bluetooth-enhet.",
       "not_enocean_prefix": "Den upptäckta enheten använder inte EnOcean BLE MAC-prefix (E2:15).",
       "already_configured": "Den här brytaren är redan konfigurerad.",
-      "discovery_required": "Tryck på valfri knapp på brytaren: den visas då som en upptäckt enhet under Inställningar → Enheter och tjänster, där du kan lägga till den."
+      "discovery_required": "Enheter läggs till från Bluetooth-upptäckt. Tryck på en knapp på brytaren; den visas sedan som upptäckt under Inställningar → Enheter och tjänster."
     },
     "error": {
-      "commissioning_not_detected": "Ingen commissioning-telegram togs emot inom 2 minuter. Försök igen. Om det fortfarande inte fungerar efter flera försök kan du prova en fabriksåterställning. Läs först reset-varningen i dokumentationen.",
-      "invalid_commissioning": "Ett commissioning-telegram togs emot men kunde inte valideras. Försök igen. Om detta fortsätter att misslyckas, läs reset-varningen i dokumentationen innan du återställer.",
-      "invalid_qr": "Ingen EnOcean-brytaradress (30SE215…) och säkerhetsnyckel på 32 tecken (+Z…) hittades i den här texten.",
-      "qr_mac_mismatch": "Den här QR-koden tillhör en annan brytare än den som upptäcktes.",
-      "qr_key_invalid": "Nyckeln i den här QR-koden matchar inte de telegram som tagits emot från brytaren. Den kan ha konfigurerats om (till exempel av ett annat system).",
-      "qr_no_telegram": "Inget telegram har tagits emot från den här brytaren än. Tryck på en av dess knappar och försök igen.",
-      "choose_method": "Skanna eller klistra in QR-koden, eller slå på knappsekvensen."
+      "commissioning_not_detected": "Inget driftsättningstelegram mottaget inom 2 min.",
+      "invalid_commissioning": "Driftsättningstelegram mottaget men valideringen misslyckades.",
+      "invalid_qr": "Ogiltiga QR-data för driftsättning: ingen enhetsadress (30SE215…) och 32-siffrig säkerhetsnyckel (+Z…) identifierad.",
+      "qr_mac_mismatch": "Enhetsadressen i QR-data matchar inte den upptäckta enheten.",
+      "qr_key_invalid": "Säkerhetsnyckeln autentiserar inte de telegram som tagits emot från enheten. Modulen kan ha fått ny nyckel av ett annat system.",
+      "qr_no_telegram": "Inget telegram har tagits emot från enheten ännu. Tryck på en knapp på modulen och skicka igen.",
+      "choose_method": "Ingen driftsättningsmetod vald."
     }
   }
 }

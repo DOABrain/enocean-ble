@@ -3,49 +3,46 @@
     "step": {
       "bluetooth_method": {
         "title": "Aggiungi {name}",
-        "description": "**[Scansiona con la fotocamera]({scan_url})** · **[Scegli una foto]({photo_url})** del codice QR sull'etichetta del modulo EnOcean, dietro il bilanciere. L'indirizzo deve essere {mac}.\n\nOppure incolla il testo del codice QR, o usa la sequenza di pulsanti.",
+        "description": "Indirizzo del dispositivo: `{mac}`\nCodice QR di messa in servizio: sul retro del modulo.\n\n**[Scansiona codice QR]({scan_url})** · **[Seleziona immagine QR]({photo_url})**\n\nAlcuni moduli OEM sono limitati a metodi di messa in servizio specifici del produttore. La messa in servizio manuale e/o tramite QR potrebbe non essere disponibile a seconda del modulo e del firmware.",
         "data": {
-          "qr_code": "Oppure incolla il testo del codice QR",
-          "button_sequence": "Oppure usa la sequenza di pulsanti (messa in servizio manuale)"
-        },
-        "data_description": {
-          "button_sequence": "Per un interruttore di cui non puoi raggiungere l'etichetta. Alcuni interruttori OEM (ad esempio Busch-Jaeger, Jung) non lo supportano."
+          "qr_code": "Incolla dati QR",
+          "button_sequence": "Messa in servizio manuale (sequenza di pulsanti)"
         }
       },
       "commissioning": {
-        "title": "Auto-commissioning EnOcean BLE",
-        "description": "Attiva l'auto-commissioning su {name}:\n\n1. Tieni premuto il pulsante 1 per 7 secondi\n2. Premi brevemente il pulsante 1\n3. Tieni di nuovo premuto il pulsante 1 per 7 secondi\n\nHai 2 minuti. Riprova se necessario."
+        "title": "Messa in servizio manuale",
+        "description": "Sequenza di messa in servizio su {name}: tenere premuto il pulsante 1 per 7 s, pressione breve, di nuovo 7 s. Timeout: 2 min."
       },
       "bluetooth_confirm": {
-        "title": "Conferma dispositivo EnOcean BLE",
-        "description": "Lo switch EnOcean con indirizzo {mac} è stato commissionato con successo.\n\n⚠️ Premi un altro pulsante per disattivare la modalità di commissioning, poi fai clic su Invia."
+        "title": "Telegramma di messa in servizio ricevuto",
+        "description": "Dispositivo {mac} messo in servizio. Premere un altro pulsante per uscire dalla modalità di messa in servizio, quindi inviare."
       },
       "commissioning_retry": {
-        "title": "La messa in servizio non è riuscita",
-        "description": "Non è stato ricevuto alcun telegramma di messa in servizio valido da {name}. Riprova, oppure torna indietro e aggiungilo con il codice QR sull'etichetta del modulo. Se continua a fallire, leggi prima l'avvertenza sul ripristino di fabbrica nella documentazione.",
+        "title": "Messa in servizio non riuscita",
+        "description": "Nessun telegramma di messa in servizio valido ricevuto da {name}. Prima di un ripristino di fabbrica, vedere l'avvertenza nella documentazione.",
         "menu_options": {
           "commissioning": "Riprova",
-          "bluetooth_method": "Torna ai metodi"
+          "bluetooth_method": "Metodi di messa in servizio"
         }
       }
     },
     "progress": {
-      "waiting_commissioning": "Tieni premuto il pulsante 1 per 7 secondi, poi premi brevemente il pulsante 1 e tienilo di nuovo premuto per 7 secondi."
+      "waiting_commissioning": "In attesa del telegramma di messa in servizio (timeout 2 min). Sequenza: pulsante 1 premuto 7 s, pressione breve, premuto 7 s."
     },
     "abort": {
       "no_bluetooth_discovery": "Questa configurazione deve partire da un dispositivo Bluetooth rilevato.",
       "not_enocean_prefix": "Questo dispositivo rilevato non usa il prefisso MAC EnOcean BLE (E2:15).",
       "already_configured": "Questo interruttore è già configurato.",
-      "discovery_required": "Premi un tasto qualsiasi dell'interruttore: comparirà come dispositivo rilevato in Impostazioni → Dispositivi e servizi, da cui puoi aggiungerlo."
+      "discovery_required": "I dispositivi vengono aggiunti dal rilevamento Bluetooth. Premere un pulsante dell'interruttore; comparirà come rilevato in Impostazioni → Dispositivi e servizi."
     },
     "error": {
-      "commissioning_not_detected": "Nessun telegramma di commissioning ricevuto entro 2 minuti. Riprova. Se continua a non funzionare dopo più tentativi, puoi provare un reset di fabbrica. Leggi prima il disclaimer sul reset nella documentazione.",
-      "invalid_commissioning": "È stato ricevuto un telegramma di commissioning, ma non è stato possibile validarlo. Riprova. Se continua a fallire, leggi il disclaimer sul reset nella documentazione prima di resettare.",
-      "invalid_qr": "In questo testo non sono stati trovati un indirizzo di interruttore EnOcean (30SE215…) e una chiave di sicurezza di 32 caratteri (+Z…).",
-      "qr_mac_mismatch": "Questo codice QR appartiene a un interruttore diverso da quello rilevato.",
-      "qr_key_invalid": "La chiave di questo codice QR non corrisponde ai telegrammi ricevuti da questo interruttore. Potrebbe essere stato riconfigurato (ad esempio da un altro sistema).",
-      "qr_no_telegram": "Non è ancora stato ricevuto alcun telegramma da questo interruttore. Premi uno dei suoi tasti, poi riprova.",
-      "choose_method": "Scansiona o incolla il codice QR, oppure attiva la sequenza di pulsanti."
+      "commissioning_not_detected": "Nessun telegramma di messa in servizio ricevuto entro 2 min.",
+      "invalid_commissioning": "Telegramma di messa in servizio ricevuto, ma la convalida non è riuscita.",
+      "invalid_qr": "Dati QR di messa in servizio non validi: nessun indirizzo del dispositivo (30SE215…) né chiave di sicurezza di 32 cifre (+Z…) riconosciuti.",
+      "qr_mac_mismatch": "L'indirizzo del dispositivo nei dati QR non corrisponde al dispositivo rilevato.",
+      "qr_key_invalid": "La chiave di sicurezza non autentica i telegrammi ricevuti da questo dispositivo. Il modulo potrebbe essere stato riconfigurato da un altro sistema.",
+      "qr_no_telegram": "Nessun telegramma ancora ricevuto da questo dispositivo. Premere un pulsante del modulo, quindi inviare di nuovo.",
+      "choose_method": "Nessun metodo di messa in servizio selezionato."
     }
   }
 }

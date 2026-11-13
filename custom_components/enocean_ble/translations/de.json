@@ -3,49 +3,46 @@
     "step": {
       "bluetooth_method": {
         "title": "{name} hinzufügen",
-        "description": "**[Mit der Kamera scannen]({scan_url})** · **[Foto wählen]({photo_url})** vom QR-Code auf dem Aufkleber des EnOcean-Moduls, hinter der Wippe. Die Adresse muss {mac} sein.\n\nOder füge den Text des QR-Codes ein oder nutze die Tastenfolge.",
+        "description": "Geräteadresse: `{mac}`\nInbetriebnahme-QR-Code: auf der Rückseite des Moduls.\n\n**[QR-Code scannen]({scan_url})** · **[QR-Bild auswählen]({photo_url})**\n\nManche OEM-Module sind auf herstellerspezifische Inbetriebnahmeverfahren beschränkt. Manuelle und/oder QR-Inbetriebnahme ist je nach Modul und Firmware möglicherweise nicht verfügbar.",
         "data": {
-          "qr_code": "Oder Text des QR-Codes einfügen",
-          "button_sequence": "Oder Tastenfolge nutzen (manuelle Inbetriebnahme)"
-        },
-        "data_description": {
-          "button_sequence": "Für einen Schalter, dessen Aufkleber du nicht erreichst. Manche OEM-Schalter (zum Beispiel Busch-Jaeger, Jung) unterstützen das nicht."
+          "qr_code": "QR-Daten einfügen",
+          "button_sequence": "Manuelle Inbetriebnahme (Tastenfolge)"
         }
       },
       "commissioning": {
-        "title": "EnOcean BLE Auto-Kommissionierung",
-        "description": "Auto-Kommissionierung für {name} aktivieren:\n\n1. Taste 1 für 7 Sekunden gedrückt halten\n2. Taste 1 kurz drücken\n3. Taste 1 erneut für 7 Sekunden gedrückt halten\n\nSie haben 2 Minuten. Bei Bedarf erneut versuchen."
+        "title": "Manuelle Inbetriebnahme",
+        "description": "Inbetriebnahmefolge an {name}: Taste 1 7 s halten, kurz drücken, erneut 7 s halten. Zeitlimit: 2 min."
       },
       "bluetooth_confirm": {
-        "title": "EnOcean BLE-Gerät bestätigen",
-        "description": "EnOcean-Schalter mit Adresse {mac} wurde erfolgreich kommissioniert.\n\n⚠️ Drücken Sie eine andere Taste, um den Kommissionierungsmodus zu beenden, und klicken Sie dann auf Senden."
+        "title": "Inbetriebnahme-Telegramm empfangen",
+        "description": "Gerät {mac} in Betrieb genommen. Eine andere Taste drücken, um den Inbetriebnahmemodus zu verlassen, dann absenden."
       },
       "commissioning_retry": {
-        "title": "Inbetriebnahme nicht erfolgreich",
-        "description": "Von {name} wurde kein gültiges Inbetriebnahme-Telegramm empfangen. Versuche es erneut oder gehe zurück und füge ihn über den QR-Code auf dem Modulaufkleber hinzu. Schlägt die Inbetriebnahme weiter fehl, lies zuerst den Hinweis zum Werksreset in der Dokumentation.",
+        "title": "Inbetriebnahme fehlgeschlagen",
+        "description": "Kein gültiges Inbetriebnahme-Telegramm von {name} empfangen. Vor einem Werksreset den Reset-Hinweis in der Dokumentation beachten.",
         "menu_options": {
-          "commissioning": "Erneut versuchen",
-          "bluetooth_method": "Zurück zu den Methoden"
+          "commissioning": "Wiederholen",
+          "bluetooth_method": "Inbetriebnahmeverfahren"
         }
       }
     },
     "progress": {
-      "waiting_commissioning": "Taste 1 für 7 Sekunden halten, dann Taste 1 kurz drücken und erneut 7 Sekunden halten."
+      "waiting_commissioning": "Warte auf das Inbetriebnahme-Telegramm (Zeitlimit 2 min). Folge: Taste 1 7 s halten, kurz drücken, erneut 7 s halten."
     },
     "abort": {
       "no_bluetooth_discovery": "Dieses Setup muss mit einem per Bluetooth gefundenen Gerät gestartet werden.",
       "not_enocean_prefix": "Dieses gefundene Gerät verwendet nicht den EnOcean BLE MAC-Präfix (E2:15).",
       "already_configured": "Dieser Schalter ist bereits eingerichtet.",
-      "discovery_required": "Drücke eine beliebige Taste am Schalter: Er erscheint dann als erkanntes Gerät unter Einstellungen → Geräte & Dienste, wo du ihn hinzufügen kannst."
+      "discovery_required": "Geräte werden über die Bluetooth-Erkennung hinzugefügt. Eine Taste am Schalter drücken; er erscheint dann als erkannt unter Einstellungen → Geräte & Dienste."
     },
     "error": {
-      "commissioning_not_detected": "Innerhalb von 2 Minuten wurde kein Kommissionierungs-Telegramm empfangen. Versuchen Sie es erneut. Wenn es nach mehreren Versuchen weiterhin nicht funktioniert, können Sie einen Werksreset versuchen. Lesen Sie vorher den Reset-Hinweis in der Dokumentation.",
-      "invalid_commissioning": "Ein Kommissionierungs-Telegramm wurde empfangen, konnte aber nicht validiert werden. Versuchen Sie es erneut. Wenn dies weiterhin fehlschlägt, lesen Sie vor einem Reset den Hinweis in der Dokumentation.",
-      "invalid_qr": "In diesem Text wurden keine EnOcean-Schalteradresse (30SE215…) und kein 32-stelliger Sicherheitsschlüssel (+Z…) gefunden.",
-      "qr_mac_mismatch": "Dieser QR-Code gehört zu einem anderen Schalter als dem erkannten.",
-      "qr_key_invalid": "Der Schlüssel in diesem QR-Code passt nicht zu den Telegrammen dieses Schalters. Er wurde möglicherweise neu konfiguriert (z. B. von einem anderen System).",
-      "qr_no_telegram": "Von diesem Schalter wurde noch kein Telegramm empfangen. Drücke eine seiner Tasten und versuche es erneut.",
-      "choose_method": "Scanne oder füge den QR-Code ein oder aktiviere die Tastenfolge."
+      "commissioning_not_detected": "Kein Inbetriebnahme-Telegramm innerhalb von 2 min empfangen.",
+      "invalid_commissioning": "Inbetriebnahme-Telegramm empfangen, Validierung fehlgeschlagen.",
+      "invalid_qr": "Ungültige Inbetriebnahme-QR-Daten: keine Geräteadresse (30SE215…) und kein 32-stelliger Sicherheitsschlüssel (+Z…) erkannt.",
+      "qr_mac_mismatch": "Die Geräteadresse in den QR-Daten stimmt nicht mit dem erkannten Gerät überein.",
+      "qr_key_invalid": "Der Sicherheitsschlüssel authentifiziert die empfangenen Telegramme dieses Geräts nicht. Das Modul wurde möglicherweise von einem anderen System neu verschlüsselt.",
+      "qr_no_telegram": "Noch kein Telegramm von diesem Gerät empfangen. Eine Taste am Modul drücken und erneut absenden.",
+      "choose_method": "Kein Inbetriebnahmeverfahren ausgewählt."
     }
   }
 }

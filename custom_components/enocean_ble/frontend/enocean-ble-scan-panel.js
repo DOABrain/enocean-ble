@@ -2,7 +2,7 @@
  * EnOcean BLE - scan page for the module label QR code.
  *
  * Hidden, admin-only Home Assistant panel: /enocean-ble-scan?flow_id=<flow_id>
- * (linked from the "Scan the QR code" step of a discovered switch). Without a
+ * (linked from the add form of a discovered switch). Without a
  * flow_id it lists the discovered switches waiting to be added.
  *
  * Reading the code, in order of preference:
@@ -53,6 +53,16 @@ const STYLE = `
   .status.error { background: rgba(219, 68, 55, .15); color: var(--error-color, #db4437); }
   ul { list-style: none; margin: 0; padding: 0; }
   li button { width: 100%; text-align: left; margin-bottom: 8px; }
+  .facts { margin: 8px 0 16px; }
+  .facts dt { font-size: 12px; color: var(--secondary-text-color); }
+  .facts dd { margin: 0 0 8px; }
+  #pasteBox textarea { margin-top: 0; }
+  button.wide { width: 100%; }
+  .notice { font-size: 13px; margin: 16px 0 8px; }
+  .help { font-size: 13px; color: var(--secondary-text-color); }
+  .help summary { cursor: pointer; color: var(--primary-color); }
+  .help ul { list-style: disc; padding-left: 20px; margin: 8px 0 0; line-height: 1.5; }
+  code { font-family: monospace; }
   a { color: var(--primary-color); }
   .overlay { position: fixed; inset: 0; z-index: 10; display: none; flex-direction: column;
     align-items: center; justify-content: center; background: #000; }
@@ -124,7 +134,7 @@ class EnOceanBleScanPanel extends HTMLElement {
       <div class="content" id="content"></div>
       <div class="overlay" id="overlay">
         <video id="video" playsinline muted></video>
-        <div class="bar"><span id="overlayMsg">Aim at the QR code on the module label</span>
+        <div class="bar"><span id="overlayMsg">Commissioning QR code: rear of the module</span>
           <button id="cancel" class="secondary">Cancel</button></div>
       </div>`;
     if (customElements.get("ha-menu-button")) {
@@ -166,13 +176,13 @@ class EnOceanBleScanPanel extends HTMLElement {
     const content = this._content(`
       <div class="card">
         <h2>Add an EnOcean switch</h2>
-        <p>Pick the switch to add. A switch appears here after you press one of its buttons.</p>
+        <p>Discovered devices awaiting commissioning. A device is listed once a telegram from it is received.</p>
         <ul id="flows"></ul>
       </div>`);
     const list = content.querySelector("#flows");
     if (!flows.length) {
       const li = document.createElement("li");
-      li.textContent = "No discovered switch is waiting. Press a button on the switch, then reload this page.";
+      li.textContent = "No discovered devices awaiting commissioning.";
       list.appendChild(li);
       return;
     }
@@ -208,8 +218,8 @@ class EnOceanBleScanPanel extends HTMLElement {
     this._stopWatching();
     this._content(`
       <div class="card"><h2>Nothing to add</h2>
-        <p>This switch is no longer waiting to be added (already added, or the setup was closed).</p>
-        <p><a href="/enocean-ble-scan">Show discovered switches</a></p></div>`);
+        <p>This device is no longer awaiting commissioning (already added, or the setup was closed).</p>
+        <p><a href="/enocean-ble-scan">Discovered devices</a></p></div>`);
   }
 
   // Show the view for wherever the config flow is. The page drives the same flow as the
@@ -228,7 +238,7 @@ class EnOceanBleScanPanel extends HTMLElement {
     if (step.type === "abort") {
       this._stopWatching();
       this._content(`<div class="card"><h2>Not added</h2><p id="reason"></p>
-        <p><a href="/enocean-ble-scan">Show discovered switches</a></p></div>`);
+        <p><a href="/enocean-ble-scan">Discovered devices</a></p></div>`);
       this._el("reason").textContent =
         this._hass.localize(`component.${DOMAIN}.config.abort.${step.reason}`) || step.reason;
       return;
@@ -264,34 +274,53 @@ class EnOceanBleScanPanel extends HTMLElement {
     const content = this._content(`
       <div class="card">
         <h2 id="name"></h2>
-        <p>Remove the rocker and scan the QR code on the EnOcean module label. Its address must be
-          <span class="mac" id="mac"></span>.</p>
+        <dl class="facts">
+          <dt>Device address</dt><dd class="mac" id="mac"></dd>
+          <dt>Commissioning QR code</dt><dd>Located on the rear of the module.</dd>
+        </dl>
         <div class="actions">
-          <button id="scan">Scan with the camera</button>
-          <button id="photo" class="secondary">Take or choose a photo</button>
+          <button id="scan" class="secondary">Scan QR code</button>
+          <button id="photo" class="secondary">Select QR image</button>
           <input id="file" type="file" accept="image/*" capture="environment" hidden>
+          <button id="paste" class="secondary" aria-expanded="false" aria-controls="pasteBox">Paste QR data</button>
+          <div id="pasteBox" hidden>
+            <textarea id="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+              placeholder="30SE215…+Z…+30P…" aria-label="QR data"></textarea>
+            <button id="add" class="wide">Submit QR data</button>
+          </div>
+          <button id="commission" class="secondary">Manual commissioning (button sequence)</button>
         </div>
         <div id="status" class="status"></div>
-      </div>
-      <div class="card">
-        <h2>Or paste the QR code text</h2>
-        <textarea id="text" autocomplete="off" autocapitalize="off" spellcheck="false"
-          placeholder="30SE215…+Z…+30P…"></textarea>
-        <button id="add">Add switch</button>
-      </div>
-      <div class="card">
-        <h2>Or use the button sequence</h2>
-        <p>Manual commissioning, for switches whose label you cannot reach. Some OEM switches
-          (for example Busch-Jaeger, Jung) do not support it; use the QR code for those.</p>
-        <button id="commission" class="secondary">Start manual commissioning</button>
+        <p class="notice">Some OEM modules are restricted to manufacturer-specific commissioning methods.
+          Manual and/or QR commissioning may be unavailable depending on the module and firmware.</p>
+        <details class="help">
+          <summary>Help</summary>
+          <ul>
+            <li>The QR label is on the rear of the PTM 215B/216B module. Access requires removing the
+              rocker; on some frames the module must be removed as well.</li>
+            <li>QR data format: <code>30S&lt;address&gt;+Z&lt;32-digit key&gt;+30P…</code></li>
+            <li>Manual commissioning: hold button 1 for 7 s, press briefly, hold again for 7 s.
+              Telegram timeout: 2 min.</li>
+            <li>Live camera scanning in a browser requires HTTPS. Image selection and pasting do not.</li>
+          </ul>
+        </details>
       </div>`);
     content.querySelector("#name").textContent = `Add ${ph.name || "EnOcean switch"}`;
     content.querySelector("#mac").textContent = ph.mac || "";
     content.querySelector("#scan").addEventListener("click", () => this._scan());
     content.querySelector("#photo").addEventListener("click", () => content.querySelector("#file").click());
     content.querySelector("#file").addEventListener("change", (ev) => this._scanPhoto(ev));
+    content.querySelector("#paste").addEventListener("click", () => this._openPaste(!content.querySelector("#pasteBox").hidden));
     content.querySelector("#add").addEventListener("click", () => this._submit(content.querySelector("#text").value));
     content.querySelector("#commission").addEventListener("click", () => this._startCommissioning());
+  }
+
+  _openPaste(close = false) {
+    const box = this._el("pasteBox");
+    if (!box) return;
+    box.hidden = close;
+    this._el("paste").setAttribute("aria-expanded", String(!close));
+    if (!close) this._el("text").focus();
   }
 
   // Opened for a switch (from the setup dialog's links): go straight to what was picked,
@@ -330,7 +359,7 @@ class EnOceanBleScanPanel extends HTMLElement {
         await this._hass.callApi("POST", this._flowUrl(), { button_sequence: true })
       );
     } catch (err) {
-      this._status("error", `Could not start manual commissioning: ${errorMessage(err)}`);
+      this._status("error", `Manual commissioning could not be started: ${errorMessage(err)}`);
     } finally {
       this._busy = false;
     }
@@ -341,11 +370,11 @@ class EnOceanBleScanPanel extends HTMLElement {
       <div class="card">
         <h2>Manual commissioning</h2>
         <p id="steps"></p>
-        <div class="status info">Waiting for the switch… (up to 2 minutes)</div>
+        <div class="status info">Waiting for the commissioning telegram (timeout 2 min)…</div>
       </div>`);
     content.querySelector("#steps").innerText = this._localizeStep(
       "step.commissioning.description",
-      "Hold button 1 for 7 seconds, press it briefly, then hold it again for 7 seconds."
+      "Commissioning sequence: hold button 1 for 7 s, press briefly, hold again for 7 s. Timeout: 2 min."
     );
   }
 
@@ -382,20 +411,22 @@ class EnOceanBleScanPanel extends HTMLElement {
   _showConfirm() {
     const content = this._content(`
       <div class="card">
-        <h2>Commissioned</h2>
+        <h2 id="title"></h2>
         <p id="text"></p>
-        <button id="confirm">Add switch</button>
+        <button id="confirm">Submit</button>
         <div id="status" class="status"></div>
       </div>`);
+    content.querySelector("#title").textContent = this._localizeStep(
+      "step.bluetooth_confirm.title", "Commissioning telegram received");
     content.querySelector("#text").innerText = this._localizeStep(
       "step.bluetooth_confirm.description",
-      "The switch was commissioned. Press another button to leave commissioning mode, then add it."
+      "Device commissioned. Press another button to exit commissioning mode, then submit."
     );
     content.querySelector("#confirm").addEventListener("click", async () => {
       try {
         await this._handleStep(await this._hass.callApi("POST", this._flowUrl(), {}));
       } catch (err) {
-        this._status("error", `Could not add the switch: ${errorMessage(err)}`);
+        this._status("error", `Device could not be added: ${errorMessage(err)}`);
       }
     });
   }
@@ -411,13 +442,13 @@ class EnOceanBleScanPanel extends HTMLElement {
         </div>
       </div>`);
     content.querySelector("#title").textContent = this._localizeStep(
-      "step.commissioning_retry.title", "Commissioning did not succeed");
+      "step.commissioning_retry.title", "Commissioning failed");
     content.querySelector("#text").innerText = this._localizeStep(
       "step.commissioning_retry.description", "No valid commissioning telegram was received.");
     content.querySelector("#retry").textContent = this._localizeStep(
-      "step.commissioning_retry.menu_options.commissioning", "Try again");
+      "step.commissioning_retry.menu_options.commissioning", "Retry");
     content.querySelector("#back").textContent = this._localizeStep(
-      "step.commissioning_retry.menu_options.bluetooth_method", "Back to the methods");
+      "step.commissioning_retry.menu_options.bluetooth_method", "Commissioning methods");
     const choose = async (next) => {
       try {
         await this._handleStep(await this._hass.callApi("POST", this._flowUrl(), { next_step_id: next }));
@@ -440,7 +471,7 @@ class EnOceanBleScanPanel extends HTMLElement {
     const text = String(raw || "").trim();
     if (!text || this._busy || !this._flowId) return;
     this._busy = true;
-    this._status("info", "Checking the QR code…");
+    this._status("info", "Validating QR data…");
     try {
       const result = await this._hass.callApi("POST", this._flowUrl(), { qr_code: text });
       if (result.type !== "form" || result.step_id !== TEXT_STEP) {
@@ -451,7 +482,7 @@ class EnOceanBleScanPanel extends HTMLElement {
       const code = (result.errors && result.errors.base) || "invalid_qr";
       this._status("error", this._localizeError(code));
     } catch (err) {
-      this._status("error", `Could not add the switch: ${errorMessage(err)}`);
+      this._status("error", `Device could not be added: ${errorMessage(err)}`);
     } finally {
       this._busy = false;
     }
@@ -460,10 +491,10 @@ class EnOceanBleScanPanel extends HTMLElement {
   _showDone(result) {
     const content = this._content(`
       <div class="card">
-        <h2>Switch added</h2>
-        <p><span id="title"></span> has been added. Press one of its buttons to test it.</p>
+        <h2>Device added</h2>
+        <p><span id="title"></span> added.</p>
         <p><a href="/config/integrations/integration/${DOMAIN}">Open EnOcean BLE</a> ·
-          <a href="/enocean-ble-scan">Add another switch</a></p>
+          <a href="/enocean-ble-scan">Discovered devices</a></p>
       </div>`);
     content.querySelector("#title").textContent = result.title || "The switch";
   }
@@ -497,12 +528,12 @@ class EnOceanBleScanPanel extends HTMLElement {
         } else {
           ext.fireMessage({
             type: "bar_code/notify",
-            payload: { message: "This is not an EnOcean module QR code." },
+            payload: { message: "Not an EnOcean commissioning QR code." },
           });
         }
       } else if (msg && msg.type === "command" && msg.command === "bar_code/aborted") {
         this._releaseNative();
-        if (msg.payload && msg.payload.reason === "alternative_options") this._el("text").focus();
+        if (msg.payload && msg.payload.reason === "alternative_options") this._openPaste();
       }
       return typeof original === "function" ? original.call(ext, msg) : true;
     };
@@ -514,16 +545,16 @@ class EnOceanBleScanPanel extends HTMLElement {
     ext.fireMessage({
       type: "bar_code/scan",
       payload: {
-        title: "Scan EnOcean switch",
-        description: "Aim at the QR code on the module label, behind the rocker.",
-        alternative_option_label: "Enter the text instead",
+        title: "Scan commissioning QR code",
+        description: "Commissioning QR code: rear of the module.",
+        alternative_option_label: "Paste QR data",
       },
     });
   }
 
   async _scanCamera() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      this._status("error", "No camera access here (it needs HTTPS). Take a photo or paste the text instead.");
+      this._status("error", "Live camera unavailable: HTTPS required. Use Select QR image or Paste QR data.");
       return;
     }
     try {
@@ -532,12 +563,12 @@ class EnOceanBleScanPanel extends HTMLElement {
         audio: false,
       });
     } catch (err) {
-      this._status("error", `Camera not available: ${errorMessage(err)}. Take a photo or paste the text instead.`);
+      this._status("error", `Camera unavailable: ${errorMessage(err)}. Use Select QR image or Paste QR data.`);
       return;
     }
     const video = this._el("video");
     const msg = this._el("overlayMsg");
-    msg.textContent = "Aim at the QR code on the module label";
+    msg.textContent = "Commissioning QR code: rear of the module";
     this._el("overlay").classList.add("open");
     video.srcObject = this._stream;
     await video.play().catch(() => {});
@@ -552,7 +583,7 @@ class EnOceanBleScanPanel extends HTMLElement {
             this._submit(value);
             return;
           }
-          if (value) msg.textContent = "That is not an EnOcean module QR code";
+          if (value) msg.textContent = "Not an EnOcean commissioning QR code";
         }
       } catch (_err) {
         // keep scanning
@@ -579,7 +610,7 @@ class EnOceanBleScanPanel extends HTMLElement {
     const file = ev.target.files && ev.target.files[0];
     ev.target.value = "";
     if (!file) return;
-    this._status("info", "Reading the photo…");
+    this._status("info", "Decoding image…");
     try {
       const bitmap = await createImageBitmap(file);
       const canvas = document.createElement("canvas");
@@ -590,9 +621,9 @@ class EnOceanBleScanPanel extends HTMLElement {
         if (value || this._detector) break;
       }
       if (value && QR_FORMAT_RE.test(value)) this._submit(value);
-      else this._status("error", "No EnOcean module QR code found in this photo. Try again closer, without glare.");
+      else this._status("error", "No EnOcean commissioning QR code detected in the image.");
     } catch (err) {
-      this._status("error", `Could not read the photo: ${errorMessage(err)}`);
+      this._status("error", `Image could not be decoded: ${errorMessage(err)}`);
     }
   }
 

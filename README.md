@@ -34,18 +34,21 @@ It provides:
 
 1. Press any button on the switch — it will appear as a discovered device in Home Assistant
    (Settings -> Devices & Services).
-2. Click `Add` when it appears. One screen offers every way to add it:
-   - **Scan with the camera** or **Pick a photo** (links at the top): open the add page with the
-     camera running (in the Home Assistant app: the app's own scanner) or the photo picker open.
-   - **Or paste the QR code text**, then submit.
-   - **Or use the button sequence**: turn it on and submit to start manual commissioning.
+2. Click `Add` when it appears. One screen lists the device address and the commissioning methods:
+   - **Scan QR code** or **Select QR image** (links at the top): open the add page with the
+     camera running (in the Home Assistant app: the app's own scanner) or the image picker open.
+   - **Paste QR data**, then submit.
+   - **Manual commissioning (button sequence)**: turn it on and submit.
+
+   Some OEM modules are restricted to manufacturer-specific commissioning methods. Manual and/or QR
+   commissioning may be unavailable depending on the module and firmware.
 
 Switches are always added from their discovery: this guarantees the switch is present, and lets the
 integration check the QR code against a telegram really received from it.
 
 ### From the QR code (scan or text)
 
-The QR code on the PTM 215B/216B module label (behind the rocker) contains the switch address and
+The commissioning QR code on the rear of the PTM 215B/216B module contains the switch address and
 its security key, for example `30SE215…+Z…+30P…`. No button sequence is needed, which also makes
 it the way to add OEM switches whose radio commissioning is disabled (for example Busch-Jaeger
 6716 UBT and Jung BLE switches).
@@ -57,8 +60,7 @@ it the way to add OEM switches whose radio commissioning is disabled (for exampl
   scanner, photos and pasting work without it.
 - **Text:** paste the QR code text (for example read with your phone's camera app).
 
-If manual commissioning times out, you can **try again** or go **back** to the add screen (for
-example to use the QR code instead).
+If manual commissioning times out, you can **retry** or return to the **commissioning methods**.
 
 The scan page is a regular, admin-only Home Assistant page (no extra web endpoint, nothing
 reachable without logging in) and decodes QR codes with the browser's `BarcodeDetector` or the

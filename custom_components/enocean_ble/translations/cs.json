@@ -3,49 +3,46 @@
     "step": {
       "bluetooth_method": {
         "title": "Přidat {name}",
-        "description": "**[Skenovat fotoaparátem]({scan_url})** · **[Vybrat fotografii]({photo_url})** QR kódu na štítku modulu EnOcean, za kolébkou. Adresa musí být {mac}.\n\nNebo vložte text QR kódu, nebo použijte sekvenci tlačítek.",
+        "description": "Adresa zařízení: `{mac}`\nQR kód pro uvedení do provozu: na zadní straně modulu.\n\n**[Skenovat QR kód]({scan_url})** · **[Vybrat obrázek QR]({photo_url})**\n\nNěkteré OEM moduly jsou omezeny na metody uvedení do provozu specifické pro výrobce. Ruční a/nebo QR uvedení do provozu nemusí být v závislosti na modulu a firmwaru k dispozici.",
         "data": {
-          "qr_code": "Nebo vložte text QR kódu",
-          "button_sequence": "Nebo použijte sekvenci tlačítek (ruční uvedení do provozu)"
-        },
-        "data_description": {
-          "button_sequence": "Pro spínač, jehož štítek není dostupný. Některé OEM spínače (například Busch-Jaeger, Jung) to nepodporují."
+          "qr_code": "Vložit data QR",
+          "button_sequence": "Ruční uvedení do provozu (sekvence tlačítek)"
         }
       },
       "commissioning": {
-        "title": "Automatické uvedení EnOcean BLE do provozu",
-        "description": "Aktivujte automatické uvedení do provozu pro {name}:\n\n1. Podržte tlačítko 1 po dobu 7 sekund\n2. Krátce stiskněte tlačítko 1\n3. Znovu podržte tlačítko 1 po dobu 7 sekund\n\nMáte 2 minuty. V případě potřeby to zkuste znovu."
+        "title": "Ruční uvedení do provozu",
+        "description": "Sekvence uvedení do provozu na {name}: držet tlačítko 1 po dobu 7 s, krátce stisknout, znovu držet 7 s. Časový limit: 2 min."
       },
       "bluetooth_confirm": {
-        "title": "Potvrdit zařízení EnOcean BLE",
-        "description": "Přepínač EnOcean s adresou {mac} byl úspěšně uveden do provozu.\n\n⚠️ Stiskněte jiné tlačítko pro vypnutí režimu commissioning a poté klikněte na Odeslat."
+        "title": "Telegram uvedení do provozu přijat",
+        "description": "Zařízení {mac} uvedeno do provozu. Stiskněte jiné tlačítko pro ukončení režimu uvedení do provozu a odešlete."
       },
       "commissioning_retry": {
-        "title": "Uvedení do provozu se nezdařilo",
-        "description": "Od {name} nebyl přijat žádný platný telegram pro uvedení do provozu. Zkuste to znovu, nebo se vraťte a přidejte jej pomocí QR kódu na štítku modulu. Pokud to stále selhává, přečtěte si nejprve upozornění k obnovení továrního nastavení v dokumentaci.",
+        "title": "Uvedení do provozu selhalo",
+        "description": "Od {name} nebyl přijat platný telegram uvedení do provozu. Před obnovením továrního nastavení si přečtěte upozornění v dokumentaci.",
         "menu_options": {
-          "commissioning": "Zkusit znovu",
-          "bluetooth_method": "Zpět k metodám"
+          "commissioning": "Opakovat",
+          "bluetooth_method": "Metody uvedení do provozu"
         }
       }
     },
     "progress": {
-      "waiting_commissioning": "Podržte tlačítko 1 po dobu 7 sekund, poté jej krátce stiskněte a znovu podržte 7 sekund."
+      "waiting_commissioning": "Čekání na telegram uvedení do provozu (limit 2 min). Sekvence: tlačítko 1 drženo 7 s, krátký stisk, drženo 7 s."
     },
     "abort": {
       "no_bluetooth_discovery": "Toto nastavení musí začít z objeveného Bluetooth zařízení.",
       "not_enocean_prefix": "Toto objevené zařízení nepoužívá MAC prefix EnOcean BLE (E2:15).",
       "already_configured": "Tento spínač je již nastaven.",
-      "discovery_required": "Stiskněte libovolné tlačítko spínače: objeví se jako nalezené zařízení v Nastavení → Zařízení a služby, odkud ho můžete přidat."
+      "discovery_required": "Zařízení se přidávají z Bluetooth vyhledávání. Stiskněte tlačítko spínače; zobrazí se jako nalezené v Nastavení → Zařízení a služby."
     },
     "error": {
-      "commissioning_not_detected": "Během 2 minut nebyl přijat commissioning telegram. Zkuste to znovu. Pokud to po více pokusech stále nefunguje, můžete zkusit tovární reset. Nejprve si přečtěte upozornění k resetu v dokumentaci.",
-      "invalid_commissioning": "Byl přijat commissioning telegram, ale nepodařilo se jej ověřit. Zkuste to znovu. Pokud to opakovaně selhává, před resetem si přečtěte upozornění v dokumentaci.",
-      "invalid_qr": "V tomto textu nebyla nalezena adresa spínače EnOcean (30SE215…) ani 32znakový bezpečnostní klíč (+Z…).",
-      "qr_mac_mismatch": "Tento QR kód patří jinému spínači, než který byl nalezen.",
-      "qr_key_invalid": "Klíč v tomto QR kódu neodpovídá telegramům přijatým z tohoto spínače. Mohl být překonfigurován (například jiným systémem).",
-      "qr_no_telegram": "Z tohoto spínače zatím nebyl přijat žádný telegram. Stiskněte některé z jeho tlačítek a zkuste to znovu.",
-      "choose_method": "Naskenujte nebo vložte QR kód, nebo zapněte sekvenci tlačítek."
+      "commissioning_not_detected": "Během 2 min nebyl přijat žádný telegram uvedení do provozu.",
+      "invalid_commissioning": "Telegram uvedení do provozu přijat, ale ověření selhalo.",
+      "invalid_qr": "Neplatná data QR pro uvedení do provozu: nerozpoznána adresa zařízení (30SE215…) ani 32místný bezpečnostní klíč (+Z…).",
+      "qr_mac_mismatch": "Adresa zařízení v datech QR neodpovídá nalezenému zařízení.",
+      "qr_key_invalid": "Bezpečnostní klíč neověřuje telegramy přijaté z tohoto zařízení. Modul mohl být překlíčován jiným systémem.",
+      "qr_no_telegram": "Z tohoto zařízení zatím nebyl přijat žádný telegram. Stiskněte tlačítko modulu a odešlete znovu.",
+      "choose_method": "Nebyla vybrána žádná metoda uvedení do provozu."
     }
   }
 }

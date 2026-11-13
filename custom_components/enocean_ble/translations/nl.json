@@ -3,49 +3,46 @@
     "step": {
       "bluetooth_method": {
         "title": "{name} toevoegen",
-        "description": "**[Scannen met de camera]({scan_url})** · **[Kies een foto]({photo_url})** van de QR-code op het label van de EnOcean-module, achter de wip. Het adres moet {mac} zijn.\n\nOf plak de tekst van de QR-code, of gebruik de knoppenreeks.",
+        "description": "Apparaatadres: `{mac}`\nCommissioning-QR-code: op de achterzijde van de module.\n\n**[QR-code scannen]({scan_url})** · **[QR-afbeelding kiezen]({photo_url})**\n\nSommige OEM-modules zijn beperkt tot fabrikantspecifieke commissioningmethoden. Handmatige en/of QR-commissioning is mogelijk niet beschikbaar, afhankelijk van module en firmware.",
         "data": {
-          "qr_code": "Of plak de tekst van de QR-code",
-          "button_sequence": "Of gebruik de knoppenreeks (handmatige commissioning)"
-        },
-        "data_description": {
-          "button_sequence": "Voor een schakelaar waarvan je het label niet kunt bereiken. Sommige OEM-schakelaars (bijvoorbeeld Busch-Jaeger, Jung) ondersteunen dit niet."
+          "qr_code": "QR-gegevens plakken",
+          "button_sequence": "Handmatige commissioning (knoppenreeks)"
         }
       },
       "commissioning": {
-        "title": "EnOcean BLE auto-commissioning",
-        "description": "Activeer auto-commissioning op {name}:\n\n1. Houd knop 1 7 seconden ingedrukt\n2. Druk kort op knop 1\n3. Houd knop 1 opnieuw 7 seconden ingedrukt\n\nJe hebt 2 minuten. Probeer opnieuw indien nodig."
+        "title": "Handmatige commissioning",
+        "description": "Commissioningreeks op {name}: knop 1 7 s vasthouden, kort drukken, opnieuw 7 s vasthouden. Time-out: 2 min."
       },
       "bluetooth_confirm": {
-        "title": "Bevestig EnOcean BLE-apparaat",
-        "description": "EnOcean-schakelaar met adres {mac} is succesvol gecommissioned.\n\n⚠️ Druk op een andere knop om de commissioningmodus uit te schakelen en klik daarna op Verzenden."
+        "title": "Commissioningtelegram ontvangen",
+        "description": "Apparaat {mac} gecommissioned. Druk op een andere knop om de commissioningmodus te verlaten en verstuur daarna."
       },
       "commissioning_retry": {
-        "title": "Commissioning is niet gelukt",
-        "description": "Er is geen geldig commissioning-telegram van {name} ontvangen. Probeer het opnieuw, of ga terug en voeg hem toe via de QR-code op het modulelabel. Blijft commissioning mislukken, lees dan eerst de resetdisclaimer in de documentatie.",
+        "title": "Commissioning mislukt",
+        "description": "Geen geldig commissioningtelegram ontvangen van {name}. Zie vóór een fabrieksreset de reset-disclaimer in de documentatie.",
         "menu_options": {
-          "commissioning": "Opnieuw proberen",
-          "bluetooth_method": "Terug naar de methoden"
+          "commissioning": "Opnieuw",
+          "bluetooth_method": "Commissioningmethoden"
         }
       }
     },
     "progress": {
-      "waiting_commissioning": "Houd knop 1 7 seconden ingedrukt, druk dan kort op knop 1 en houd opnieuw 7 seconden ingedrukt."
+      "waiting_commissioning": "Wachten op het commissioningtelegram (time-out 2 min). Reeks: knop 1 7 s vasthouden, kort drukken, opnieuw 7 s vasthouden."
     },
     "abort": {
       "already_configured": "Deze schakelaar is al geconfigureerd.",
       "no_bluetooth_discovery": "Deze configuratie moet gestart worden vanaf een ontdekt Bluetooth-apparaat.",
       "not_enocean_prefix": "Dit ontdekte apparaat gebruikt niet de EnOcean BLE MAC-prefix (E2:15).",
-      "discovery_required": "Druk op een willekeurige knop van de schakelaar: hij verschijnt dan als ontdekt apparaat in Instellingen → Apparaten en diensten, waar je hem kunt toevoegen."
+      "discovery_required": "Apparaten worden toegevoegd via Bluetooth-detectie. Druk op een knop van de schakelaar; deze verschijnt dan als gevonden onder Instellingen → Apparaten & diensten."
     },
     "error": {
-      "invalid_qr": "In deze tekst is geen EnOcean-schakelaaradres (30SE215…) en beveiligingssleutel van 32 tekens (+Z…) gevonden.",
-      "commissioning_not_detected": "Binnen 2 minuten is geen commissioning-telegram ontvangen. Probeer opnieuw. Als het na meerdere pogingen nog steeds niet werkt, kun je een fabrieksreset proberen. Lees eerst de resetdisclaimer in de documentatie.",
-      "invalid_commissioning": "Er is een commissioning-telegram ontvangen, maar dit kon niet worden gevalideerd. Probeer opnieuw. Als dit blijft mislukken, lees dan eerst de resetdisclaimer in de documentatie.",
-      "qr_mac_mismatch": "Deze QR-code hoort bij een andere schakelaar dan de ontdekte.",
-      "qr_key_invalid": "De sleutel in deze QR-code past niet bij de telegrammen van deze schakelaar. Mogelijk is hij opnieuw geconfigureerd (bijvoorbeeld door een ander systeem).",
-      "qr_no_telegram": "Er is nog geen telegram van deze schakelaar ontvangen. Druk op een van de knoppen en probeer het opnieuw.",
-      "choose_method": "Scan of plak de QR-code, of zet de knoppenreeks aan."
+      "invalid_qr": "Ongeldige commissioning-QR-gegevens: geen apparaatadres (30SE215…) en 32-cijferige beveiligingssleutel (+Z…) herkend.",
+      "commissioning_not_detected": "Geen commissioningtelegram ontvangen binnen 2 min.",
+      "invalid_commissioning": "Commissioningtelegram ontvangen, maar validatie mislukt.",
+      "qr_mac_mismatch": "Het apparaatadres in de QR-gegevens komt niet overeen met het gevonden apparaat.",
+      "qr_key_invalid": "De beveiligingssleutel authenticeert de ontvangen telegrammen van dit apparaat niet. De module is mogelijk door een ander systeem opnieuw gesleuteld.",
+      "qr_no_telegram": "Nog geen telegram van dit apparaat ontvangen. Druk op een knop van de module en verstuur opnieuw.",
+      "choose_method": "Geen commissioningmethode gekozen."
     }
   }
 }

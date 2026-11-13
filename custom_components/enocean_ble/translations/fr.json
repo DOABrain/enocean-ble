@@ -3,49 +3,46 @@
     "step": {
       "bluetooth_method": {
         "title": "Ajouter {name}",
-        "description": "**[Scanner avec la caméra]({scan_url})** · **[Choisir une photo]({photo_url})** du QR code de l'étiquette du module EnOcean, derrière la bascule. Son adresse doit être {mac}.\n\nOu collez le texte du QR code, ou utilisez la séquence de boutons.",
+        "description": "Adresse de l'appareil: `{mac}`\nQR code de mise en service : au dos du module.\n\n**[Scanner le QR code]({scan_url})** · **[Sélectionner une image QR]({photo_url})**\n\nCertains modules OEM sont limités à des méthodes de mise en service propres au fabricant. La mise en service manuelle et/ou par QR code peut être indisponible selon le module et le firmware.",
         "data": {
-          "qr_code": "Ou coller le texte du QR code",
-          "button_sequence": "Ou utiliser la séquence de boutons (mise en service manuelle)"
-        },
-        "data_description": {
-          "button_sequence": "Pour un interrupteur dont l'étiquette est inaccessible. Certains interrupteurs OEM (par exemple Busch-Jaeger, Jung) ne le prennent pas en charge."
+          "qr_code": "Coller les données QR",
+          "button_sequence": "Mise en service manuelle (séquence de boutons)"
         }
       },
       "commissioning": {
-        "title": "Auto-commissioning EnOcean BLE",
-        "description": "Activez l'auto-commissioning sur {name} :\n\n1. Maintenez le bouton 1 pendant 7 secondes\n2. Appuyez brièvement sur le bouton 1\n3. Maintenez à nouveau le bouton 1 pendant 7 secondes\n\nVous avez 2 minutes. Réessayez si nécessaire."
+        "title": "Mise en service manuelle",
+        "description": "Séquence de mise en service sur {name} : maintenir le bouton 1 pendant 7 s, appui bref, maintenir de nouveau 7 s. Délai : 2 min."
       },
       "bluetooth_confirm": {
-        "title": "Confirmer l'appareil EnOcean BLE",
-        "description": "Le switch EnOcean avec l'adresse {mac} a été commissionné avec succès.\n\n⚠️ Appuyez sur un autre bouton pour désactiver le mode commissioning, puis cliquez sur Soumettre."
+        "title": "Télégramme de mise en service reçu",
+        "description": "Appareil {mac} mis en service. Appuyer sur un autre bouton pour quitter le mode mise en service, puis valider."
       },
       "commissioning_retry": {
-        "title": "La mise en service a échoué",
-        "description": "Aucun télégramme de mise en service valide n'a été reçu de {name}. Réessayez, ou revenez en arrière et ajoutez-le avec le QR code de l'étiquette du module. Si la mise en service échoue encore, lisez d'abord l'avertissement sur la réinitialisation d'usine dans la documentation.",
+        "title": "Échec de la mise en service",
+        "description": "Aucun télégramme de mise en service valide reçu de {name}. Avant une réinitialisation d'usine, voir l'avertissement dans la documentation.",
         "menu_options": {
           "commissioning": "Réessayer",
-          "bluetooth_method": "Retour aux méthodes"
+          "bluetooth_method": "Méthodes de mise en service"
         }
       }
     },
     "progress": {
-      "waiting_commissioning": "Maintenez le bouton 1 pendant 7 secondes, puis appuyez brièvement sur le bouton 1, puis maintenez à nouveau 7 secondes."
+      "waiting_commissioning": "En attente du télégramme de mise en service (délai 2 min). Séquence : bouton 1 maintenu 7 s, appui bref, maintenu 7 s."
     },
     "abort": {
       "no_bluetooth_discovery": "Cette configuration doit être lancée depuis un appareil Bluetooth détecté.",
       "not_enocean_prefix": "L'appareil détecté n'utilise pas le préfixe MAC EnOcean BLE (E2:15).",
       "already_configured": "Ce switch est déjà configuré.",
-      "discovery_required": "Appuyez sur n'importe quel bouton du switch : il apparaît alors comme appareil découvert dans Paramètres → Appareils et services, d'où vous pouvez l'ajouter."
+      "discovery_required": "Les appareils sont ajoutés depuis la découverte Bluetooth. Appuyer sur un bouton de l'interrupteur ; il apparaît alors comme découvert dans Paramètres → Appareils et services."
     },
     "error": {
-      "commissioning_not_detected": "Aucune trame de commissioning n'a été reçue dans les 2 minutes. Réessayez. Si cela ne fonctionne toujours pas après plusieurs tentatives, vous pouvez essayer un reset usine. Merci de lire d'abord le disclaimer de reset dans la documentation.",
-      "invalid_commissioning": "Une trame de commissioning a été reçue mais n'a pas pu être validée. Réessayez. Si cela continue d'échouer, consultez le disclaimer de reset dans la documentation avant de réinitialiser.",
-      "invalid_qr": "Aucune adresse de switch EnOcean (30SE215…) ni clé de sécurité de 32 caractères (+Z…) n'a été trouvée dans ce texte.",
-      "qr_mac_mismatch": "Ce QR code correspond à un autre switch que celui qui a été découvert.",
-      "qr_key_invalid": "La clé de ce QR code ne correspond pas aux télégrammes reçus de ce switch. Il a peut-être été reconfiguré (par exemple par un autre système).",
-      "qr_no_telegram": "Aucun télégramme n'a encore été reçu de ce switch. Appuyez sur un de ses boutons, puis réessayez.",
-      "choose_method": "Scannez ou collez le QR code, ou activez la séquence de boutons."
+      "commissioning_not_detected": "Aucun télégramme de mise en service reçu en 2 min.",
+      "invalid_commissioning": "Télégramme de mise en service reçu, mais la validation a échoué.",
+      "invalid_qr": "Données QR de mise en service invalides : aucune adresse d'appareil (30SE215…) ni clé de sécurité de 32 caractères (+Z…) reconnue.",
+      "qr_mac_mismatch": "L'adresse de l'appareil dans les données QR ne correspond pas à l'appareil découvert.",
+      "qr_key_invalid": "La clé de sécurité n'authentifie pas les télégrammes reçus de cet appareil. Le module a peut-être été reconfiguré par un autre système.",
+      "qr_no_telegram": "Aucun télégramme reçu de cet appareil. Appuyer sur un bouton du module, puis valider de nouveau.",
+      "choose_method": "Aucune méthode de mise en service sélectionnée."
     }
   }
 }

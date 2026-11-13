@@ -3,49 +3,46 @@
     "step": {
       "bluetooth_method": {
         "title": "Add {name}",
-        "description": "**[Scan with the camera]({scan_url})** · **[Pick a photo]({photo_url})** of the QR code on the EnOcean module label, behind the rocker. Its address must be {mac}.\n\nOr paste the QR code text, or use the button sequence.",
+        "description": "Device address: `{mac}`\nCommissioning QR code: located on the rear of the module.\n\n**[Scan QR code]({scan_url})** · **[Select QR image]({photo_url})**\n\nSome OEM modules are restricted to manufacturer-specific commissioning methods. Manual and/or QR commissioning may be unavailable depending on the module and firmware.",
         "data": {
-          "qr_code": "Or paste the QR code text",
-          "button_sequence": "Or use the button sequence (manual commissioning)"
-        },
-        "data_description": {
-          "button_sequence": "For a switch whose label you cannot reach. Some OEM switches (for example Busch-Jaeger, Jung) do not support it."
+          "qr_code": "Paste QR data",
+          "button_sequence": "Manual commissioning (button sequence)"
         }
       },
       "commissioning": {
-        "title": "EnOcean BLE Auto-Commissioning",
-        "description": "Activate auto-commissioning on {name}:\n\n1. Hold button 1 for 7 seconds\n2. Press button 1 briefly\n3. Hold button 1 again for 7 seconds\n\nYou have 2 minutes. Retry if needed."
+        "title": "Manual commissioning",
+        "description": "Commissioning sequence on {name}: hold button 1 for 7 s, press briefly, hold again for 7 s. Timeout: 2 min."
       },
       "bluetooth_confirm": {
-        "title": "Confirm EnOcean BLE Device",
-        "description": "EnOcean switch with address {mac} was commissioned successfully.\n\n⚠️ Press another button to disable commissioning mode, then click Submit."
+        "title": "Commissioning telegram received",
+        "description": "Device {mac} commissioned. Press another button to exit commissioning mode, then submit."
       },
       "commissioning_retry": {
-        "title": "Commissioning did not succeed",
-        "description": "No valid commissioning telegram was received from {name}. Try again, or go back and add it from the QR code on its module label. If commissioning keeps failing, read the factory reset disclaimer in the documentation first.",
+        "title": "Commissioning failed",
+        "description": "No valid commissioning telegram received from {name}. Before a factory reset, see the reset disclaimer in the documentation.",
         "menu_options": {
-          "commissioning": "Try again",
-          "bluetooth_method": "Back to the methods"
+          "commissioning": "Retry",
+          "bluetooth_method": "Commissioning methods"
         }
       }
     },
     "progress": {
-      "waiting_commissioning": "Hold button 1 for 7 seconds, then press button 1 briefly, and hold again for 7 seconds."
+      "waiting_commissioning": "Waiting for the commissioning telegram (timeout 2 min). Sequence: hold button 1 for 7 s, press briefly, hold again for 7 s."
     },
     "abort": {
       "already_configured": "This switch is already configured.",
       "no_bluetooth_discovery": "This setup must start from a discovered Bluetooth device.",
       "not_enocean_prefix": "This discovered device does not use the EnOcean BLE MAC prefix (E2:15).",
-      "discovery_required": "Press any button on the switch: it then appears as a discovered device in Settings → Devices & services, where you can add it."
+      "discovery_required": "Devices are added from Bluetooth discovery. Press a button on the switch; it then appears as discovered under Settings → Devices & services."
     },
     "error": {
-      "invalid_qr": "No EnOcean switch address (30SE215…) and 32-character security key (+Z…) were found in this text.",
-      "commissioning_not_detected": "No commissioning telegram was received within 2 minutes. Try again. If it still does not work after multiple attempts, you can try a factory reset. Please read the reset disclaimer in the documentation first.",
-      "invalid_commissioning": "A commissioning telegram was received but could not be validated. Try again. If this keeps failing, review the factory reset disclaimer in the documentation before resetting.",
-      "qr_mac_mismatch": "This QR code belongs to another switch than the one that was discovered.",
-      "qr_key_invalid": "The key in this QR code does not match the telegrams received from this switch. It may have been reconfigured (for example by another system).",
-      "qr_no_telegram": "No telegram has been received from this switch yet. Press one of its buttons, then try again.",
-      "choose_method": "Scan or paste the QR code, or turn on the button sequence."
+      "invalid_qr": "Invalid commissioning QR data: no device address (30SE215…) and 32-digit security key (+Z…) recognized.",
+      "commissioning_not_detected": "No commissioning telegram received within 2 min.",
+      "invalid_commissioning": "Commissioning telegram received but failed validation.",
+      "qr_mac_mismatch": "Device address in the QR data does not match the discovered device.",
+      "qr_key_invalid": "Security key does not authenticate the telegrams received from this device. The module may have been re-keyed by another system.",
+      "qr_no_telegram": "No telegram received from this device yet. Press a button on the module, then resubmit.",
+      "choose_method": "No commissioning method selected."
     }
   }
 }

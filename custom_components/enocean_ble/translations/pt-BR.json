@@ -3,49 +3,46 @@
     "step": {
       "bluetooth_method": {
         "title": "Adicionar {name}",
-        "description": "**[Escanear com a câmera]({scan_url})** · **[Escolher uma foto]({photo_url})** do código QR da etiqueta do módulo EnOcean, atrás da tecla. O endereço deve ser {mac}.\n\nOu cole o texto do código QR, ou use a sequência de botões.",
+        "description": "Endereço do dispositivo: `{mac}`\nCódigo QR de comissionamento: na parte traseira do módulo.\n\n**[Escanear código QR]({scan_url})** · **[Selecionar imagem QR]({photo_url})**\n\nAlguns módulos OEM são restritos a métodos de comissionamento específicos do fabricante. O comissionamento manual e/ou por QR pode não estar disponível, dependendo do módulo e do firmware.",
         "data": {
-          "qr_code": "Ou cole o texto do código QR",
-          "button_sequence": "Ou use a sequência de botões (comissionamento manual)"
-        },
-        "data_description": {
-          "button_sequence": "Para um interruptor cuja etiqueta você não alcança. Alguns interruptores OEM (por exemplo Busch-Jaeger, Jung) não oferecem suporte."
+          "qr_code": "Colar dados QR",
+          "button_sequence": "Comissionamento manual (sequência de botões)"
         }
       },
       "commissioning": {
-        "title": "Auto-comissionamento EnOcean BLE",
-        "description": "Ative o auto-comissionamento em {name}:\n\n1. Mantenha o botão 1 pressionado por 7 segundos\n2. Pressione o botão 1 brevemente\n3. Mantenha o botão 1 pressionado novamente por 7 segundos\n\nVocê tem 2 minutos. Tente novamente se necessário."
+        "title": "Comissionamento manual",
+        "description": "Sequência de comissionamento em {name}: segurar o botão 1 por 7 s, pressionar brevemente, segurar novamente por 7 s. Tempo limite: 2 min."
       },
       "bluetooth_confirm": {
-        "title": "Confirmar dispositivo EnOcean BLE",
-        "description": "O interruptor EnOcean com endereço {mac} foi comissionado com sucesso.\n\n⚠️ Pressione outro botão para desativar o modo de comissionamento e depois clique em Enviar."
+        "title": "Telegrama de comissionamento recebido",
+        "description": "Dispositivo {mac} comissionado. Pressione outro botão para sair do modo de comissionamento e envie."
       },
       "commissioning_retry": {
-        "title": "O comissionamento não teve sucesso",
-        "description": "Nenhum telegrama de comissionamento válido foi recebido de {name}. Tente novamente, ou volte e adicione-o pelo código QR da etiqueta do módulo. Se continuar falhando, leia primeiro o aviso sobre a redefinição de fábrica na documentação.",
+        "title": "Falha no comissionamento",
+        "description": "Nenhum telegrama de comissionamento válido recebido de {name}. Antes de uma redefinição de fábrica, consulte o aviso na documentação.",
         "menu_options": {
           "commissioning": "Tentar novamente",
-          "bluetooth_method": "Voltar aos métodos"
+          "bluetooth_method": "Métodos de comissionamento"
         }
       }
     },
     "progress": {
-      "waiting_commissioning": "Segure o botão 1 por 7 segundos, depois pressione brevemente o botão 1 e segure novamente por 7 segundos."
+      "waiting_commissioning": "Aguardando o telegrama de comissionamento (limite 2 min). Sequência: botão 1 segurado 7 s, toque breve, segurado 7 s."
     },
     "abort": {
       "no_bluetooth_discovery": "Esta configuração deve ser iniciada a partir de um dispositivo Bluetooth descoberto.",
       "not_enocean_prefix": "Este dispositivo descoberto não usa o prefixo MAC EnOcean BLE (E2:15).",
       "already_configured": "Este interruptor já está configurado.",
-      "discovery_required": "Pressione qualquer botão do interruptor: ele aparecerá como dispositivo descoberto em Configurações → Dispositivos e serviços, onde você pode adicioná-lo."
+      "discovery_required": "Os dispositivos são adicionados pela descoberta Bluetooth. Pressione um botão do interruptor; ele aparece como descoberto em Configurações → Dispositivos e serviços."
     },
     "error": {
-      "commissioning_not_detected": "Nenhum telegrama de comissionamento foi recebido em 2 minutos. Tente novamente. Se continuar sem funcionar após várias tentativas, você pode tentar um reset de fábrica. Leia primeiro o aviso de reset na documentação.",
-      "invalid_commissioning": "Um telegrama de comissionamento foi recebido, mas não pôde ser validado. Tente novamente. Se isso continuar falhando, revise o aviso de reset na documentação antes de resetar.",
-      "invalid_qr": "Nenhum endereço de interruptor EnOcean (30SE215…) e chave de segurança de 32 caracteres (+Z…) foram encontrados neste texto.",
-      "qr_mac_mismatch": "Este código QR pertence a outro interruptor, diferente do descoberto.",
-      "qr_key_invalid": "A chave deste código QR não corresponde aos telegramas recebidos deste interruptor. Ele pode ter sido reconfigurado (por exemplo, por outro sistema).",
-      "qr_no_telegram": "Nenhum telegrama foi recebido deste interruptor ainda. Pressione um dos botões e tente novamente.",
-      "choose_method": "Escaneie ou cole o código QR, ou ative a sequência de botões."
+      "commissioning_not_detected": "Nenhum telegrama de comissionamento recebido em 2 min.",
+      "invalid_commissioning": "Telegrama de comissionamento recebido, mas a validação falhou.",
+      "invalid_qr": "Dados QR de comissionamento inválidos: endereço do dispositivo (30SE215…) e chave de segurança de 32 dígitos (+Z…) não reconhecidos.",
+      "qr_mac_mismatch": "O endereço do dispositivo nos dados QR não corresponde ao dispositivo descoberto.",
+      "qr_key_invalid": "A chave de segurança não autentica os telegramas recebidos deste dispositivo. O módulo pode ter sido reconfigurado por outro sistema.",
+      "qr_no_telegram": "Nenhum telegrama recebido deste dispositivo ainda. Pressione um botão do módulo e envie novamente.",
+      "choose_method": "Nenhum método de comissionamento selecionado."
     }
   }
 }
