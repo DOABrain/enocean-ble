@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import asyncio
-from types import SimpleNamespace
 from collections.abc import Iterator
+from types import SimpleNamespace
 from typing import Any
 from unittest.mock import patch
 
@@ -39,6 +39,18 @@ def _service_info(payload: bytes | None = DATA_TELEGRAM, address: str = MAC) -> 
         time=1.0,
         manufacturer_data={ENOCEAN_MANUFACTURER_ID: payload} if payload is not None else {},
     )
+
+
+def _fields(result: Any) -> list[str]:
+    schema = result["data_schema"]
+    assert schema is not None
+    return [str(key) for key in schema.schema]
+
+
+def _placeholders(result: Any) -> Any:
+    placeholders = result["description_placeholders"]
+    assert placeholders is not None
+    return placeholders
 
 
 async def _discovered_flow(hass: Any, cached: list[SimpleNamespace]) -> tuple[EnOceanBleConfigFlow, Any]:
@@ -107,7 +119,7 @@ async def test_qr_code_creates_entry(hass: Any, flows: list[EnOceanBleConfigFlow
     result = await flow.async_step_qr_add({"qr_code": QR})
     assert result["type"] == FlowResultType.FORM
     assert result["step_id"] == "device_name"
-    assert [field["name"] for field in result["data_schema"].schema] == ["name"]
+    assert _fields(result) == ["name"]
     result = await flow.async_step_device_name({"name": "  Woonkamer Gira  "})
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["title"] == "Woonkamer Gira"
@@ -138,7 +150,7 @@ async def test_commissioned_switch_is_named_on_confirm(
     flow._pending_security_key = KEY
     result = await flow.async_step_bluetooth_confirm()
     assert result["type"] == FlowResultType.FORM
-    assert [field["name"] for field in result["data_schema"].schema] == ["name"]
+    assert _fields(result) == ["name"]
     result = await flow.async_step_bluetooth_confirm({"name": "Gang"})
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["title"] == "Gang"
@@ -168,7 +180,7 @@ async def test_qr_code_errors_stay_on_the_add_step(
         result = await flow.async_step_bluetooth_method({"qr_code": raw})
     assert result["type"] == FlowResultType.SHOW_PROGRESS
     assert result["step_id"] == "bluetooth_method"
-    assert result["description_placeholders"]["error"] == error
+    assert _placeholders(result)["error"] == error
 
 
 async def test_qr_code_without_any_telegram(hass: Any, flows: list[EnOceanBleConfigFlow]) -> None:
@@ -176,7 +188,7 @@ async def test_qr_code_without_any_telegram(hass: Any, flows: list[EnOceanBleCon
     flow._discovery_payload = None
     with patch.object(config_flow_module, "async_discovered_service_info", return_value=[]):
         result = await flow.async_step_bluetooth_method({"qr_code": QR})
-    assert result["description_placeholders"]["error"] == "qr_no_telegram"
+    assert _placeholders(result)["error"] == "qr_no_telegram"
 
 
 async def test_qr_add_without_accepted_code_returns_to_the_add_step(
@@ -191,7 +203,7 @@ async def test_empty_input_keeps_waiting(hass: Any, flows: list[EnOceanBleConfig
     for empty in ({}, {"qr_code": "  ", "button_sequence": False}):
         result = await flow.async_step_bluetooth_method(empty)
         assert result["type"] == FlowResultType.SHOW_PROGRESS
-        assert result["description_placeholders"]["error"] == ""
+        assert _placeholders(result)["error"] == ""
 
 
 async def test_button_sequence_starts_commissioning(hass: Any, flows: list[EnOceanBleConfigFlow]) -> None:

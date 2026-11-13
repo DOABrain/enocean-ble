@@ -25,7 +25,8 @@ def _keys(node: Any, prefix: str = "") -> set[str]:
 
 
 def _load(lang: str) -> dict[str, Any]:
-    return json.loads((TRANSLATIONS / f"{lang}.json").read_text(encoding="utf-8"))
+    data: dict[str, Any] = json.loads((TRANSLATIONS / f"{lang}.json").read_text(encoding="utf-8"))
+    return data
 
 
 @pytest.mark.parametrize("path", sorted(TRANSLATIONS.glob("*.json")), ids=lambda p: p.stem)

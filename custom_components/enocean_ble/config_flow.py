@@ -88,7 +88,7 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._shown_steps: set[str] = set()
         # The add step waits (as a progress step, so the dialog has no Submit) until
         # the commissioning page submits a method; this task never completes by itself.
-        self._method_task: asyncio.Task[None] | None = None
+        self._method_task: asyncio.Task[Any] | None = None
         self._qr_onboarding: OnboardingData | None = None
 
     def async_remove(self) -> None:
@@ -243,7 +243,7 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             )
         return self.async_show_form(
             step_id=NAME_STEP_ID,
-            data_schema=self._name_schema(),
+            data_schema=self._name_schema(),  # type: ignore[arg-type,unused-ignore]
             description_placeholders=self._name_placeholders(),
         )
 
@@ -368,7 +368,7 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             )
             return self.async_show_form(
                 step_id="bluetooth_confirm",
-                data_schema=self._name_schema(),
+                data_schema=self._name_schema(),  # type: ignore[arg-type,unused-ignore]
                 description_placeholders={
                     "name": self._pending_title or self._pending_mac or DOMAIN,
                     "mac": self._pending_mac,
