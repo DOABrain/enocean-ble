@@ -2,12 +2,7 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "Lägg till {name}",
-        "description": "Enhetsadress: `{mac}`\nQR-kod för driftsättning: på modulens baksida.\n\n**[Skanna QR-kod]({scan_url})** · **[Välj QR-bild]({photo_url})**\n\nVissa OEM-moduler är begränsade till tillverkarspecifika driftsättningsmetoder. Manuell och/eller QR-driftsättning kan vara otillgänglig beroende på modul och firmware.",
-        "data": {
-          "qr_code": "Klistra in QR-data",
-          "button_sequence": "Manuell driftsättning (knappsekvens)"
-        }
+        "title": "Lägg till {name}"
       },
       "commissioning": {
         "title": "Manuell driftsättning",
@@ -27,7 +22,8 @@
       }
     },
     "progress": {
-      "waiting_commissioning": "Väntar på driftsättningstelegrammet (tidsgräns 2 min). Sekvens: knapp 1 hålls 7 s, kort tryck, hålls 7 s."
+      "waiting_commissioning": "Väntar på driftsättningstelegrammet (tidsgräns 2 min). Sekvens: knapp 1 hålls 7 s, kort tryck, hålls 7 s.",
+      "open_commissioning_page": "Enhetsadress: `{mac}`\n\n**[Öppna driftsättningssidan]({page_url})**"
     },
     "abort": {
       "no_bluetooth_discovery": "Denna konfiguration måste startas från en upptäckt Bluetooth-enhet.",
@@ -41,8 +37,7 @@
       "invalid_qr": "Ogiltiga QR-data för driftsättning: ingen enhetsadress (30SE215…) och 32-siffrig säkerhetsnyckel (+Z…) identifierad.",
       "qr_mac_mismatch": "Enhetsadressen i QR-data matchar inte den upptäckta enheten.",
       "qr_key_invalid": "Säkerhetsnyckeln autentiserar inte de telegram som tagits emot från enheten. Modulen kan ha fått ny nyckel av ett annat system.",
-      "qr_no_telegram": "Inget telegram har tagits emot från enheten ännu. Tryck på en knapp på modulen och skicka igen.",
-      "choose_method": "Ingen driftsättningsmetod vald."
+      "qr_no_telegram": "Inget telegram har tagits emot från enheten ännu. Tryck på en knapp på modulen och skicka igen."
     }
   }
 }

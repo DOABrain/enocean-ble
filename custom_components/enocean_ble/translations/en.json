@@ -2,12 +2,7 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "Add {name}",
-        "description": "Device address: `{mac}`\nCommissioning QR code: located on the rear of the module.\n\n**[Scan QR code]({scan_url})** · **[Select QR image]({photo_url})**\n\nSome OEM modules are restricted to manufacturer-specific commissioning methods. Manual and/or QR commissioning may be unavailable depending on the module and firmware.",
-        "data": {
-          "qr_code": "Paste QR data",
-          "button_sequence": "Manual commissioning (button sequence)"
-        }
+        "title": "Add {name}"
       },
       "commissioning": {
         "title": "Manual commissioning",
@@ -27,7 +22,8 @@
       }
     },
     "progress": {
-      "waiting_commissioning": "Waiting for the commissioning telegram (timeout 2 min). Sequence: hold button 1 for 7 s, press briefly, hold again for 7 s."
+      "waiting_commissioning": "Waiting for the commissioning telegram (timeout 2 min). Sequence: hold button 1 for 7 s, press briefly, hold again for 7 s.",
+      "open_commissioning_page": "Device address: `{mac}`\n\n**[Open commissioning page]({page_url})**"
     },
     "abort": {
       "already_configured": "This switch is already configured.",
@@ -41,8 +37,7 @@
       "invalid_commissioning": "Commissioning telegram received but failed validation.",
       "qr_mac_mismatch": "Device address in the QR data does not match the discovered device.",
       "qr_key_invalid": "Security key does not authenticate the telegrams received from this device. The module may have been re-keyed by another system.",
-      "qr_no_telegram": "No telegram received from this device yet. Press a button on the module, then resubmit.",
-      "choose_method": "No commissioning method selected."
+      "qr_no_telegram": "No telegram received from this device yet. Press a button on the module, then resubmit."
     }
   }
 }

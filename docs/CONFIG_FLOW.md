@@ -16,22 +16,23 @@ Bluetooth discovery (press any button on it).
 - Starts from Bluetooth discovery.
 - Stores discovered MAC/title, the discovery payload, and initializes trace state.
 
-2. `bluetooth_method` (form, one screen laid out like the add page)
-- Description: device address, QR code location, the OEM restriction notice, and links
-  **Scan QR code** (`/enocean-ble-scan?flow_id=<flow_id>`) and **Select QR image** (same with
-  `&photo=1`, opens the image picker). Relative links: they open
-  inside the frontend, and inside the HA app, not in a new window.
-- Field `qr_code` (Paste QR data): submit; validated with
-  `qr_onboarding.validate_qr_for_device()`, errors are shown on this form.
-- Field `button_sequence`: turn on and submit to start manual commissioning (below).
-- Neither: error `choose_method`.
+2. `bluetooth_method` (progress step `open_commissioning_page`, waiting for the add page)
+- A config flow dialog cannot host a camera, an image picker or custom buttons, so the dialog
+  shows only the device address and **Open commissioning page**
+  (`/enocean-ble-scan?flow_id=<flow_id>`, a relative link: it opens inside the frontend and the
+  HA app, not in a new window). A progress step has no Submit button; its task never completes
+  by itself and is cancelled when the flow moves on or is removed.
+- Input from the add page: `qr_code` is validated with `qr_onboarding.validate_qr_for_device()`;
+  accepted → `show_progress_done` → `qr_add` (creates the entry); rejected → the same progress
+  step with the error code in the `error` description placeholder.
+  `button_sequence: true` → `show_progress_done` → `commissioning` (below).
+- Other input keeps waiting.
 
 ### The add page
 
 - Hidden, admin-only frontend panel (`panel.py`, `frontend/enocean-ble-scan-panel.js`),
-  registered once. Opening it for a flow starts the camera (HA app: its native scanner via the
-  external bus `bar_code/scan`; phone/tablet browser: live camera), or the photo picker with
-  `photo=1`. Camera frames and photos are decoded with `BarcodeDetector`, else the decoder worker
+  registered once. Scan QR code uses the HA app's native scanner (external bus `bar_code/scan`)
+  or the browser camera; Select QR image the image picker. Camera frames and images are decoded with `BarcodeDetector`, else the decoder worker
   the HA frontend serves (`/static/js/qr-scanner-worker.min.js`). No third-party code is bundled.
 - A flow continued from a discovery is not deleted when the dialog closes, so the page submits to
   `bluetooth_method` with the standard, authenticated config flow API

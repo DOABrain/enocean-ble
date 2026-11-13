@@ -2,12 +2,7 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "Přidat {name}",
-        "description": "Adresa zařízení: `{mac}`\nQR kód pro uvedení do provozu: na zadní straně modulu.\n\n**[Skenovat QR kód]({scan_url})** · **[Vybrat obrázek QR]({photo_url})**\n\nNěkteré OEM moduly jsou omezeny na metody uvedení do provozu specifické pro výrobce. Ruční a/nebo QR uvedení do provozu nemusí být v závislosti na modulu a firmwaru k dispozici.",
-        "data": {
-          "qr_code": "Vložit data QR",
-          "button_sequence": "Ruční uvedení do provozu (sekvence tlačítek)"
-        }
+        "title": "Přidat {name}"
       },
       "commissioning": {
         "title": "Ruční uvedení do provozu",
@@ -27,7 +22,8 @@
       }
     },
     "progress": {
-      "waiting_commissioning": "Čekání na telegram uvedení do provozu (limit 2 min). Sekvence: tlačítko 1 drženo 7 s, krátký stisk, drženo 7 s."
+      "waiting_commissioning": "Čekání na telegram uvedení do provozu (limit 2 min). Sekvence: tlačítko 1 drženo 7 s, krátký stisk, drženo 7 s.",
+      "open_commissioning_page": "Adresa zařízení: `{mac}`\n\n**[Otevřít stránku uvedení do provozu]({page_url})**"
     },
     "abort": {
       "no_bluetooth_discovery": "Toto nastavení musí začít z objeveného Bluetooth zařízení.",
@@ -41,8 +37,7 @@
       "invalid_qr": "Neplatná data QR pro uvedení do provozu: nerozpoznána adresa zařízení (30SE215…) ani 32místný bezpečnostní klíč (+Z…).",
       "qr_mac_mismatch": "Adresa zařízení v datech QR neodpovídá nalezenému zařízení.",
       "qr_key_invalid": "Bezpečnostní klíč neověřuje telegramy přijaté z tohoto zařízení. Modul mohl být překlíčován jiným systémem.",
-      "qr_no_telegram": "Z tohoto zařízení zatím nebyl přijat žádný telegram. Stiskněte tlačítko modulu a odešlete znovu.",
-      "choose_method": "Nebyla vybrána žádná metoda uvedení do provozu."
+      "qr_no_telegram": "Z tohoto zařízení zatím nebyl přijat žádný telegram. Stiskněte tlačítko modulu a odešlete znovu."
     }
   }
 }

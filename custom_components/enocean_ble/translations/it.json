@@ -2,12 +2,7 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "Aggiungi {name}",
-        "description": "Indirizzo del dispositivo: `{mac}`\nCodice QR di messa in servizio: sul retro del modulo.\n\n**[Scansiona codice QR]({scan_url})** · **[Seleziona immagine QR]({photo_url})**\n\nAlcuni moduli OEM sono limitati a metodi di messa in servizio specifici del produttore. La messa in servizio manuale e/o tramite QR potrebbe non essere disponibile a seconda del modulo e del firmware.",
-        "data": {
-          "qr_code": "Incolla dati QR",
-          "button_sequence": "Messa in servizio manuale (sequenza di pulsanti)"
-        }
+        "title": "Aggiungi {name}"
       },
       "commissioning": {
         "title": "Messa in servizio manuale",
@@ -27,7 +22,8 @@
       }
     },
     "progress": {
-      "waiting_commissioning": "In attesa del telegramma di messa in servizio (timeout 2 min). Sequenza: pulsante 1 premuto 7 s, pressione breve, premuto 7 s."
+      "waiting_commissioning": "In attesa del telegramma di messa in servizio (timeout 2 min). Sequenza: pulsante 1 premuto 7 s, pressione breve, premuto 7 s.",
+      "open_commissioning_page": "Indirizzo del dispositivo: `{mac}`\n\n**[Apri la pagina di messa in servizio]({page_url})**"
     },
     "abort": {
       "no_bluetooth_discovery": "Questa configurazione deve partire da un dispositivo Bluetooth rilevato.",
@@ -41,8 +37,7 @@
       "invalid_qr": "Dati QR di messa in servizio non validi: nessun indirizzo del dispositivo (30SE215…) né chiave di sicurezza di 32 cifre (+Z…) riconosciuti.",
       "qr_mac_mismatch": "L'indirizzo del dispositivo nei dati QR non corrisponde al dispositivo rilevato.",
       "qr_key_invalid": "La chiave di sicurezza non autentica i telegrammi ricevuti da questo dispositivo. Il modulo potrebbe essere stato riconfigurato da un altro sistema.",
-      "qr_no_telegram": "Nessun telegramma ancora ricevuto da questo dispositivo. Premere un pulsante del modulo, quindi inviare di nuovo.",
-      "choose_method": "Nessun metodo di messa in servizio selezionato."
+      "qr_no_telegram": "Nessun telegramma ancora ricevuto da questo dispositivo. Premere un pulsante del modulo, quindi inviare di nuovo."
     }
   }
 }

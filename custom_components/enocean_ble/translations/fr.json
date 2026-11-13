@@ -2,12 +2,7 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "Ajouter {name}",
-        "description": "Adresse de l'appareil: `{mac}`\nQR code de mise en service : au dos du module.\n\n**[Scanner le QR code]({scan_url})** · **[Sélectionner une image QR]({photo_url})**\n\nCertains modules OEM sont limités à des méthodes de mise en service propres au fabricant. La mise en service manuelle et/ou par QR code peut être indisponible selon le module et le firmware.",
-        "data": {
-          "qr_code": "Coller les données QR",
-          "button_sequence": "Mise en service manuelle (séquence de boutons)"
-        }
+        "title": "Ajouter {name}"
       },
       "commissioning": {
         "title": "Mise en service manuelle",
@@ -27,7 +22,8 @@
       }
     },
     "progress": {
-      "waiting_commissioning": "En attente du télégramme de mise en service (délai 2 min). Séquence : bouton 1 maintenu 7 s, appui bref, maintenu 7 s."
+      "waiting_commissioning": "En attente du télégramme de mise en service (délai 2 min). Séquence : bouton 1 maintenu 7 s, appui bref, maintenu 7 s.",
+      "open_commissioning_page": "Adresse de l'appareil: `{mac}`\n\n**[Ouvrir la page de mise en service]({page_url})**"
     },
     "abort": {
       "no_bluetooth_discovery": "Cette configuration doit être lancée depuis un appareil Bluetooth détecté.",
@@ -41,8 +37,7 @@
       "invalid_qr": "Données QR de mise en service invalides : aucune adresse d'appareil (30SE215…) ni clé de sécurité de 32 caractères (+Z…) reconnue.",
       "qr_mac_mismatch": "L'adresse de l'appareil dans les données QR ne correspond pas à l'appareil découvert.",
       "qr_key_invalid": "La clé de sécurité n'authentifie pas les télégrammes reçus de cet appareil. Le module a peut-être été reconfiguré par un autre système.",
-      "qr_no_telegram": "Aucun télégramme reçu de cet appareil. Appuyer sur un bouton du module, puis valider de nouveau.",
-      "choose_method": "Aucune méthode de mise en service sélectionnée."
+      "qr_no_telegram": "Aucun télégramme reçu de cet appareil. Appuyer sur un bouton du module, puis valider de nouveau."
     }
   }
 }

@@ -2,7 +2,7 @@
  * EnOcean BLE - scan page for the module label QR code.
  *
  * Hidden, admin-only Home Assistant panel: /enocean-ble-scan?flow_id=<flow_id>
- * (linked from the add form of a discovered switch). Without a
+ * (linked from the setup dialog of a discovered switch). Without a
  * flow_id it lists the discovered switches waiting to be added.
  *
  * Reading the code, in order of preference:
@@ -21,7 +21,8 @@
  */
 
 const DOMAIN = "enocean_ble";
-// The flow's add form (same layout as this page): qr_code, or button_sequence.
+// The flow's add step: a progress step (the dialog only links here) that takes
+// qr_code or button_sequence; a rejected QR code comes back in placeholders.error.
 const TEXT_STEP = "bluetooth_method";
 const HA_QR_WORKER = "/static/js/qr-scanner-worker.min.js";
 const QR_FORMAT_RE = /30S[0-9A-Fa-f]{12}.*\+Z[0-9A-Fa-f]{32}|E2:15(:[0-9A-Fa-f]{2}){4}[\s\S]*\b[0-9A-Fa-f]{32}\b/;
@@ -244,11 +245,10 @@ class EnOceanBleScanPanel extends HTMLElement {
       return;
     }
     if (step.description_placeholders) this._placeholders = step.description_placeholders;
-    if (step.type === "form" && step.step_id === TEXT_STEP) {
+    if (step.type === "progress" && step.step_id === TEXT_STEP) {
       this._stopWatching();
       this._flow = step;
       this._showMethods();
-      this._autoScanOnce();
       return;
     }
     if (step.type === "progress") {
@@ -321,26 +321,6 @@ class EnOceanBleScanPanel extends HTMLElement {
     box.hidden = close;
     this._el("paste").setAttribute("aria-expanded", String(!close));
     if (!close) this._el("text").focus();
-  }
-
-  // Opened for a switch (from the setup dialog's links): go straight to what was picked,
-  // once. "Pick a photo" (?photo=1) opens the photo picker, which the browser allows
-  // right after the tap on the link; if it is blocked the button is on the page.
-  // "Scan with the camera": in the HA app its native scanner; in a browser on a
-  // phone/tablet the live camera; not on a desktop (no camera aimed at a label there).
-  // Cancelling leaves the page with all the other ways to add the switch.
-  _autoScanOnce() {
-    if (this._autoScanned) return;
-    this._autoScanned = true;
-    if (new URLSearchParams(window.location.search).get("photo") === "1") {
-      const input = this._el("file");
-      if (input) input.click();
-      return;
-    }
-    const touch = navigator.maxTouchPoints > 0 || window.matchMedia("(pointer: coarse)").matches;
-    if (this._external() || (touch && navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
-      this._scan();
-    }
   }
 
   // ---------------------------------------------------------------- manual commissioning
@@ -474,12 +454,12 @@ class EnOceanBleScanPanel extends HTMLElement {
     this._status("info", "Validating QR data…");
     try {
       const result = await this._hass.callApi("POST", this._flowUrl(), { qr_code: text });
-      if (result.type !== "form" || result.step_id !== TEXT_STEP) {
+      if (result.type !== "progress" || result.step_id !== TEXT_STEP) {
         await this._handleStep(result);
         return;
       }
       this._flow = result;
-      const code = (result.errors && result.errors.base) || "invalid_qr";
+      const code = (result.description_placeholders && result.description_placeholders.error) || "invalid_qr";
       this._status("error", this._localizeError(code));
     } catch (err) {
       this._status("error", `Device could not be added: ${errorMessage(err)}`);

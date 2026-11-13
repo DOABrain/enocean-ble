@@ -2,12 +2,7 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "{name} hinzufügen",
-        "description": "Geräteadresse: `{mac}`\nInbetriebnahme-QR-Code: auf der Rückseite des Moduls.\n\n**[QR-Code scannen]({scan_url})** · **[QR-Bild auswählen]({photo_url})**\n\nManche OEM-Module sind auf herstellerspezifische Inbetriebnahmeverfahren beschränkt. Manuelle und/oder QR-Inbetriebnahme ist je nach Modul und Firmware möglicherweise nicht verfügbar.",
-        "data": {
-          "qr_code": "QR-Daten einfügen",
-          "button_sequence": "Manuelle Inbetriebnahme (Tastenfolge)"
-        }
+        "title": "{name} hinzufügen"
       },
       "commissioning": {
         "title": "Manuelle Inbetriebnahme",
@@ -27,7 +22,8 @@
       }
     },
     "progress": {
-      "waiting_commissioning": "Warte auf das Inbetriebnahme-Telegramm (Zeitlimit 2 min). Folge: Taste 1 7 s halten, kurz drücken, erneut 7 s halten."
+      "waiting_commissioning": "Warte auf das Inbetriebnahme-Telegramm (Zeitlimit 2 min). Folge: Taste 1 7 s halten, kurz drücken, erneut 7 s halten.",
+      "open_commissioning_page": "Geräteadresse: `{mac}`\n\n**[Inbetriebnahmeseite öffnen]({page_url})**"
     },
     "abort": {
       "no_bluetooth_discovery": "Dieses Setup muss mit einem per Bluetooth gefundenen Gerät gestartet werden.",
@@ -41,8 +37,7 @@
       "invalid_qr": "Ungültige Inbetriebnahme-QR-Daten: keine Geräteadresse (30SE215…) und kein 32-stelliger Sicherheitsschlüssel (+Z…) erkannt.",
       "qr_mac_mismatch": "Die Geräteadresse in den QR-Daten stimmt nicht mit dem erkannten Gerät überein.",
       "qr_key_invalid": "Der Sicherheitsschlüssel authentifiziert die empfangenen Telegramme dieses Geräts nicht. Das Modul wurde möglicherweise von einem anderen System neu verschlüsselt.",
-      "qr_no_telegram": "Noch kein Telegramm von diesem Gerät empfangen. Eine Taste am Modul drücken und erneut absenden.",
-      "choose_method": "Kein Inbetriebnahmeverfahren ausgewählt."
+      "qr_no_telegram": "Noch kein Telegramm von diesem Gerät empfangen. Eine Taste am Modul drücken und erneut absenden."
     }
   }
 }

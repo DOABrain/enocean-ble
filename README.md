@@ -34,11 +34,12 @@ It provides:
 
 1. Press any button on the switch — it will appear as a discovered device in Home Assistant
    (Settings -> Devices & Services).
-2. Click `Add` when it appears. One screen lists the device address and the commissioning methods:
-   - **Scan QR code** or **Select QR image** (links at the top): open the add page with the
-     camera running (in the Home Assistant app: the app's own scanner) or the image picker open.
-   - **Paste QR data**, then submit.
-   - **Manual commissioning (button sequence)**: turn it on and submit.
+2. Click `Add` when it appears, then **Open commissioning page**. The page lists the device
+   address and the commissioning methods:
+   - **Scan QR code** (in the Home Assistant app: the app's own scanner)
+   - **Select QR image**
+   - **Paste QR data**
+   - **Manual commissioning (button sequence)**
 
    Some OEM modules are restricted to manufacturer-specific commissioning methods. Manual and/or QR
    commissioning may be unavailable depending on the module and firmware.
@@ -53,12 +54,11 @@ its security key, for example `30SE215…+Z…+30P…`. No button sequence is ne
 it the way to add OEM switches whose radio commissioning is disabled (for example Busch-Jaeger
 6716 UBT and Jung BLE switches).
 
-- **Scan / photo:** the links open an add page inside Home Assistant with the same options. In the
-  Home Assistant app it uses the app's own barcode scanner; in a browser it uses the camera, or
-  reads a **photo** of the label (taken with the camera or picked from the gallery). The switch is
-  added as soon as the code is accepted. Live camera access in a browser needs **HTTPS**; the app
-  scanner, photos and pasting work without it.
-- **Text:** paste the QR code text (for example read with your phone's camera app).
+- **Scan QR code / Select QR image:** in the Home Assistant app the page uses the app's own
+  barcode scanner; in a browser it uses the camera, or decodes an image of the label (camera or
+  gallery). The switch is added as soon as the code is accepted. Live camera access in a browser
+  needs **HTTPS**; the app scanner, images and pasting work without it.
+- **Paste QR data:** the QR code text (for example read with a phone's camera app).
 
 If manual commissioning times out, you can **retry** or return to the **commissioning methods**.
 

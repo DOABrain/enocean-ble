@@ -2,12 +2,7 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "Dodaj {name}",
-        "description": "Adres urządzenia: `{mac}`\nKod QR uruchomienia: z tyłu modułu.\n\n**[Skanuj kod QR]({scan_url})** · **[Wybierz obraz QR]({photo_url})**\n\nNiektóre moduły OEM są ograniczone do metod uruchomienia określonych przez producenta. Ręczne i/lub QR uruchomienie może być niedostępne w zależności od modułu i oprogramowania.",
-        "data": {
-          "qr_code": "Wklej dane QR",
-          "button_sequence": "Ręczne uruchomienie (sekwencja przycisków)"
-        }
+        "title": "Dodaj {name}"
       },
       "commissioning": {
         "title": "Ręczne uruchomienie",
@@ -27,7 +22,8 @@
       }
     },
     "progress": {
-      "waiting_commissioning": "Oczekiwanie na telegram uruchomienia (limit 2 min). Sekwencja: przycisk 1 przytrzymany 7 s, krótkie naciśnięcie, przytrzymany 7 s."
+      "waiting_commissioning": "Oczekiwanie na telegram uruchomienia (limit 2 min). Sekwencja: przycisk 1 przytrzymany 7 s, krótkie naciśnięcie, przytrzymany 7 s.",
+      "open_commissioning_page": "Adres urządzenia: `{mac}`\n\n**[Otwórz stronę uruchomienia]({page_url})**"
     },
     "abort": {
       "no_bluetooth_discovery": "Ta konfiguracja musi zostać uruchomiona z wykrytego urządzenia Bluetooth.",
@@ -41,8 +37,7 @@
       "invalid_qr": "Nieprawidłowe dane QR uruchomienia: nie rozpoznano adresu urządzenia (30SE215…) ani 32-znakowego klucza bezpieczeństwa (+Z…).",
       "qr_mac_mismatch": "Adres urządzenia w danych QR nie zgadza się z wykrytym urządzeniem.",
       "qr_key_invalid": "Klucz bezpieczeństwa nie uwierzytelnia telegramów odebranych z tego urządzenia. Moduł mógł zostać przekluczowany przez inny system.",
-      "qr_no_telegram": "Nie odebrano jeszcze żadnego telegramu z tego urządzenia. Naciśnij przycisk modułu i zatwierdź ponownie.",
-      "choose_method": "Nie wybrano metody uruchomienia."
+      "qr_no_telegram": "Nie odebrano jeszcze żadnego telegramu z tego urządzenia. Naciśnij przycisk modułu i zatwierdź ponownie."
     }
   }
 }

@@ -2,12 +2,7 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "Adicionar {name}",
-        "description": "Endereço do dispositivo: `{mac}`\nCódigo QR de comissionamento: na parte traseira do módulo.\n\n**[Escanear código QR]({scan_url})** · **[Selecionar imagem QR]({photo_url})**\n\nAlguns módulos OEM são restritos a métodos de comissionamento específicos do fabricante. O comissionamento manual e/ou por QR pode não estar disponível, dependendo do módulo e do firmware.",
-        "data": {
-          "qr_code": "Colar dados QR",
-          "button_sequence": "Comissionamento manual (sequência de botões)"
-        }
+        "title": "Adicionar {name}"
       },
       "commissioning": {
         "title": "Comissionamento manual",
@@ -27,7 +22,8 @@
       }
     },
     "progress": {
-      "waiting_commissioning": "Aguardando o telegrama de comissionamento (limite 2 min). Sequência: botão 1 segurado 7 s, toque breve, segurado 7 s."
+      "waiting_commissioning": "Aguardando o telegrama de comissionamento (limite 2 min). Sequência: botão 1 segurado 7 s, toque breve, segurado 7 s.",
+      "open_commissioning_page": "Endereço do dispositivo: `{mac}`\n\n**[Abrir a página de comissionamento]({page_url})**"
     },
     "abort": {
       "no_bluetooth_discovery": "Esta configuração deve ser iniciada a partir de um dispositivo Bluetooth descoberto.",
@@ -41,8 +37,7 @@
       "invalid_qr": "Dados QR de comissionamento inválidos: endereço do dispositivo (30SE215…) e chave de segurança de 32 dígitos (+Z…) não reconhecidos.",
       "qr_mac_mismatch": "O endereço do dispositivo nos dados QR não corresponde ao dispositivo descoberto.",
       "qr_key_invalid": "A chave de segurança não autentica os telegramas recebidos deste dispositivo. O módulo pode ter sido reconfigurado por outro sistema.",
-      "qr_no_telegram": "Nenhum telegrama recebido deste dispositivo ainda. Pressione um botão do módulo e envie novamente.",
-      "choose_method": "Nenhum método de comissionamento selecionado."
+      "qr_no_telegram": "Nenhum telegrama recebido deste dispositivo ainda. Pressione um botão do módulo e envie novamente."
     }
   }
 }

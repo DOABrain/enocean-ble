@@ -2,12 +2,7 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "{name} toevoegen",
-        "description": "Apparaatadres: `{mac}`\nCommissioning-QR-code: op de achterzijde van de module.\n\n**[QR-code scannen]({scan_url})** · **[QR-afbeelding kiezen]({photo_url})**\n\nSommige OEM-modules zijn beperkt tot fabrikantspecifieke commissioningmethoden. Handmatige en/of QR-commissioning is mogelijk niet beschikbaar, afhankelijk van module en firmware.",
-        "data": {
-          "qr_code": "QR-gegevens plakken",
-          "button_sequence": "Handmatige commissioning (knoppenreeks)"
-        }
+        "title": "{name} toevoegen"
       },
       "commissioning": {
         "title": "Handmatige commissioning",
@@ -27,7 +22,8 @@
       }
     },
     "progress": {
-      "waiting_commissioning": "Wachten op het commissioningtelegram (time-out 2 min). Reeks: knop 1 7 s vasthouden, kort drukken, opnieuw 7 s vasthouden."
+      "waiting_commissioning": "Wachten op het commissioningtelegram (time-out 2 min). Reeks: knop 1 7 s vasthouden, kort drukken, opnieuw 7 s vasthouden.",
+      "open_commissioning_page": "Apparaatadres: `{mac}`\n\n**[Commissioningpagina openen]({page_url})**"
     },
     "abort": {
       "already_configured": "Deze schakelaar is al geconfigureerd.",
@@ -41,8 +37,7 @@
       "invalid_commissioning": "Commissioningtelegram ontvangen, maar validatie mislukt.",
       "qr_mac_mismatch": "Het apparaatadres in de QR-gegevens komt niet overeen met het gevonden apparaat.",
       "qr_key_invalid": "De beveiligingssleutel authenticeert de ontvangen telegrammen van dit apparaat niet. De module is mogelijk door een ander systeem opnieuw gesleuteld.",
-      "qr_no_telegram": "Nog geen telegram van dit apparaat ontvangen. Druk op een knop van de module en verstuur opnieuw.",
-      "choose_method": "Geen commissioningmethode gekozen."
+      "qr_no_telegram": "Nog geen telegram van dit apparaat ontvangen. Druk op een knop van de module en verstuur opnieuw."
     }
   }
 }

@@ -7,7 +7,6 @@ import logging
 from collections import defaultdict
 from typing import Any
 
-import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.components.bluetooth import (
     BluetoothServiceInfoBleak,
@@ -38,15 +37,16 @@ CANCEL_TRACE_TAG = "FLOW_CANCEL_TRACE"
 FLOW_TRACE_TAG = "FLOW_TRACE_V3"
 
 COMMISSIONING_TIMEOUT = 120.0
-# One "add" form for a discovered switch, laid out like the add page: a link that
-# scans with the camera, the QR code text, or the button sequence.
+# Adding a discovered switch: the dialog only links to the commissioning page (scan,
+# image, paste, button sequence), which drives this step through the config flow API.
 METHOD_STEP_ID = "bluetooth_method"
+METHOD_PROGRESS_ACTION = "open_commissioning_page"
+QR_ADD_STEP_ID = "qr_add"
 COMMISSIONING_RETRY_STEP_ID = "commissioning_retry"
 # "Back" = return to the add form, i.e. restart adding the switch.
 COMMISSIONING_RETRY_OPTIONS = ["commissioning", METHOD_STEP_ID]
 CONF_QR_CODE = "qr_code"
 CONF_BUTTON_SEQUENCE = "button_sequence"
-ERROR_CHOOSE_METHOD = "choose_method"
 
 
 class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -82,6 +82,10 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         # current step without input; a step shown a second time that way restarts
         # adding the switch from the method menu.
         self._shown_steps: set[str] = set()
+        # The add step waits (as a progress step, so the dialog has no Submit) until
+        # the commissioning page submits a method; this task never completes by itself.
+        self._method_task: asyncio.Task[None] | None = None
+        self._qr_onboarding: OnboardingData | None = None
 
     def async_remove(self) -> None:
         """Cleanup when flow is aborted/cancelled/finished by HA."""
@@ -109,6 +113,7 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
         self._log_terminal_without_entry()
         self._cancel_stage_task(reason="flow_removed")
+        self._cancel_method_task()
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Manual start is not supported: a switch is added from its discovery.
@@ -173,49 +178,55 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_bluetooth_method(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Add the discovered switch: one form, laid out like the add page.
+        """Add the discovered switch from the commissioning page.
 
-        - The description's "Scan with the camera" link opens the in-app add page with
-          the camera running (in the HA app: its own scanner; a photo works there too).
-          A flow continued from a discovery survives the dialog closing, so the page
-          submits the scanned code to this step through the authenticated config flow
-          API.
-        - ``qr_code``: paste the QR code text here and submit.
-        - ``button_sequence``: turn on and submit to run manual commissioning.
+        Config flow dialogs cannot host a camera, an image picker or custom buttons, so
+        the dialog shows a progress step (no Submit) that links to the commissioning
+        page. A flow continued from a discovery survives the dialog closing; the page
+        submits to this step through the authenticated config flow API:
+
+        - ``qr_code``: validated against the discovered switch; the entry is created,
+          or the error code is returned in the ``error`` description placeholder.
+        - ``button_sequence``: runs manual commissioning.
         """
-        errors: dict[str, str] = {}
+        error = ""
         if user_input is not None:
             raw = str(user_input.get(CONF_QR_CODE) or "").strip()
             if raw:
                 try:
-                    onboarding = self._validate_qr(raw)
+                    self._qr_onboarding = self._validate_qr(raw)
                 except QrValidationError as err:
-                    errors["base"] = err.code
+                    error = err.code
                     self._log_qr_rejected(step=METHOD_STEP_ID, code=err.code)
                 else:
-                    return self._create_entry_from_qr(onboarding, method="qr")
+                    return self.async_show_progress_done(next_step_id=QR_ADD_STEP_ID)
             elif user_input.get(CONF_BUTTON_SEQUENCE):
-                return await self.async_step_commissioning()
-            else:
-                errors["base"] = ERROR_CHOOSE_METHOD
+                return self.async_show_progress_done(next_step_id="commissioning")
 
         await async_register_scan_panel(self.hass)
-        return self.async_show_form(
+        if self._method_task is None or self._method_task.done():
+            self._method_task = self.hass.async_create_task(asyncio.Event().wait())
+        return self.async_show_progress(
             step_id=METHOD_STEP_ID,
-            # HA 2026.x maps voluptuous onto probatio at runtime; only the type stubs differ.
-            data_schema=vol.Schema(  # type: ignore[arg-type,unused-ignore]
-                {
-                    vol.Optional(CONF_QR_CODE): str,
-                    vol.Optional(CONF_BUTTON_SEQUENCE, default=False): bool,
-                }
-            ),
-            errors=errors,
+            progress_action=METHOD_PROGRESS_ACTION,
+            progress_task=self._method_task,
             description_placeholders={
                 **self._name_placeholders(),
-                "scan_url": scan_panel_path(self.flow_id),
-                "photo_url": scan_panel_path(self.flow_id) + "&photo=1",
+                "page_url": scan_panel_path(self.flow_id),
+                "error": error,
             },
         )
+
+    async def async_step_qr_add(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """Create the entry from the QR code accepted by ``bluetooth_method``."""
+        if self._qr_onboarding is None:
+            return await self.async_step_bluetooth_method()
+        return self._create_entry_from_qr(self._qr_onboarding, method="qr")
+
+    def _cancel_method_task(self) -> None:
+        if self._method_task is not None and not self._method_task.done():
+            self._method_task.cancel()
+        self._method_task = None
 
     async def async_step_commissioning_retry(
         self, user_input: dict[str, Any] | None = None

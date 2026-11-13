@@ -2,12 +2,7 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "Añadir {name}",
-        "description": "Dirección del dispositivo: `{mac}`\nCódigo QR de puesta en marcha: en la parte trasera del módulo.\n\n**[Escanear código QR]({scan_url})** · **[Seleccionar imagen QR]({photo_url})**\n\nAlgunos módulos OEM están limitados a métodos de puesta en marcha específicos del fabricante. La puesta en marcha manual y/o por QR puede no estar disponible según el módulo y el firmware.",
-        "data": {
-          "qr_code": "Pegar datos QR",
-          "button_sequence": "Puesta en marcha manual (secuencia de botones)"
-        }
+        "title": "Añadir {name}"
       },
       "commissioning": {
         "title": "Puesta en marcha manual",
@@ -27,7 +22,8 @@
       }
     },
     "progress": {
-      "waiting_commissioning": "Esperando el telegrama de puesta en marcha (límite 2 min). Secuencia: botón 1 mantenido 7 s, pulsación breve, mantenido 7 s."
+      "waiting_commissioning": "Esperando el telegrama de puesta en marcha (límite 2 min). Secuencia: botón 1 mantenido 7 s, pulsación breve, mantenido 7 s.",
+      "open_commissioning_page": "Dirección del dispositivo: `{mac}`\n\n**[Abrir la página de puesta en marcha]({page_url})**"
     },
     "abort": {
       "no_bluetooth_discovery": "Esta configuración debe iniciarse desde un dispositivo Bluetooth detectado.",
@@ -41,8 +37,7 @@
       "invalid_qr": "Datos QR de puesta en marcha no válidos: no se reconoce dirección de dispositivo (30SE215…) ni clave de seguridad de 32 dígitos (+Z…).",
       "qr_mac_mismatch": "La dirección del dispositivo en los datos QR no coincide con el dispositivo descubierto.",
       "qr_key_invalid": "La clave de seguridad no autentica los telegramas recibidos de este dispositivo. Es posible que otro sistema haya cambiado la clave del módulo.",
-      "qr_no_telegram": "Aún no se ha recibido ningún telegrama de este dispositivo. Pulsar un botón del módulo y volver a enviar.",
-      "choose_method": "No se ha seleccionado ningún método de puesta en marcha."
+      "qr_no_telegram": "Aún no se ha recibido ningún telegrama de este dispositivo. Pulsar un botón del módulo y volver a enviar."
     }
   }
 }

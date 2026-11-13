@@ -34,15 +34,10 @@ def test_same_keys_as_english(path: Path) -> None:
 
 
 @pytest.mark.parametrize("path", sorted(TRANSLATIONS.glob("*.json")), ids=lambda p: p.stem)
-def test_add_form_placeholders(path: Path) -> None:
-    description = _load(path.stem)["config"]["step"]["bluetooth_method"]["description"]
-    for placeholder in ("{mac}", "{scan_url}", "{photo_url}"):
+def test_add_step_links_to_the_commissioning_page(path: Path) -> None:
+    description = _load(path.stem)["config"]["progress"]["open_commissioning_page"]
+    for placeholder in ("{mac}", "{page_url}"):
         assert placeholder in description
-
-
-def test_oem_notice_wording() -> None:
-    description = _load("en")["config"]["step"]["bluetooth_method"]["description"]
-    assert description.endswith(OEM_NOTICE)
 
 
 def test_add_page_oem_notice_wording() -> None:

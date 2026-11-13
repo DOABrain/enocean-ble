@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import asyncio
 from types import SimpleNamespace
+from collections.abc import Iterator
 from typing import Any
-from unittest.mock import AsyncMock, patch
+from unittest.mock import patch
 
 import pytest
 from homeassistant.data_entry_flow import FlowResultType
@@ -60,34 +61,58 @@ async def test_user_step_requires_discovery(hass: Any) -> None:
     assert result["reason"] == "discovery_required"
 
 
-async def test_discovery_shows_one_add_form(hass: Any) -> None:
-    """Like the add page: scan / photo links, QR code text, or the button sequence."""
-    _, result = await _discovered_flow(hass, [_service_info()])
-    assert result["type"] == FlowResultType.FORM
+@pytest.fixture
+def flows() -> Iterator[list[EnOceanBleConfigFlow]]:
+    """Flows created by a test; their waiting add-step task is cancelled afterwards."""
+    created: list[EnOceanBleConfigFlow] = []
+    yield created
+    for flow in created:
+        flow._cancel_method_task()
+
+
+async def _flow(
+    hass: Any, flows: list[EnOceanBleConfigFlow], cached: list[SimpleNamespace]
+) -> tuple[EnOceanBleConfigFlow, Any]:
+    flow, result = await _discovered_flow(hass, cached)
+    flows.append(flow)
+    return flow, result
+
+
+async def test_discovery_links_to_the_commissioning_page(hass: Any, flows: list[EnOceanBleConfigFlow]) -> None:
+    """The dialog cannot host the methods: a progress step (no Submit) links to the page."""
+    flow, result = await _flow(hass, flows, [_service_info()])
+    assert result["type"] == FlowResultType.SHOW_PROGRESS
     assert result["step_id"] == "bluetooth_method"
-    assert [field["name"] for field in result["data_schema"].schema] == ["qr_code", "button_sequence"]
+    assert result["progress_action"] == "open_commissioning_page"
     placeholders = result["description_placeholders"]
     assert placeholders is not None
     assert placeholders["mac"] == MAC
-    # Relative links: they open inside the frontend (and inside the HA app), never a new window.
-    assert placeholders["scan_url"] == "/enocean-ble-scan?flow_id=test-flow"
-    assert placeholders["photo_url"] == "/enocean-ble-scan?flow_id=test-flow&photo=1"
+    assert placeholders["error"] == ""
+    # Relative link: it opens inside the frontend (and inside the HA app), never a new window.
+    assert placeholders["page_url"] == "/enocean-ble-scan?flow_id=test-flow"
+    # The step waits until the page submits; reopening it keeps the same task.
+    task = result["progress_task"]
+    assert not task.done()
+    assert (await flow.async_step_bluetooth_method())["progress_task"] is task
 
 
-async def test_qr_code_creates_entry(hass: Any) -> None:
-    """Pasted in the form, or submitted by the add page after a scan or a photo."""
-    flow, _ = await _discovered_flow(hass, [_service_info()])
+async def test_qr_code_creates_entry(hass: Any, flows: list[EnOceanBleConfigFlow]) -> None:
+    """Submitted by the commissioning page (scan, image or pasted data)."""
+    flow, _ = await _flow(hass, flows, [_service_info()])
     with patch.object(config_flow_module, "async_discovered_service_info", return_value=[_service_info()]):
         result = await flow.async_step_bluetooth_method({"qr_code": QR})
+    assert result["type"] == FlowResultType.SHOW_PROGRESS_DONE
+    assert result["step_id"] == "qr_add"
+    result = await flow.async_step_qr_add()
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["data"] == {CONF_MAC_ADDRESS: MAC, CONF_SECURITY_KEY: KEY}
 
 
-async def test_qr_code_uses_discovery_payload_when_cache_is_empty(hass: Any) -> None:
-    flow, _ = await _discovered_flow(hass, [])
+async def test_qr_code_uses_discovery_payload_when_cache_is_empty(hass: Any, flows: list[EnOceanBleConfigFlow]) -> None:
+    flow, _ = await _flow(hass, flows, [])
     with patch.object(config_flow_module, "async_discovered_service_info", return_value=[]):
         result = await flow.async_step_bluetooth_method({"qr_code": QR})
-    assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert result["step_id"] == "qr_add"
 
 
 @pytest.mark.parametrize(
@@ -98,41 +123,57 @@ async def test_qr_code_uses_discovery_payload_when_cache_is_empty(hass: Any) -> 
         (OTHER_KEY_QR, "qr_key_invalid"),
     ],
 )
-async def test_qr_code_errors_stay_on_the_add_form(hass: Any, raw: str, error: str) -> None:
-    flow, _ = await _discovered_flow(hass, [_service_info()])
+async def test_qr_code_errors_stay_on_the_add_step(
+    hass: Any, flows: list[EnOceanBleConfigFlow], raw: str, error: str
+) -> None:
+    flow, _ = await _flow(hass, flows, [_service_info()])
     with patch.object(config_flow_module, "async_discovered_service_info", return_value=[_service_info()]):
         result = await flow.async_step_bluetooth_method({"qr_code": raw})
-    assert result["type"] == FlowResultType.FORM
+    assert result["type"] == FlowResultType.SHOW_PROGRESS
     assert result["step_id"] == "bluetooth_method"
-    assert result["errors"] == {"base": error}
+    assert result["description_placeholders"]["error"] == error
 
 
-async def test_qr_code_without_any_telegram(hass: Any) -> None:
-    flow, _ = await _discovered_flow(hass, [])
+async def test_qr_code_without_any_telegram(hass: Any, flows: list[EnOceanBleConfigFlow]) -> None:
+    flow, _ = await _flow(hass, flows, [])
     flow._discovery_payload = None
     with patch.object(config_flow_module, "async_discovered_service_info", return_value=[]):
         result = await flow.async_step_bluetooth_method({"qr_code": QR})
-    assert result["errors"] == {"base": "qr_no_telegram"}
+    assert result["description_placeholders"]["error"] == "qr_no_telegram"
 
 
-async def test_nothing_chosen_asks_for_a_method(hass: Any) -> None:
-    flow, _ = await _discovered_flow(hass, [_service_info()])
+async def test_qr_add_without_accepted_code_returns_to_the_add_step(
+    hass: Any, flows: list[EnOceanBleConfigFlow]
+) -> None:
+    flow, _ = await _flow(hass, flows, [_service_info()])
+    assert (await flow.async_step_qr_add())["step_id"] == "bluetooth_method"
+
+
+async def test_empty_input_keeps_waiting(hass: Any, flows: list[EnOceanBleConfigFlow]) -> None:
+    flow, _ = await _flow(hass, flows, [_service_info()])
     for empty in ({}, {"qr_code": "  ", "button_sequence": False}):
         result = await flow.async_step_bluetooth_method(empty)
-        assert result["step_id"] == "bluetooth_method"
-        assert result["errors"] == {"base": "choose_method"}
+        assert result["type"] == FlowResultType.SHOW_PROGRESS
+        assert result["description_placeholders"]["error"] == ""
 
 
-async def test_button_sequence_starts_commissioning(hass: Any) -> None:
-    flow, _ = await _discovered_flow(hass, [_service_info()])
-    with patch.object(flow, "async_step_commissioning", AsyncMock(return_value={"step_id": "commissioning"})) as step:
-        result = await flow.async_step_bluetooth_method({"button_sequence": True})
-    step.assert_awaited_once()
+async def test_button_sequence_starts_commissioning(hass: Any, flows: list[EnOceanBleConfigFlow]) -> None:
+    flow, _ = await _flow(hass, flows, [_service_info()])
+    result = await flow.async_step_bluetooth_method({"button_sequence": True})
+    assert result["type"] == FlowResultType.SHOW_PROGRESS_DONE
     assert result["step_id"] == "commissioning"
 
 
-async def test_commissioning_timeout_offers_retry_or_back(hass: Any) -> None:
-    flow, _ = await _discovered_flow(hass, [_service_info()])
+async def test_flow_removal_cancels_the_waiting_task(hass: Any, flows: list[EnOceanBleConfigFlow]) -> None:
+    flow, result = await _flow(hass, flows, [_service_info()])
+    task = result["progress_task"]
+    flow.async_remove()
+    await asyncio.sleep(0)
+    assert task.cancelled()
+
+
+async def test_commissioning_timeout_offers_retry_or_back(hass: Any, flows: list[EnOceanBleConfigFlow]) -> None:
+    flow, _ = await _flow(hass, flows, [_service_info()])
     failed: asyncio.Future[None] = hass.loop.create_future()
     failed.set_exception(TimeoutError())
     flow._stage_task = failed  # type: ignore[assignment]
@@ -142,7 +183,7 @@ async def test_commissioning_timeout_offers_retry_or_back(hass: Any) -> None:
     result = await flow.async_step_commissioning_retry()
     assert result["type"] == FlowResultType.MENU
     assert result["menu_options"] == ["commissioning", "bluetooth_method"]
-    # Reopened after the failure (dialog closed with X): back to the add form.
+    # Reopened after the failure (dialog closed with X): back to the add step.
     assert (await flow.async_step_commissioning_retry())["step_id"] == "bluetooth_method"
 
 
