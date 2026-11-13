@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "{name} hinzufügen"
+        "title": "EnOcean-Schalter hinzufügen"
       },
       "commissioning": {
         "title": "Manuelle Inbetriebnahme",

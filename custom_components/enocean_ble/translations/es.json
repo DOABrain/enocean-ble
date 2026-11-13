@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "Añadir {name}"
+        "title": "Añadir interruptor EnOcean"
       },
       "commissioning": {
         "title": "Puesta en marcha manual",

@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "Dodaj {name}"
+        "title": "Dodaj przełącznik EnOcean"
       },
       "commissioning": {
         "title": "Ręczne uruchomienie",

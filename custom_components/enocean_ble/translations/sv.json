@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "Lägg till {name}"
+        "title": "Lägg till EnOcean-brytare"
       },
       "commissioning": {
         "title": "Manuell driftsättning",

@@ -43,3 +43,11 @@ def test_add_step_links_to_the_commissioning_page(path: Path) -> None:
 def test_add_page_oem_notice_wording() -> None:
     script = (TRANSLATIONS.parent / "frontend" / "enocean-ble-scan-panel.js").read_text(encoding="utf-8")
     assert " ".join(OEM_NOTICE.split()) in " ".join(script.split())
+
+
+@pytest.mark.parametrize("path", sorted(TRANSLATIONS.glob("*.json")), ids=lambda p: p.stem)
+def test_progress_step_titles_have_no_placeholders(path: Path) -> None:
+    """HA renders a progress step title without placeholders (formatjs MISSING_VALUE)."""
+    steps = _load(path.stem)["config"]["step"]
+    for step_id in ("bluetooth_method", "commissioning"):
+        assert "{" not in steps[step_id]["title"]

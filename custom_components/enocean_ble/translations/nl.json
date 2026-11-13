@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "{name} toevoegen"
+        "title": "EnOcean-schakelaar toevoegen"
       },
       "commissioning": {
         "title": "Handmatige commissioning",
