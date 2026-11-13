@@ -21,10 +21,8 @@
  */
 
 const DOMAIN = "enocean_ble";
-// The code is always submitted to qr_text; from the method menu or the scan step's
-// menu, the page first selects qr_text.
-const TEXT_STEP = "qr_text";
-const MENU_STEPS = ["bluetooth_method", "qr_scan"];
+// The flow's add form (same layout as this page): qr_code, or button_sequence.
+const TEXT_STEP = "bluetooth_method";
 const HA_QR_WORKER = "/static/js/qr-scanner-worker.min.js";
 const QR_FORMAT_RE = /30S[0-9A-Fa-f]{12}.*\+Z[0-9A-Fa-f]{32}|E2:15(:[0-9A-Fa-f]{2}){4}[\s\S]*\b[0-9A-Fa-f]{32}\b/;
 
@@ -215,7 +213,7 @@ class EnOceanBleScanPanel extends HTMLElement {
   }
 
   // Show the view for wherever the config flow is. The page drives the same flow as the
-  // setup dialog: menus -> qr_text (scan / photo / paste), commissioning (progress),
+  // setup dialog: bluetooth_method (qr_code / button_sequence), commissioning (progress),
   // bluetooth_confirm, commissioning_retry, create_entry.
   async _handleStep(step) {
     if (step.handler && step.handler !== DOMAIN) {
@@ -236,12 +234,6 @@ class EnOceanBleScanPanel extends HTMLElement {
       return;
     }
     if (step.description_placeholders) this._placeholders = step.description_placeholders;
-    if (step.type === "menu" && MENU_STEPS.includes(step.step_id)) {
-      await this._handleStep(
-        await this._hass.callApi("POST", this._flowUrl(), { next_step_id: TEXT_STEP })
-      );
-      return;
-    }
     if (step.type === "form" && step.step_id === TEXT_STEP) {
       this._stopWatching();
       this._flow = step;
@@ -302,13 +294,20 @@ class EnOceanBleScanPanel extends HTMLElement {
     content.querySelector("#commission").addEventListener("click", () => this._startCommissioning());
   }
 
-  // Opened for a switch (from the setup dialog's link): go straight to the camera, once.
-  // In the HA app its native scanner; in a browser on a phone/tablet the live camera.
-  // Not on a desktop (no camera aimed at a label there). Cancelling the scanner leaves
-  // the page with all the other ways to add the switch.
+  // Opened for a switch (from the setup dialog's links): go straight to what was picked,
+  // once. "Pick a photo" (?photo=1) opens the photo picker, which the browser allows
+  // right after the tap on the link; if it is blocked the button is on the page.
+  // "Scan with the camera": in the HA app its native scanner; in a browser on a
+  // phone/tablet the live camera; not on a desktop (no camera aimed at a label there).
+  // Cancelling leaves the page with all the other ways to add the switch.
   _autoScanOnce() {
     if (this._autoScanned) return;
     this._autoScanned = true;
+    if (new URLSearchParams(window.location.search).get("photo") === "1") {
+      const input = this._el("file");
+      if (input) input.click();
+      return;
+    }
     const touch = navigator.maxTouchPoints > 0 || window.matchMedia("(pointer: coarse)").matches;
     if (this._external() || (touch && navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
       this._scan();
@@ -327,14 +326,8 @@ class EnOceanBleScanPanel extends HTMLElement {
     if (this._busy) return;
     this._busy = true;
     try {
-      // From the text step, an empty submission returns to the method menu.
-      const menu = await this._hass.callApi("POST", this._flowUrl(), { qr_code: "" });
-      if (menu.type !== "menu") {
-        await this._handleStep(menu);
-        return;
-      }
       await this._handleStep(
-        await this._hass.callApi("POST", this._flowUrl(), { next_step_id: "commissioning" })
+        await this._hass.callApi("POST", this._flowUrl(), { button_sequence: true })
       );
     } catch (err) {
       this._status("error", `Could not start manual commissioning: ${errorMessage(err)}`);

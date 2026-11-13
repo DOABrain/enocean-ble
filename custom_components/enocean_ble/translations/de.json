@@ -2,30 +2,14 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "EnOcean-BLE-Schalter hinzufügen",
-        "description": "**[Hinzufügen-Seite öffnen]({scan_url})**: QR-Code scannen, ein Foto verwenden, den Text einfügen oder die Tastenfolge nutzen, alles auf einer Seite. Oder wähle unten eine Methode.\n\nSchalter {name} ({mac}) wurde erkannt. Wie möchtest du ihn hinzufügen?\n\nDer QR-Code befindet sich auf dem Etikett des EnOcean-Moduls, hinter der Wippe.",
-        "menu_options": {
-          "qr_scan": "QR-Code mit der Kamera scannen",
-          "qr_text": "Text des QR-Codes eingeben",
-          "commissioning": "Manuelles Commissioning (Tastenfolge)"
-        }
-      },
-      "qr_text": {
-        "title": "Text des QR-Codes eingeben",
-        "description": "Tippe oder füge den Text des QR-Codes vom Modul-Etikett von {name} ein. Er sieht aus wie 30SE215…+Z…+30P… und seine Adresse muss {mac} sein.",
+        "title": "{name} hinzufügen",
+        "description": "**[Mit der Kamera scannen]({scan_url})** · **[Foto wählen]({photo_url})** vom QR-Code auf dem Aufkleber des EnOcean-Moduls, hinter der Wippe. Die Adresse muss {mac} sein.\n\nOder füge den Text des QR-Codes ein oder nutze die Tastenfolge.",
         "data": {
-          "qr_code": "Text des QR-Codes"
+          "qr_code": "Oder Text des QR-Codes einfügen",
+          "button_sequence": "Oder Tastenfolge nutzen (manuelle Inbetriebnahme)"
         },
         "data_description": {
-          "qr_code": "Beispiel: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215\nLeer lassen und absenden, um zu den Methoden zurückzukehren."
-        }
-      },
-      "qr_scan": {
-        "title": "QR-Code scannen",
-        "description": "[Scan-Seite öffnen]({scan_url}), um den QR-Code auf dem Modulaufkleber von {name} mit der Kamera (in der Home Assistant App: deren eigener Scanner) oder von einem Foto zu scannen. Der Schalter wird hinzugefügt, sobald der Code akzeptiert ist.",
-        "menu_options": {
-          "qr_text": "Stattdessen den Text des QR-Codes eingeben",
-          "bluetooth_method": "Zurück"
+          "button_sequence": "Für einen Schalter, dessen Aufkleber du nicht erreichst. Manche OEM-Schalter (zum Beispiel Busch-Jaeger, Jung) unterstützen das nicht."
         }
       },
       "commissioning": {
@@ -60,7 +44,8 @@
       "invalid_qr": "In diesem Text wurden keine EnOcean-Schalteradresse (30SE215…) und kein 32-stelliger Sicherheitsschlüssel (+Z…) gefunden.",
       "qr_mac_mismatch": "Dieser QR-Code gehört zu einem anderen Schalter als dem erkannten.",
       "qr_key_invalid": "Der Schlüssel in diesem QR-Code passt nicht zu den Telegrammen dieses Schalters. Er wurde möglicherweise neu konfiguriert (z. B. von einem anderen System).",
-      "qr_no_telegram": "Von diesem Schalter wurde noch kein Telegramm empfangen. Drücke eine seiner Tasten und versuche es erneut."
+      "qr_no_telegram": "Von diesem Schalter wurde noch kein Telegramm empfangen. Drücke eine seiner Tasten und versuche es erneut.",
+      "choose_method": "Scanne oder füge den QR-Code ein oder aktiviere die Tastenfolge."
     }
   }
 }

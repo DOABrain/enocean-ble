@@ -2,30 +2,14 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "Adicionar interruptor EnOcean BLE",
-        "description": "**[Abra a página de adição]({scan_url})**: escaneie o código QR, use uma foto, cole o texto ou use a sequência de botões, tudo em uma página. Ou escolha um método abaixo.\n\nO interruptor {name} ({mac}) foi descoberto. Como você quer adicioná-lo?\n\nO código QR está na etiqueta do módulo EnOcean, atrás da tecla.",
-        "menu_options": {
-          "qr_scan": "Escanear o código QR com a câmera",
-          "qr_text": "Digitar o texto do código QR",
-          "commissioning": "Commissioning manual (sequência de botões)"
-        }
-      },
-      "qr_text": {
-        "title": "Digitar o texto do código QR",
-        "description": "Digite ou cole o texto do código QR da etiqueta do módulo de {name}. Ele tem o formato 30SE215…+Z…+30P… e o endereço deve ser {mac}.",
+        "title": "Adicionar {name}",
+        "description": "**[Escanear com a câmera]({scan_url})** · **[Escolher uma foto]({photo_url})** do código QR da etiqueta do módulo EnOcean, atrás da tecla. O endereço deve ser {mac}.\n\nOu cole o texto do código QR, ou use a sequência de botões.",
         "data": {
-          "qr_code": "Texto do código QR"
+          "qr_code": "Ou cole o texto do código QR",
+          "button_sequence": "Ou use a sequência de botões (comissionamento manual)"
         },
         "data_description": {
-          "qr_code": "Exemplo: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215\nDeixe vazio e envie para voltar aos métodos."
-        }
-      },
-      "qr_scan": {
-        "title": "Escanear o código QR",
-        "description": "[Abra a página de escaneamento]({scan_url}) para escanear o código QR da etiqueta do módulo de {name} com a câmera (no app Home Assistant: o próprio leitor) ou a partir de uma foto. O interruptor é adicionado assim que o código for aceito.",
-        "menu_options": {
-          "qr_text": "Inserir o texto do código QR em vez disso",
-          "bluetooth_method": "Voltar"
+          "button_sequence": "Para um interruptor cuja etiqueta você não alcança. Alguns interruptores OEM (por exemplo Busch-Jaeger, Jung) não oferecem suporte."
         }
       },
       "commissioning": {
@@ -60,7 +44,8 @@
       "invalid_qr": "Nenhum endereço de interruptor EnOcean (30SE215…) e chave de segurança de 32 caracteres (+Z…) foram encontrados neste texto.",
       "qr_mac_mismatch": "Este código QR pertence a outro interruptor, diferente do descoberto.",
       "qr_key_invalid": "A chave deste código QR não corresponde aos telegramas recebidos deste interruptor. Ele pode ter sido reconfigurado (por exemplo, por outro sistema).",
-      "qr_no_telegram": "Nenhum telegrama foi recebido deste interruptor ainda. Pressione um dos botões e tente novamente."
+      "qr_no_telegram": "Nenhum telegrama foi recebido deste interruptor ainda. Pressione um dos botões e tente novamente.",
+      "choose_method": "Escaneie ou cole o código QR, ou ative a sequência de botões."
     }
   }
 }

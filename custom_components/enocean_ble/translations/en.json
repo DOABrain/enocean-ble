@@ -2,30 +2,14 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "Add EnOcean BLE switch",
-        "description": "**[Open the add page]({scan_url})**: scan the QR code, use a photo, paste the text or use the button sequence, all on one page. Or pick a method below.\n\nSwitch {name} ({mac}) was discovered. How do you want to add it?\n\nThe QR code is on the label of the EnOcean module, behind the rocker.",
-        "menu_options": {
-          "qr_scan": "Scan the QR code with the camera",
-          "qr_text": "Enter the QR code text",
-          "commissioning": "Manual commissioning (button sequence)"
-        }
-      },
-      "qr_text": {
-        "title": "Enter the QR code text",
-        "description": "Type or paste the text of the QR code on the module label of {name}. It looks like 30SE215…+Z…+30P… and its address must be {mac}.",
+        "title": "Add {name}",
+        "description": "**[Scan with the camera]({scan_url})** · **[Pick a photo]({photo_url})** of the QR code on the EnOcean module label, behind the rocker. Its address must be {mac}.\n\nOr paste the QR code text, or use the button sequence.",
         "data": {
-          "qr_code": "QR code text"
+          "qr_code": "Or paste the QR code text",
+          "button_sequence": "Or use the button sequence (manual commissioning)"
         },
         "data_description": {
-          "qr_code": "Example: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215\nLeave empty and submit to go back to the methods."
-        }
-      },
-      "qr_scan": {
-        "title": "Scan the QR code",
-        "description": "[Open the scan page]({scan_url}) to scan the QR code on the module label of {name} with the camera (in the Home Assistant app: its own scanner) or from a photo. The switch is added as soon as the code is accepted.",
-        "menu_options": {
-          "qr_text": "Enter the QR code text instead",
-          "bluetooth_method": "Back"
+          "button_sequence": "For a switch whose label you cannot reach. Some OEM switches (for example Busch-Jaeger, Jung) do not support it."
         }
       },
       "commissioning": {
@@ -60,7 +44,8 @@
       "invalid_commissioning": "A commissioning telegram was received but could not be validated. Try again. If this keeps failing, review the factory reset disclaimer in the documentation before resetting.",
       "qr_mac_mismatch": "This QR code belongs to another switch than the one that was discovered.",
       "qr_key_invalid": "The key in this QR code does not match the telegrams received from this switch. It may have been reconfigured (for example by another system).",
-      "qr_no_telegram": "No telegram has been received from this switch yet. Press one of its buttons, then try again."
+      "qr_no_telegram": "No telegram has been received from this switch yet. Press one of its buttons, then try again.",
+      "choose_method": "Scan or paste the QR code, or turn on the button sequence."
     }
   }
 }

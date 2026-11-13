@@ -38,13 +38,15 @@ CANCEL_TRACE_TAG = "FLOW_CANCEL_TRACE"
 FLOW_TRACE_TAG = "FLOW_TRACE_V3"
 
 COMMISSIONING_TIMEOUT = 120.0
-METHOD_MENU_STEP_ID = "bluetooth_method"
-METHOD_MENU_OPTIONS = ["qr_scan", "qr_text", "commissioning"]
-# "Back" everywhere = return to the method menu, i.e. restart adding the switch.
-SCAN_MENU_OPTIONS = ["qr_text", METHOD_MENU_STEP_ID]
+# One "add" form for a discovered switch, laid out like the add page: a link that
+# scans with the camera, the QR code text, or the button sequence.
+METHOD_STEP_ID = "bluetooth_method"
 COMMISSIONING_RETRY_STEP_ID = "commissioning_retry"
-COMMISSIONING_RETRY_OPTIONS = ["commissioning", METHOD_MENU_STEP_ID]
+# "Back" = return to the add form, i.e. restart adding the switch.
+COMMISSIONING_RETRY_OPTIONS = ["commissioning", METHOD_STEP_ID]
 CONF_QR_CODE = "qr_code"
+CONF_BUTTON_SEQUENCE = "button_sequence"
+ERROR_CHOOSE_METHOD = "choose_method"
 
 
 class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -171,75 +173,54 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_bluetooth_method(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Let the user pick how to add the discovered switch.
+        """Add the discovered switch: one form, laid out like the add page.
 
-        The description links to the in-app add page (scan, photo, text or button
-        sequence); the menu options do the same in this dialog.
+        - The description's "Scan with the camera" link opens the in-app add page with
+          the camera running (in the HA app: its own scanner; a photo works there too).
+          A flow continued from a discovery survives the dialog closing, so the page
+          submits the scanned code to this step through the authenticated config flow
+          API.
+        - ``qr_code``: paste the QR code text here and submit.
+        - ``button_sequence``: turn on and submit to run manual commissioning.
         """
-        self._shown_steps.clear()
-        await async_register_scan_panel(self.hass)
-        return self.async_show_menu(
-            step_id=METHOD_MENU_STEP_ID,
-            menu_options=METHOD_MENU_OPTIONS,
-            description_placeholders={
-                **self._name_placeholders(),
-                "scan_url": scan_panel_path(self.flow_id),
-            },
-        )
-
-    async def async_step_qr_text(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        """Add the switch from the QR code text, typed, pasted or sent by the scan page.
-
-        Submitting the field empty goes back to the method menu.
-        """
-        if user_input is None and self._reopened("qr_text"):
-            return await self.async_step_bluetooth_method()
         errors: dict[str, str] = {}
         if user_input is not None:
             raw = str(user_input.get(CONF_QR_CODE) or "").strip()
-            if not raw:
-                return await self.async_step_bluetooth_method()
-            try:
-                onboarding = self._validate_qr(raw)
-            except QrValidationError as err:
-                errors["base"] = err.code
-                self._log_qr_rejected(step="qr_text", code=err.code)
+            if raw:
+                try:
+                    onboarding = self._validate_qr(raw)
+                except QrValidationError as err:
+                    errors["base"] = err.code
+                    self._log_qr_rejected(step=METHOD_STEP_ID, code=err.code)
+                else:
+                    return self._create_entry_from_qr(onboarding, method="qr")
+            elif user_input.get(CONF_BUTTON_SEQUENCE):
+                return await self.async_step_commissioning()
             else:
-                return self._create_entry_from_qr(onboarding, method="text")
+                errors["base"] = ERROR_CHOOSE_METHOD
 
-        return self.async_show_form(
-            step_id="qr_text",
-            # HA 2026.x maps voluptuous onto probatio at runtime; only the type stubs differ.
-            data_schema=vol.Schema({vol.Optional(CONF_QR_CODE): str}),  # type: ignore[arg-type,unused-ignore]
-            errors=errors,
-            description_placeholders=self._name_placeholders(),
-        )
-
-    async def async_step_qr_scan(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        """Point to the in-app scan page, with "enter the text" and "back" options.
-
-        The scan page is a hidden, admin-only Home Assistant panel. A link in this
-        step opens it inside the frontend (in the HA app: inside the app, with its
-        native scanner). A flow continued from a discovery survives the dialog
-        closing, so the page moves the flow to qr_text and submits the scanned code
-        there through the authenticated config flow API.
-        """
-        if self._reopened("qr_scan"):
-            return await self.async_step_bluetooth_method()
         await async_register_scan_panel(self.hass)
-        return self.async_show_menu(
-            step_id="qr_scan",
-            menu_options=SCAN_MENU_OPTIONS,
+        return self.async_show_form(
+            step_id=METHOD_STEP_ID,
+            # HA 2026.x maps voluptuous onto probatio at runtime; only the type stubs differ.
+            data_schema=vol.Schema(  # type: ignore[arg-type,unused-ignore]
+                {
+                    vol.Optional(CONF_QR_CODE): str,
+                    vol.Optional(CONF_BUTTON_SEQUENCE, default=False): bool,
+                }
+            ),
+            errors=errors,
             description_placeholders={
                 **self._name_placeholders(),
                 "scan_url": scan_panel_path(self.flow_id),
+                "photo_url": scan_panel_path(self.flow_id) + "&photo=1",
             },
         )
 
     async def async_step_commissioning_retry(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """After a failed commissioning attempt: try again, or back to the method menu."""
+        """After a failed commissioning attempt: try again, or back to the add form."""
         if self._reopened(COMMISSIONING_RETRY_STEP_ID):
             return await self.async_step_bluetooth_method()
         return self.async_show_menu(

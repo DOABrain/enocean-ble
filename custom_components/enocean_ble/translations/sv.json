@@ -2,30 +2,14 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "Lägg till EnOcean BLE-brytare",
-        "description": "**[Öppna sidan för att lägga till]({scan_url})**: skanna QR-koden, använd ett foto, klistra in texten eller använd knappsekvensen, allt på en sida. Eller välj en metod nedan.\n\nBrytaren {name} ({mac}) har upptäckts. Hur vill du lägga till den?\n\nQR-koden sitter på EnOcean-modulens etikett, bakom vippan.",
-        "menu_options": {
-          "qr_scan": "Skanna QR-koden med kameran",
-          "qr_text": "Ange QR-kodens text",
-          "commissioning": "Manuell commissioning (knappsekvens)"
-        }
-      },
-      "qr_text": {
-        "title": "Ange QR-kodens text",
-        "description": "Skriv eller klistra in texten från QR-koden på modulens etikett för {name}. Den ser ut som 30SE215…+Z…+30P… och adressen måste vara {mac}.",
+        "title": "Lägg till {name}",
+        "description": "**[Skanna med kameran]({scan_url})** · **[Välj ett foto]({photo_url})** av QR-koden på EnOcean-modulens etikett, bakom vippan. Adressen måste vara {mac}.\n\nEller klistra in QR-kodens text, eller använd knappsekvensen.",
         "data": {
-          "qr_code": "QR-kodens text"
+          "qr_code": "Eller klistra in QR-kodens text",
+          "button_sequence": "Eller använd knappsekvensen (manuell driftsättning)"
         },
         "data_description": {
-          "qr_code": "Exempel: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215\nLämna tomt och skicka för att gå tillbaka till metoderna."
-        }
-      },
-      "qr_scan": {
-        "title": "Skanna QR-koden",
-        "description": "[Öppna skanningssidan]({scan_url}) för att skanna QR-koden på modulens etikett för {name} med kameran (i Home Assistant-appen: dess egen skanner) eller från ett foto. Brytaren läggs till så snart koden godkänns.",
-        "menu_options": {
-          "qr_text": "Ange QR-kodens text i stället",
-          "bluetooth_method": "Tillbaka"
+          "button_sequence": "För en brytare vars etikett du inte kommer åt. Vissa OEM-brytare (till exempel Busch-Jaeger, Jung) stöder det inte."
         }
       },
       "commissioning": {
@@ -60,7 +44,8 @@
       "invalid_qr": "Ingen EnOcean-brytaradress (30SE215…) och säkerhetsnyckel på 32 tecken (+Z…) hittades i den här texten.",
       "qr_mac_mismatch": "Den här QR-koden tillhör en annan brytare än den som upptäcktes.",
       "qr_key_invalid": "Nyckeln i den här QR-koden matchar inte de telegram som tagits emot från brytaren. Den kan ha konfigurerats om (till exempel av ett annat system).",
-      "qr_no_telegram": "Inget telegram har tagits emot från den här brytaren än. Tryck på en av dess knappar och försök igen."
+      "qr_no_telegram": "Inget telegram har tagits emot från den här brytaren än. Tryck på en av dess knappar och försök igen.",
+      "choose_method": "Skanna eller klistra in QR-koden, eller slå på knappsekvensen."
     }
   }
 }

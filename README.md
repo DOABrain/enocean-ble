@@ -34,13 +34,11 @@ It provides:
 
 1. Press any button on the switch — it will appear as a discovered device in Home Assistant
    (Settings -> Devices & Services).
-2. Click `Add` when it appears. The easiest is the **Open the add page** link at the top: one page
-   (inside Home Assistant, also in the app) to scan the QR code, use a photo, paste the text or run
-   the button sequence. On a phone or tablet it opens the camera right away (in the app: the app's
-   scanner); cancel it to use the other ways. Or choose a method in the dialog:
-   - **Scan the QR code with the camera**
-   - **Enter the QR code text**
-   - **Manual commissioning (button sequence)**
+2. Click `Add` when it appears. One screen offers every way to add it:
+   - **Scan with the camera** or **Pick a photo** (links at the top): open the add page with the
+     camera running (in the Home Assistant app: the app's own scanner) or the photo picker open.
+   - **Or paste the QR code text**, then submit.
+   - **Or use the button sequence**: turn it on and submit to start manual commissioning.
 
 Switches are always added from their discovery: this guarantees the switch is present, and lets the
 integration check the QR code against a telegram really received from it.
@@ -52,15 +50,14 @@ its security key, for example `30SE215…+Z…+30P…`. No button sequence is ne
 it the way to add OEM switches whose radio commissioning is disabled (for example Busch-Jaeger
 6716 UBT and Jung BLE switches).
 
-- **Scan:** the step links to a scan page inside Home Assistant. In the Home Assistant app it
-  uses the app's own barcode scanner; in a browser it uses the camera, or reads a **photo** of the
-  label (taken with the camera or picked from the gallery). The switch is added as soon as the code
-  is accepted. Live camera access in a browser needs **HTTPS**; the app scanner, photos and pasting
-  work without it. The step also offers **Enter the QR code text instead** and **Back**.
-- **Text:** type or paste the QR code text (for example read with your phone's camera app).
-  Submit it empty to go back to the methods.
+- **Scan / photo:** the links open an add page inside Home Assistant with the same options. In the
+  Home Assistant app it uses the app's own barcode scanner; in a browser it uses the camera, or
+  reads a **photo** of the label (taken with the camera or picked from the gallery). The switch is
+  added as soon as the code is accepted. Live camera access in a browser needs **HTTPS**; the app
+  scanner, photos and pasting work without it.
+- **Text:** paste the QR code text (for example read with your phone's camera app).
 
-If manual commissioning times out, you can **try again** or go **back to the methods** (for
+If manual commissioning times out, you can **try again** or go **back** to the add screen (for
 example to use the QR code instead).
 
 The scan page is a regular, admin-only Home Assistant page (no extra web endpoint, nothing

@@ -2,30 +2,14 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "EnOcean BLE-schakelaar toevoegen",
-        "description": "**[Open de toevoegpagina]({scan_url})**: QR-code scannen, een foto gebruiken, de tekst plakken of de knoppenreeks gebruiken, alles op één pagina. Of kies hieronder een methode.\n\nSchakelaar {name} ({mac}) is ontdekt. Hoe wil je hem toevoegen?\n\nDe QR-code staat op het label van de EnOcean-module, achter de wip.",
-        "menu_options": {
-          "qr_scan": "QR-code scannen met de camera",
-          "qr_text": "Tekst van de QR-code invoeren",
-          "commissioning": "Handmatige commissioning (knoppenreeks)"
-        }
-      },
-      "qr_text": {
-        "title": "Tekst van de QR-code invoeren",
-        "description": "Typ of plak de tekst van de QR-code op het modulelabel van {name}. Die ziet eruit als 30SE215…+Z…+30P… en het adres moet {mac} zijn.",
+        "title": "{name} toevoegen",
+        "description": "**[Scannen met de camera]({scan_url})** · **[Kies een foto]({photo_url})** van de QR-code op het label van de EnOcean-module, achter de wip. Het adres moet {mac} zijn.\n\nOf plak de tekst van de QR-code, of gebruik de knoppenreeks.",
         "data": {
-          "qr_code": "Tekst van de QR-code"
+          "qr_code": "Of plak de tekst van de QR-code",
+          "button_sequence": "Of gebruik de knoppenreeks (handmatige commissioning)"
         },
         "data_description": {
-          "qr_code": "Voorbeeld: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215\nLaat leeg en verstuur om terug te gaan naar de methoden."
-        }
-      },
-      "qr_scan": {
-        "title": "QR-code scannen",
-        "description": "[Open de scanpagina]({scan_url}) om de QR-code op het modulelabel van {name} te scannen met de camera (in de Home Assistant-app: de eigen scanner) of vanaf een foto. De schakelaar wordt toegevoegd zodra de code is geaccepteerd.",
-        "menu_options": {
-          "qr_text": "In plaats daarvan de tekst van de QR-code invoeren",
-          "bluetooth_method": "Terug"
+          "button_sequence": "Voor een schakelaar waarvan je het label niet kunt bereiken. Sommige OEM-schakelaars (bijvoorbeeld Busch-Jaeger, Jung) ondersteunen dit niet."
         }
       },
       "commissioning": {
@@ -60,7 +44,8 @@
       "invalid_commissioning": "Er is een commissioning-telegram ontvangen, maar dit kon niet worden gevalideerd. Probeer opnieuw. Als dit blijft mislukken, lees dan eerst de resetdisclaimer in de documentatie.",
       "qr_mac_mismatch": "Deze QR-code hoort bij een andere schakelaar dan de ontdekte.",
       "qr_key_invalid": "De sleutel in deze QR-code past niet bij de telegrammen van deze schakelaar. Mogelijk is hij opnieuw geconfigureerd (bijvoorbeeld door een ander systeem).",
-      "qr_no_telegram": "Er is nog geen telegram van deze schakelaar ontvangen. Druk op een van de knoppen en probeer het opnieuw."
+      "qr_no_telegram": "Er is nog geen telegram van deze schakelaar ontvangen. Druk op een van de knoppen en probeer het opnieuw.",
+      "choose_method": "Scan of plak de QR-code, of zet de knoppenreeks aan."
     }
   }
 }

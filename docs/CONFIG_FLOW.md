@@ -16,45 +16,33 @@ Bluetooth discovery (press any button on it).
 - Starts from Bluetooth discovery.
 - Stores discovered MAC/title, the discovery payload, and initializes trace state.
 
-2. `bluetooth_method` (menu)
-- `qr_scan`: scan the module label QR code with the camera.
-- `qr_text`: type or paste the QR code text.
-- `commissioning`: manual commissioning (button sequence), below.
+2. `bluetooth_method` (form, one screen laid out like the add page)
+- Description links: **Scan with the camera** (`/enocean-ble-scan?flow_id=<flow_id>`) and
+  **Pick a photo** (same with `&photo=1`, opens the photo picker). Relative links: they open
+  inside the frontend, and inside the HA app, not in a new window.
+- Field `qr_code`: paste the QR code text and submit; validated with
+  `qr_onboarding.validate_qr_for_device()`, errors are shown on this form.
+- Field `button_sequence`: turn on and submit to start manual commissioning (below).
+- Neither: error `choose_method`.
 
-### From the QR code
+### The add page
 
-`qr_text` (form, field `qr_code`)
-- Validates the text with `qr_onboarding.validate_qr_for_device()`, then creates the entry.
-
-"Back" in every branch returns to the `bluetooth_method` menu, i.e. restarts adding the switch.
-Closing the dialog (X) does the same: a flow continued from a discovery is not deleted, and
-reopening it re-runs the current step without input (`GET` on the flow). `qr_scan`, `qr_text` and
-`commissioning_retry` treat being shown a second time that way as "reopened" and return to the
-method menu (`_reopened()`). A running `commissioning` progress step cannot be reset; its retry
-menu comes when it ends.
-
-`qr_text` (form, field `qr_code`)
-- Submitting the field empty goes back to `bluetooth_method`.
-
-`qr_scan` (menu: `qr_text` = enter the text instead, `bluetooth_method` = back)
-- Its description links to the scan page `/enocean-ble-scan?flow_id=<flow_id>` (relative link:
-  it opens inside the frontend, and inside the HA app, not in a new window). The page is a hidden,
-  admin-only frontend panel (`panel.py`, `frontend/enocean-ble-scan-panel.js`), registered once.
-- A flow continued from a discovery is not deleted when the dialog closes, so the page moves the
-  flow to `qr_text` (from either menu) and submits the scanned code there with the standard,
-  authenticated config flow API (`POST /api/config/config_entries/flow/<flow_id>`).
-- Reading the code, in order: the Companion app's native scanner (external bus `bar_code/scan`),
-  the live camera, a photo of the label, the text field. Camera frames and photos are decoded with
-  `BarcodeDetector`, else the decoder worker the HA frontend serves
-  (`/static/js/qr-scanner-worker.min.js`). No third-party code is bundled.
-- Validation errors are returned on the `qr_text` form; the page shows them with the
-  integration's translations (`config.error.<code>`).
+- Hidden, admin-only frontend panel (`panel.py`, `frontend/enocean-ble-scan-panel.js`),
+  registered once. Opening it for a flow starts the camera (HA app: its native scanner via the
+  external bus `bar_code/scan`; phone/tablet browser: live camera), or the photo picker with
+  `photo=1`. Camera frames and photos are decoded with `BarcodeDetector`, else the decoder worker
+  the HA frontend serves (`/static/js/qr-scanner-worker.min.js`). No third-party code is bundled.
+- A flow continued from a discovery is not deleted when the dialog closes, so the page submits to
+  `bluetooth_method` with the standard, authenticated config flow API
+  (`POST /api/config/config_entries/flow/<flow_id>`): `{"qr_code": …}` or
+  `{"button_sequence": true}`. It then follows the progress step (`data_entry_flow_progressed`
+  events, polling as a fallback) and shows `bluetooth_confirm` or the `commissioning_retry`
+  choice, all with the integration's translations (`config.error.<code>`, `config.step.*`).
 - Opened without `flow_id`, the page lists the EnOcean BLE flows in progress to pick one.
-- The `bluetooth_method` menu links to the same page (`{scan_url}`), which offers every method:
-  scan / photo / paste (via `qr_text`) and manual commissioning. For commissioning the page returns
-  to the menu (empty `qr_text`), selects `commissioning`, follows the progress step
-  (`data_entry_flow_progressed` events, with polling as a fallback), then shows
-  `bluetooth_confirm` or the `commissioning_retry` choice, all with the integration's translations.
+
+Closing the dialog (X) restarts adding the switch: reopening a flow re-runs the current step
+without input; `commissioning_retry` treats a second showing as reopened and returns to
+`bluetooth_method` (`_reopened()`). A running `commissioning` progress step cannot be reset.
 
 Validation (`validate_qr_for_device`), each failure has its own error code:
 - `invalid_qr`: not a module label QR code (`30S<MAC>+Z<key>…`) nor free text with MAC + key.
@@ -72,7 +60,7 @@ The scan page design is adapted from hass-pronote (delphiki/hass-pronote#229, MI
 - Waits for a commissioning telegram (`len=26`) with a `120s` timeout.
 - On success, parses and validates payload MAC and stores `security_key`.
 - On timeout/invalid payload, ends with `show_progress_done` -> `commissioning_retry` (menu:
-  `commissioning` = try again, `bluetooth_method` = back to the methods). A running progress step
+  `commissioning` = try again, `bluetooth_method` = back to the add form). A running progress step
   cannot be interrupted from the frontend; the choice comes when it ends.
 
 4. `bluetooth_confirm` (explicit submit)

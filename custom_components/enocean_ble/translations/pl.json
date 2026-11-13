@@ -2,30 +2,14 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "Dodaj przełącznik EnOcean BLE",
-        "description": "**[Otwórz stronę dodawania]({scan_url})**: zeskanuj kod QR, użyj zdjęcia, wklej tekst lub użyj sekwencji przycisków, wszystko na jednej stronie. Albo wybierz metodę poniżej.\n\nWykryto przełącznik {name} ({mac}). Jak chcesz go dodać?\n\nKod QR znajduje się na etykiecie modułu EnOcean, pod klawiszem.",
-        "menu_options": {
-          "qr_scan": "Zeskanuj kod QR aparatem",
-          "qr_text": "Wpisz tekst kodu QR",
-          "commissioning": "Ręczny commissioning (sekwencja przycisków)"
-        }
-      },
-      "qr_text": {
-        "title": "Wpisz tekst kodu QR",
-        "description": "Wpisz lub wklej tekst kodu QR z etykiety modułu {name}. Wygląda jak 30SE215…+Z…+30P…, a jego adres musi być {mac}.",
+        "title": "Dodaj {name}",
+        "description": "**[Skanuj aparatem]({scan_url})** · **[Wybierz zdjęcie]({photo_url})** kodu QR z etykiety modułu EnOcean, za klawiszem. Jego adres musi być {mac}.\n\nLub wklej tekst kodu QR, albo użyj sekwencji przycisków.",
         "data": {
-          "qr_code": "Tekst kodu QR"
+          "qr_code": "Lub wklej tekst kodu QR",
+          "button_sequence": "Lub użyj sekwencji przycisków (ręczne uruchomienie)"
         },
         "data_description": {
-          "qr_code": "Przykład: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215\nPozostaw puste i wyślij, aby wrócić do metod."
-        }
-      },
-      "qr_scan": {
-        "title": "Zeskanuj kod QR",
-        "description": "[Otwórz stronę skanowania]({scan_url}), aby zeskanować kod QR z etykiety modułu {name} aparatem (w aplikacji Home Assistant: jej własnym skanerem) lub ze zdjęcia. Przełącznik zostanie dodany, gdy kod zostanie zaakceptowany.",
-        "menu_options": {
-          "qr_text": "Zamiast tego wpisz tekst kodu QR",
-          "bluetooth_method": "Wstecz"
+          "button_sequence": "Dla przełącznika, którego etykieta jest niedostępna. Niektóre przełączniki OEM (np. Busch-Jaeger, Jung) tego nie obsługują."
         }
       },
       "commissioning": {
@@ -60,7 +44,8 @@
       "invalid_qr": "W tym tekście nie znaleziono adresu przełącznika EnOcean (30SE215…) ani 32-znakowego klucza bezpieczeństwa (+Z…).",
       "qr_mac_mismatch": "Ten kod QR należy do innego przełącznika niż wykryty.",
       "qr_key_invalid": "Klucz w tym kodzie QR nie pasuje do telegramów odebranych z tego przełącznika. Mógł zostać ponownie skonfigurowany (na przykład przez inny system).",
-      "qr_no_telegram": "Nie odebrano jeszcze żadnego telegramu z tego przełącznika. Naciśnij jeden z jego przycisków i spróbuj ponownie."
+      "qr_no_telegram": "Nie odebrano jeszcze żadnego telegramu z tego przełącznika. Naciśnij jeden z jego przycisków i spróbuj ponownie.",
+      "choose_method": "Zeskanuj lub wklej kod QR albo włącz sekwencję przycisków."
     }
   }
 }

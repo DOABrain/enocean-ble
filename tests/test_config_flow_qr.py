@@ -60,30 +60,33 @@ async def test_user_step_requires_discovery(hass: Any) -> None:
     assert result["reason"] == "discovery_required"
 
 
-async def test_discovery_shows_method_menu(hass: Any) -> None:
+async def test_discovery_shows_one_add_form(hass: Any) -> None:
+    """Like the add page: scan / photo links, QR code text, or the button sequence."""
     _, result = await _discovered_flow(hass, [_service_info()])
-    assert result["type"] == FlowResultType.MENU
+    assert result["type"] == FlowResultType.FORM
     assert result["step_id"] == "bluetooth_method"
-    assert result["menu_options"] == ["qr_scan", "qr_text", "commissioning"]
+    assert [field["name"] for field in result["data_schema"].schema] == ["qr_code", "button_sequence"]
     placeholders = result["description_placeholders"]
     assert placeholders is not None
     assert placeholders["mac"] == MAC
-    # The menu links to the in-app add page right away (all methods on one page).
+    # Relative links: they open inside the frontend (and inside the HA app), never a new window.
     assert placeholders["scan_url"] == "/enocean-ble-scan?flow_id=test-flow"
+    assert placeholders["photo_url"] == "/enocean-ble-scan?flow_id=test-flow&photo=1"
 
 
-async def test_qr_text_creates_entry(hass: Any) -> None:
+async def test_qr_code_creates_entry(hass: Any) -> None:
+    """Pasted in the form, or submitted by the add page after a scan or a photo."""
     flow, _ = await _discovered_flow(hass, [_service_info()])
     with patch.object(config_flow_module, "async_discovered_service_info", return_value=[_service_info()]):
-        result = await flow.async_step_qr_text({"qr_code": QR})
+        result = await flow.async_step_bluetooth_method({"qr_code": QR})
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["data"] == {CONF_MAC_ADDRESS: MAC, CONF_SECURITY_KEY: KEY}
 
 
-async def test_qr_text_uses_discovery_payload_when_cache_is_empty(hass: Any) -> None:
+async def test_qr_code_uses_discovery_payload_when_cache_is_empty(hass: Any) -> None:
     flow, _ = await _discovered_flow(hass, [])
     with patch.object(config_flow_module, "async_discovered_service_info", return_value=[]):
-        result = await flow.async_step_qr_text({"qr_code": QR})
+        result = await flow.async_step_bluetooth_method({"qr_code": QR})
     assert result["type"] == FlowResultType.CREATE_ENTRY
 
 
@@ -95,64 +98,37 @@ async def test_qr_text_uses_discovery_payload_when_cache_is_empty(hass: Any) -> 
         (OTHER_KEY_QR, "qr_key_invalid"),
     ],
 )
-async def test_qr_text_errors(hass: Any, raw: str, error: str) -> None:
+async def test_qr_code_errors_stay_on_the_add_form(hass: Any, raw: str, error: str) -> None:
     flow, _ = await _discovered_flow(hass, [_service_info()])
     with patch.object(config_flow_module, "async_discovered_service_info", return_value=[_service_info()]):
-        result = await flow.async_step_qr_text({"qr_code": raw})
+        result = await flow.async_step_bluetooth_method({"qr_code": raw})
     assert result["type"] == FlowResultType.FORM
-    assert result["step_id"] == "qr_text"
+    assert result["step_id"] == "bluetooth_method"
     assert result["errors"] == {"base": error}
 
 
-async def test_qr_text_without_any_telegram(hass: Any) -> None:
+async def test_qr_code_without_any_telegram(hass: Any) -> None:
     flow, _ = await _discovered_flow(hass, [])
     flow._discovery_payload = None
     with patch.object(config_flow_module, "async_discovered_service_info", return_value=[]):
-        result = await flow.async_step_qr_text({"qr_code": QR})
+        result = await flow.async_step_bluetooth_method({"qr_code": QR})
     assert result["errors"] == {"base": "qr_no_telegram"}
 
 
-async def test_qr_scan_menu_with_in_app_link_text_and_back(hass: Any) -> None:
+async def test_nothing_chosen_asks_for_a_method(hass: Any) -> None:
     flow, _ = await _discovered_flow(hass, [_service_info()])
-    register = AsyncMock()
-    with patch.object(config_flow_module, "async_register_scan_panel", register):
-        result = await flow.async_step_qr_scan()
-    register.assert_awaited_once()
-    assert result["type"] == FlowResultType.MENU
-    assert result["step_id"] == "qr_scan"
-    # Enter the text instead, or back to the method menu.
-    assert result["menu_options"] == ["qr_text", "bluetooth_method"]
-    placeholders = result["description_placeholders"]
-    assert placeholders is not None
-    # Relative link: it opens inside the frontend (and inside the HA app), never a new window.
-    assert placeholders["scan_url"] == "/enocean-ble-scan?flow_id=test-flow"
-    assert placeholders["mac"] == MAC
-
-
-async def test_qr_text_empty_goes_back_to_method_menu(hass: Any) -> None:
-    flow, _ = await _discovered_flow(hass, [_service_info()])
-    for empty in ({}, {"qr_code": ""}, {"qr_code": "   "}):
-        result = await flow.async_step_qr_text(empty)
-        assert result["type"] == FlowResultType.MENU
+    for empty in ({}, {"qr_code": "  ", "button_sequence": False}):
+        result = await flow.async_step_bluetooth_method(empty)
         assert result["step_id"] == "bluetooth_method"
+        assert result["errors"] == {"base": "choose_method"}
 
 
-async def test_reopening_the_dialog_restarts_at_the_method_menu(hass: Any) -> None:
-    """Closing the dialog with X and reopening re-runs the current step without input."""
+async def test_button_sequence_starts_commissioning(hass: Any) -> None:
     flow, _ = await _discovered_flow(hass, [_service_info()])
-    with patch.object(config_flow_module, "async_register_scan_panel", AsyncMock()):
-        # Picked "scan", then reopened: back at the method menu.
-        assert (await flow.async_step_qr_scan())["step_id"] == "qr_scan"
-        assert (await flow.async_step_qr_scan())["step_id"] == "bluetooth_method"
-        # Picked "text" (fresh after the menu), a failed attempt keeps the form...
-        assert (await flow.async_step_qr_text())["step_id"] == "qr_text"
-        result = await flow.async_step_qr_text({"qr_code": "not a qr code"})
-        assert result["step_id"] == "qr_text"
-        assert result["errors"] == {"base": "invalid_qr"}
-        # ...and reopening it restarts too.
-        assert (await flow.async_step_qr_text())["step_id"] == "bluetooth_method"
-        # After the menu, each method shows normally again.
-        assert (await flow.async_step_qr_scan())["step_id"] == "qr_scan"
+    with patch.object(flow, "async_step_commissioning", AsyncMock(return_value={"step_id": "commissioning"})) as step:
+        result = await flow.async_step_bluetooth_method({"button_sequence": True})
+    step.assert_awaited_once()
+    assert result["step_id"] == "commissioning"
 
 
 async def test_commissioning_timeout_offers_retry_or_back(hass: Any) -> None:
@@ -166,7 +142,7 @@ async def test_commissioning_timeout_offers_retry_or_back(hass: Any) -> None:
     result = await flow.async_step_commissioning_retry()
     assert result["type"] == FlowResultType.MENU
     assert result["menu_options"] == ["commissioning", "bluetooth_method"]
-    # Reopened after the failure: back to the method menu.
+    # Reopened after the failure (dialog closed with X): back to the add form.
     assert (await flow.async_step_commissioning_retry())["step_id"] == "bluetooth_method"
 
 

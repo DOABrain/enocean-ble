@@ -2,30 +2,14 @@
   "config": {
     "step": {
       "bluetooth_method": {
-        "title": "Ajouter un switch EnOcean BLE",
-        "description": "**[Ouvrir la page d'ajout]({scan_url})** : scanner le QR code, utiliser une photo, coller le texte ou utiliser la séquence de boutons, le tout sur une page. Ou choisissez une méthode ci-dessous.\n\nLe switch {name} ({mac}) a été découvert. Comment voulez-vous l'ajouter ?\n\nLe QR code se trouve sur l'étiquette du module EnOcean, derrière la bascule.",
-        "menu_options": {
-          "qr_scan": "Scanner le QR code avec la caméra",
-          "qr_text": "Saisir le texte du QR code",
-          "commissioning": "Commissioning manuel (séquence de boutons)"
-        }
-      },
-      "qr_text": {
-        "title": "Saisir le texte du QR code",
-        "description": "Tapez ou collez le texte du QR code de l'étiquette du module de {name}. Il ressemble à 30SE215…+Z…+30P… et son adresse doit être {mac}.",
+        "title": "Ajouter {name}",
+        "description": "**[Scanner avec la caméra]({scan_url})** · **[Choisir une photo]({photo_url})** du QR code de l'étiquette du module EnOcean, derrière la bascule. Son adresse doit être {mac}.\n\nOu collez le texte du QR code, ou utilisez la séquence de boutons.",
         "data": {
-          "qr_code": "Texte du QR code"
+          "qr_code": "Ou coller le texte du QR code",
+          "button_sequence": "Ou utiliser la séquence de boutons (mise en service manuelle)"
         },
         "data_description": {
-          "qr_code": "Exemple : 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215\nLaissez vide et validez pour revenir aux méthodes."
-        }
-      },
-      "qr_scan": {
-        "title": "Scanner le QR code",
-        "description": "[Ouvrir la page de scan]({scan_url}) pour scanner le QR code de l'étiquette du module de {name} avec la caméra (dans l'app Home Assistant : son propre scanner) ou depuis une photo. L'interrupteur est ajouté dès que le code est accepté.",
-        "menu_options": {
-          "qr_text": "Saisir plutôt le texte du QR code",
-          "bluetooth_method": "Retour"
+          "button_sequence": "Pour un interrupteur dont l'étiquette est inaccessible. Certains interrupteurs OEM (par exemple Busch-Jaeger, Jung) ne le prennent pas en charge."
         }
       },
       "commissioning": {
@@ -60,7 +44,8 @@
       "invalid_qr": "Aucune adresse de switch EnOcean (30SE215…) ni clé de sécurité de 32 caractères (+Z…) n'a été trouvée dans ce texte.",
       "qr_mac_mismatch": "Ce QR code correspond à un autre switch que celui qui a été découvert.",
       "qr_key_invalid": "La clé de ce QR code ne correspond pas aux télégrammes reçus de ce switch. Il a peut-être été reconfiguré (par exemple par un autre système).",
-      "qr_no_telegram": "Aucun télégramme n'a encore été reçu de ce switch. Appuyez sur un de ses boutons, puis réessayez."
+      "qr_no_telegram": "Aucun télégramme n'a encore été reçu de ce switch. Appuyez sur un de ses boutons, puis réessayez.",
+      "choose_method": "Scannez ou collez le QR code, ou activez la séquence de boutons."
     }
   }
 }
