@@ -4,13 +4,23 @@
       "bluetooth_method": {
         "title": "EnOcean-Schalter hinzufügen"
       },
+      "device_name": {
+        "title": "Gerätename",
+        "description": "QR-Daten für `{mac}` validiert.",
+        "data": {
+          "name": "Name"
+        }
+      },
       "commissioning": {
         "title": "Manuelle Inbetriebnahme",
         "description": "Inbetriebnahmefolge an {name}: Taste 1 7 s halten, kurz drücken, erneut 7 s halten. Zeitlimit: 2 min."
       },
       "bluetooth_confirm": {
         "title": "Inbetriebnahme-Telegramm empfangen",
-        "description": "Gerät {mac} in Betrieb genommen. Eine andere Taste drücken, um den Inbetriebnahmemodus zu verlassen, dann absenden."
+        "description": "Gerät {mac} in Betrieb genommen. Eine andere Taste drücken, um den Inbetriebnahmemodus zu verlassen, dann absenden.",
+        "data": {
+          "name": "Name"
+        }
       },
       "commissioning_retry": {
         "title": "Inbetriebnahme fehlgeschlagen",

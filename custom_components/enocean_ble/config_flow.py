@@ -7,6 +7,7 @@ import logging
 from collections import defaultdict
 from typing import Any
 
+import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.components.bluetooth import (
     BluetoothServiceInfoBleak,
@@ -47,6 +48,9 @@ COMMISSIONING_RETRY_STEP_ID = "commissioning_retry"
 COMMISSIONING_RETRY_OPTIONS = ["commissioning", METHOD_STEP_ID]
 CONF_QR_CODE = "qr_code"
 CONF_BUTTON_SEQUENCE = "button_sequence"
+# Naming the switch after validation: the entry title, also the device name.
+NAME_STEP_ID = "device_name"
+CONF_NAME = "name"
 
 
 class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -218,10 +222,42 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def async_step_qr_add(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        """Create the entry from the QR code accepted by ``bluetooth_method``."""
+        """The QR code accepted by ``bluetooth_method``: name the switch next.
+
+        Reached through ``show_progress_done``; the flow manager passes the page's input
+        along, so it is ignored here.
+        """
         if self._qr_onboarding is None:
             return await self.async_step_bluetooth_method()
-        return self._create_entry_from_qr(self._qr_onboarding, method="qr")
+        return await self.async_step_device_name()
+
+    async def async_step_device_name(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Name the switch validated from its QR code, then create the entry."""
+        if self._qr_onboarding is None:
+            return await self.async_step_bluetooth_method()
+        if user_input is not None:
+            return self._create_entry_from_qr(
+                self._qr_onboarding, method="qr", title=self._entry_title(user_input)
+            )
+        return self.async_show_form(
+            step_id=NAME_STEP_ID,
+            data_schema=self._name_schema(),
+            description_placeholders=self._name_placeholders(),
+        )
+
+    def _name_schema(self) -> vol.Schema:
+        # HA 2026.x maps voluptuous onto probatio at runtime; only the type stubs differ.
+        return vol.Schema(  # type: ignore[no-any-return,unused-ignore]
+            {vol.Required(CONF_NAME, default=self._default_title()): str}
+        )
+
+    def _default_title(self) -> str:
+        return self._pending_title or self._pending_mac or DOMAIN
+
+    def _entry_title(self, user_input: dict[str, Any]) -> str:
+        return str(user_input.get(CONF_NAME) or "").strip() or self._default_title()
 
     def _cancel_method_task(self) -> None:
         if self._method_task is not None and not self._method_task.done():
@@ -249,11 +285,12 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             payloads.append(self._discovery_payload)
         return validate_qr_for_device(raw, mac_address=self._pending_mac, payloads=payloads)
 
-    def _create_entry_from_qr(self, onboarding: OnboardingData, *, method: str) -> ConfigFlowResult:
+    def _create_entry_from_qr(
+        self, onboarding: OnboardingData, *, method: str, title: str
+    ) -> ConfigFlowResult:
         """Create the config entry from a validated QR code."""
         self._pending_security_key = onboarding.security_key_hex
         self._entry_created = True
-        title = self._pending_title or onboarding.mac_address
         self._trace_event(
             "FLOW_CREATE_ENTRY",
             step=f"qr_{method}",
@@ -329,15 +366,16 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 step="bluetooth_confirm",
                 note="Commissioning complete; waiting for explicit user confirmation.",
             )
-            self._set_confirm_only()
             return self.async_show_form(
                 step_id="bluetooth_confirm",
+                data_schema=self._name_schema(),
                 description_placeholders={
                     "name": self._pending_title or self._pending_mac or DOMAIN,
                     "mac": self._pending_mac,
                 },
             )
 
+        title = self._entry_title(user_input)
         self._trace_event(
             "FLOW_USER_ADD_CONFIRMED",
             step="bluetooth_confirm",
@@ -346,24 +384,24 @@ class EnOceanBleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         _LOGGER.debug(
             "flow_commissioning_create_entry address=%s title=%s",
             self._pending_mac,
-            self._pending_title,
+            title,
         )
         _LOGGER.info(
             "%s ADD_CONFIRMED_CREATE_ENTRY flow_id=%s mac=%s title=%s",
             FLOW_TAG,
             getattr(self, "flow_id", "unknown"),
             self._pending_mac,
-            self._pending_title,
+            title,
         )
         self._entry_created = True
         self._trace_event(
             "FLOW_CREATE_ENTRY",
             step="bluetooth_confirm",
             note="Commissioning succeeded and config entry is being created.",
-            title=self._pending_title or self._pending_mac or DOMAIN,
+            title=title,
         )
         return self.async_create_entry(
-            title=self._pending_title or self._pending_mac or DOMAIN,
+            title=title,
             data={
                 CONF_MAC_ADDRESS: self._pending_mac,
                 CONF_SECURITY_KEY: self._pending_security_key,

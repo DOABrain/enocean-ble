@@ -4,13 +4,23 @@
       "bluetooth_method": {
         "title": "EnOcean-schakelaar toevoegen"
       },
+      "device_name": {
+        "title": "Apparaatnaam",
+        "description": "QR-gegevens gevalideerd voor `{mac}`.",
+        "data": {
+          "name": "Naam"
+        }
+      },
       "commissioning": {
         "title": "Handmatige commissioning",
         "description": "Commissioningreeks op {name}: knop 1 7 s vasthouden, kort drukken, opnieuw 7 s vasthouden. Time-out: 2 min."
       },
       "bluetooth_confirm": {
         "title": "Commissioningtelegram ontvangen",
-        "description": "Apparaat {mac} gecommissioned. Druk op een andere knop om de commissioningmodus te verlaten en verstuur daarna."
+        "description": "Apparaat {mac} gecommissioned. Druk op een andere knop om de commissioningmodus te verlaten en verstuur daarna.",
+        "data": {
+          "name": "Naam"
+        }
       },
       "commissioning_retry": {
         "title": "Commissioning mislukt",

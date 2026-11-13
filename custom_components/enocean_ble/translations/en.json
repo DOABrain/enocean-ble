@@ -4,13 +4,23 @@
       "bluetooth_method": {
         "title": "Add EnOcean switch"
       },
+      "device_name": {
+        "title": "Device name",
+        "description": "QR data validated for `{mac}`.",
+        "data": {
+          "name": "Name"
+        }
+      },
       "commissioning": {
         "title": "Manual commissioning",
         "description": "Commissioning sequence on {name}: hold button 1 for 7 s, press briefly, hold again for 7 s. Timeout: 2 min."
       },
       "bluetooth_confirm": {
         "title": "Commissioning telegram received",
-        "description": "Device {mac} commissioned. Press another button to exit commissioning mode, then submit."
+        "description": "Device {mac} commissioned. Press another button to exit commissioning mode, then submit.",
+        "data": {
+          "name": "Name"
+        }
       },
       "commissioning_retry": {
         "title": "Commissioning failed",

@@ -4,13 +4,23 @@
       "bluetooth_method": {
         "title": "Přidat spínač EnOcean"
       },
+      "device_name": {
+        "title": "Název zařízení",
+        "description": "Data QR ověřena pro `{mac}`.",
+        "data": {
+          "name": "Název"
+        }
+      },
       "commissioning": {
         "title": "Ruční uvedení do provozu",
         "description": "Sekvence uvedení do provozu na {name}: držet tlačítko 1 po dobu 7 s, krátce stisknout, znovu držet 7 s. Časový limit: 2 min."
       },
       "bluetooth_confirm": {
         "title": "Telegram uvedení do provozu přijat",
-        "description": "Zařízení {mac} uvedeno do provozu. Stiskněte jiné tlačítko pro ukončení režimu uvedení do provozu a odešlete."
+        "description": "Zařízení {mac} uvedeno do provozu. Stiskněte jiné tlačítko pro ukončení režimu uvedení do provozu a odešlete.",
+        "data": {
+          "name": "Název"
+        }
       },
       "commissioning_retry": {
         "title": "Uvedení do provozu selhalo",

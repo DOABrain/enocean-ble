@@ -4,13 +4,23 @@
       "bluetooth_method": {
         "title": "Aggiungi interruttore EnOcean"
       },
+      "device_name": {
+        "title": "Nome del dispositivo",
+        "description": "Dati QR convalidati per `{mac}`.",
+        "data": {
+          "name": "Nome"
+        }
+      },
       "commissioning": {
         "title": "Messa in servizio manuale",
         "description": "Sequenza di messa in servizio su {name}: tenere premuto il pulsante 1 per 7 s, pressione breve, di nuovo 7 s. Timeout: 2 min."
       },
       "bluetooth_confirm": {
         "title": "Telegramma di messa in servizio ricevuto",
-        "description": "Dispositivo {mac} messo in servizio. Premere un altro pulsante per uscire dalla modalità di messa in servizio, quindi inviare."
+        "description": "Dispositivo {mac} messo in servizio. Premere un altro pulsante per uscire dalla modalità di messa in servizio, quindi inviare.",
+        "data": {
+          "name": "Nome"
+        }
       },
       "commissioning_retry": {
         "title": "Messa in servizio non riuscita",

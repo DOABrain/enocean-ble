@@ -103,8 +103,45 @@ async def test_qr_code_creates_entry(hass: Any, flows: list[EnOceanBleConfigFlow
         result = await flow.async_step_bluetooth_method({"qr_code": QR})
     assert result["type"] == FlowResultType.SHOW_PROGRESS_DONE
     assert result["step_id"] == "qr_add"
-    result = await flow.async_step_qr_add()
+    # The flow manager passes the page's input on to qr_add: it only leads to naming.
+    result = await flow.async_step_qr_add({"qr_code": QR})
+    assert result["type"] == FlowResultType.FORM
+    assert result["step_id"] == "device_name"
+    assert [field["name"] for field in result["data_schema"].schema] == ["name"]
+    result = await flow.async_step_device_name({"name": "  Woonkamer Gira  "})
     assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert result["title"] == "Woonkamer Gira"
+    assert result["data"] == {CONF_MAC_ADDRESS: MAC, CONF_SECURITY_KEY: KEY}
+
+
+async def test_empty_name_keeps_the_discovered_name(
+    hass: Any, flows: list[EnOceanBleConfigFlow]
+) -> None:
+    flow, _ = await _flow(hass, flows, [_service_info()])
+    with patch.object(config_flow_module, "async_discovered_service_info", return_value=[_service_info()]):
+        await flow.async_step_bluetooth_method({"qr_code": QR})
+    result = await flow.async_step_device_name({"name": " "})
+    assert result["title"] == MAC
+
+
+async def test_device_name_without_accepted_code_returns_to_the_add_step(
+    hass: Any, flows: list[EnOceanBleConfigFlow]
+) -> None:
+    flow, _ = await _flow(hass, flows, [_service_info()])
+    assert (await flow.async_step_device_name({"name": "x"}))["step_id"] == "bluetooth_method"
+
+
+async def test_commissioned_switch_is_named_on_confirm(
+    hass: Any, flows: list[EnOceanBleConfigFlow]
+) -> None:
+    flow, _ = await _flow(hass, flows, [_service_info()])
+    flow._pending_security_key = KEY
+    result = await flow.async_step_bluetooth_confirm()
+    assert result["type"] == FlowResultType.FORM
+    assert [field["name"] for field in result["data_schema"].schema] == ["name"]
+    result = await flow.async_step_bluetooth_confirm({"name": "Gang"})
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert result["title"] == "Gang"
     assert result["data"] == {CONF_MAC_ADDRESS: MAC, CONF_SECURITY_KEY: KEY}
 
 

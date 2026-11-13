@@ -24,6 +24,12 @@ const DOMAIN = "enocean_ble";
 // The flow's add step: a progress step (the dialog only links here) that takes
 // qr_code or button_sequence; a rejected QR code comes back in placeholders.error.
 const TEXT_STEP = "bluetooth_method";
+// Steps that name the switch: [title, text] fallbacks when translations are missing.
+const NAME_STEPS = {
+  device_name: ["Device name", "QR data validated."],
+  bluetooth_confirm: ["Commissioning telegram received",
+    "Device commissioned. Press another button to exit commissioning mode."],
+};
 const HA_QR_WORKER = "/static/js/qr-scanner-worker.min.js";
 const QR_FORMAT_RE = /30S[0-9A-Fa-f]{12}.*\+Z[0-9A-Fa-f]{32}|E2:15(:[0-9A-Fa-f]{2}){4}[\s\S]*\b[0-9A-Fa-f]{32}\b/;
 
@@ -58,6 +64,10 @@ const STYLE = `
   .facts dt { font-size: 12px; color: var(--secondary-text-color); }
   .facts dd { margin: 0 0 8px; }
   #pasteBox textarea { margin-top: 0; }
+  .field { display: grid; gap: 4px; margin: 0 0 12px; font-size: 12px; color: var(--secondary-text-color); }
+  .field input { font: inherit; font-size: 16px; padding: 10px; border-radius: 8px; box-sizing: border-box;
+    width: 100%; border: 1px solid var(--divider-color, #ccc); background: var(--card-background-color, #fff);
+    color: var(--primary-text-color); }
   button.wide { width: 100%; }
   .notice { font-size: 13px; margin: 16px 0 8px; }
   .help { font-size: 13px; color: var(--secondary-text-color); }
@@ -225,7 +235,7 @@ class EnOceanBleScanPanel extends HTMLElement {
 
   // Show the view for wherever the config flow is. The page drives the same flow as the
   // setup dialog: bluetooth_method (qr_code / button_sequence), commissioning (progress),
-  // bluetooth_confirm, commissioning_retry, create_entry.
+  // bluetooth_confirm or device_name (name the switch), commissioning_retry, create_entry.
   async _handleStep(step) {
     if (step.handler && step.handler !== DOMAIN) {
       this._showGone();
@@ -256,9 +266,9 @@ class EnOceanBleScanPanel extends HTMLElement {
       this._watch();
       return;
     }
-    if (step.type === "form" && step.step_id === "bluetooth_confirm") {
+    if (step.type === "form" && NAME_STEPS[step.step_id]) {
       this._stopWatching();
-      this._showConfirm();
+      this._showName(step);
       return;
     }
     if (step.type === "menu" && step.step_id === "commissioning_retry") {
@@ -388,28 +398,42 @@ class EnOceanBleScanPanel extends HTMLElement {
     this._pollTimer = null;
   }
 
-  _showConfirm() {
+  // Name the switch after validation (QR code: device_name; manual commissioning:
+  // bluetooth_confirm). The name is the entry title and the device name.
+  _showName(step) {
+    const [titleFallback, textFallback] = NAME_STEPS[step.step_id];
+    const field = (step.data_schema || []).find((item) => item.name === "name") || {};
     const content = this._content(`
       <div class="card">
         <h2 id="title"></h2>
         <p id="text"></p>
-        <button id="confirm">Submit</button>
+        <label class="field"><span id="nameLabel"></span>
+          <input id="name" type="text" autocomplete="off" required></label>
+        <button id="confirm" class="wide">Add device</button>
         <div id="status" class="status"></div>
       </div>`);
-    content.querySelector("#title").textContent = this._localizeStep(
-      "step.bluetooth_confirm.title", "Commissioning telegram received");
-    content.querySelector("#text").innerText = this._localizeStep(
-      "step.bluetooth_confirm.description",
-      "Device commissioned. Press another button to exit commissioning mode, then submit."
-    );
-    content.querySelector("#confirm").addEventListener("click", async () => {
+    content.querySelector("#title").textContent = this._localizeStep(`step.${step.step_id}.title`, titleFallback);
+    content.querySelector("#text").innerText = this._localizeStep(`step.${step.step_id}.description`, textFallback);
+    content.querySelector("#nameLabel").textContent = this._localizeStep(`step.${step.step_id}.data.name`, "Name");
+    const input = content.querySelector("#name");
+    input.value = field.default || (this._placeholders && this._placeholders.name) || "";
+    const add = async () => {
+      if (this._busy) return;
+      this._busy = true;
       try {
-        await this._handleStep(await this._hass.callApi("POST", this._flowUrl(), {}));
+        await this._handleStep(await this._hass.callApi("POST", this._flowUrl(), { name: input.value.trim() }));
       } catch (err) {
         this._status("error", `Device could not be added: ${errorMessage(err)}`);
+      } finally {
+        this._busy = false;
       }
-    });
+    };
+    content.querySelector("#confirm").addEventListener("click", add);
+    input.addEventListener("keydown", (ev) => { if (ev.key === "Enter") add(); });
+    input.focus();
+    input.select();
   }
+
 
   _showRetry() {
     const content = this._content(`

@@ -4,13 +4,23 @@
       "bluetooth_method": {
         "title": "Ajouter un interrupteur EnOcean"
       },
+      "device_name": {
+        "title": "Nom de l'appareil",
+        "description": "Données QR validées pour `{mac}`.",
+        "data": {
+          "name": "Nom"
+        }
+      },
       "commissioning": {
         "title": "Mise en service manuelle",
         "description": "Séquence de mise en service sur {name} : maintenir le bouton 1 pendant 7 s, appui bref, maintenir de nouveau 7 s. Délai : 2 min."
       },
       "bluetooth_confirm": {
         "title": "Télégramme de mise en service reçu",
-        "description": "Appareil {mac} mis en service. Appuyer sur un autre bouton pour quitter le mode mise en service, puis valider."
+        "description": "Appareil {mac} mis en service. Appuyer sur un autre bouton pour quitter le mode mise en service, puis valider.",
+        "data": {
+          "name": "Nom"
+        }
       },
       "commissioning_retry": {
         "title": "Échec de la mise en service",

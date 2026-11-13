@@ -4,13 +4,23 @@
       "bluetooth_method": {
         "title": "Adicionar interruptor EnOcean"
       },
+      "device_name": {
+        "title": "Nome do dispositivo",
+        "description": "Dados QR validados para `{mac}`.",
+        "data": {
+          "name": "Nome"
+        }
+      },
       "commissioning": {
         "title": "Comissionamento manual",
         "description": "Sequência de comissionamento em {name}: segurar o botão 1 por 7 s, pressionar brevemente, segurar novamente por 7 s. Tempo limite: 2 min."
       },
       "bluetooth_confirm": {
         "title": "Telegrama de comissionamento recebido",
-        "description": "Dispositivo {mac} comissionado. Pressione outro botão para sair do modo de comissionamento e envie."
+        "description": "Dispositivo {mac} comissionado. Pressione outro botão para sair do modo de comissionamento e envie.",
+        "data": {
+          "name": "Nome"
+        }
       },
       "commissioning_retry": {
         "title": "Falha no comissionamento",

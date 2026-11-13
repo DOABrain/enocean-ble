@@ -23,7 +23,8 @@ Bluetooth discovery (press any button on it).
   HA app, not in a new window). A progress step has no Submit button; its task never completes
   by itself and is cancelled when the flow moves on or is removed.
 - Input from the add page: `qr_code` is validated with `qr_onboarding.validate_qr_for_device()`;
-  accepted → `show_progress_done` → `qr_add` (creates the entry); rejected → the same progress
+  accepted → `show_progress_done` → `qr_add` → `device_name` (form, field `name`, default the
+  discovered name; creates the entry with that title, which is also the device name); rejected → the same progress
   step with the error code in the `error` description placeholder.
   `button_sequence: true` → `show_progress_done` → `commissioning` (below).
 - Other input keeps waiting.
@@ -67,7 +68,8 @@ The scan page design is adapted from hass-pronote (delphiki/hass-pronote#229, MI
 
 4. `bluetooth_confirm` (explicit submit)
 - Shows final confirmation once commissioning data is ready.
-- User presses `Submit` to create the config entry.
+- Field `name` (default the discovered name); `Submit` creates the config entry with that title,
+  which is also the device name.
 
 ## Important Behavior
 

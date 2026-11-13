@@ -4,13 +4,23 @@
       "bluetooth_method": {
         "title": "Añadir interruptor EnOcean"
       },
+      "device_name": {
+        "title": "Nombre del dispositivo",
+        "description": "Datos QR validados para `{mac}`.",
+        "data": {
+          "name": "Nombre"
+        }
+      },
       "commissioning": {
         "title": "Puesta en marcha manual",
         "description": "Secuencia de puesta en marcha en {name}: mantener el botón 1 7 s, pulsación breve, mantener de nuevo 7 s. Tiempo límite: 2 min."
       },
       "bluetooth_confirm": {
         "title": "Telegrama de puesta en marcha recibido",
-        "description": "Dispositivo {mac} puesto en marcha. Pulsar otro botón para salir del modo de puesta en marcha y enviar."
+        "description": "Dispositivo {mac} puesto en marcha. Pulsar otro botón para salir del modo de puesta en marcha y enviar.",
+        "data": {
+          "name": "Nombre"
+        }
       },
       "commissioning_retry": {
         "title": "Puesta en marcha fallida",

@@ -4,13 +4,23 @@
       "bluetooth_method": {
         "title": "Lägg till EnOcean-brytare"
       },
+      "device_name": {
+        "title": "Enhetsnamn",
+        "description": "QR-data validerade för `{mac}`.",
+        "data": {
+          "name": "Namn"
+        }
+      },
       "commissioning": {
         "title": "Manuell driftsättning",
         "description": "Driftsättningssekvens på {name}: håll knapp 1 i 7 s, kort tryck, håll igen i 7 s. Tidsgräns: 2 min."
       },
       "bluetooth_confirm": {
         "title": "Driftsättningstelegram mottaget",
-        "description": "Enhet {mac} driftsatt. Tryck på en annan knapp för att lämna driftsättningsläget och skicka sedan."
+        "description": "Enhet {mac} driftsatt. Tryck på en annan knapp för att lämna driftsättningsläget och skicka sedan.",
+        "data": {
+          "name": "Namn"
+        }
       },
       "commissioning_retry": {
         "title": "Driftsättningen misslyckades",

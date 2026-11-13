@@ -4,13 +4,23 @@
       "bluetooth_method": {
         "title": "Dodaj przełącznik EnOcean"
       },
+      "device_name": {
+        "title": "Nazwa urządzenia",
+        "description": "Dane QR zweryfikowane dla `{mac}`.",
+        "data": {
+          "name": "Nazwa"
+        }
+      },
       "commissioning": {
         "title": "Ręczne uruchomienie",
         "description": "Sekwencja uruchomienia na {name}: przytrzymaj przycisk 1 przez 7 s, krótko naciśnij, ponownie przytrzymaj 7 s. Limit czasu: 2 min."
       },
       "bluetooth_confirm": {
         "title": "Odebrano telegram uruchomienia",
-        "description": "Urządzenie {mac} uruchomione. Naciśnij inny przycisk, aby wyjść z trybu uruchomienia, a następnie zatwierdź."
+        "description": "Urządzenie {mac} uruchomione. Naciśnij inny przycisk, aby wyjść z trybu uruchomienia, a następnie zatwierdź.",
+        "data": {
+          "name": "Nazwa"
+        }
       },
       "commissioning_retry": {
         "title": "Uruchomienie nie powiodło się",
