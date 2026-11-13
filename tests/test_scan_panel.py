@@ -31,6 +31,7 @@ def test_scan_panel_script_is_packaged() -> None:
 
 def test_scan_panel_path() -> None:
     assert scan_panel_path("abc") == f"/{SCAN_PANEL_URL_PATH}?flow_id=abc"
+    assert scan_panel_path(None) == f"/{SCAN_PANEL_URL_PATH}?scan=1"
 
 
 async def test_register_skips_without_http() -> None:
@@ -39,7 +40,7 @@ async def test_register_skips_without_http() -> None:
     assert hass.data == {}
 
 
-async def test_register_once_hidden_and_admin_only(hass: Any) -> None:
+async def test_register_once_in_sidebar_admin_only(hass: Any) -> None:
     register_panel = AsyncMock()
     hass.http = SimpleNamespace(async_register_static_paths=AsyncMock())
     with patch("homeassistant.components.panel_custom.async_register_panel", register_panel):
@@ -50,6 +51,6 @@ async def test_register_once_hidden_and_admin_only(hass: Any) -> None:
     kwargs = register_panel.await_args.kwargs
     assert kwargs["frontend_url_path"] == SCAN_PANEL_URL_PATH
     assert kwargs["webcomponent_name"] == SCAN_PANEL_ELEMENT
-    assert kwargs["sidebar_title"] is None
+    assert kwargs["sidebar_title"] == "EnOcean BLE"
     assert kwargs["require_admin"] is True
     assert hass.data[DOMAIN]["scan_panel_registered"] is True

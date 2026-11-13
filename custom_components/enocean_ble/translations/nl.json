@@ -43,6 +43,16 @@
           "commissioning": "Opnieuw proberen",
           "bluetooth_method": "Terug naar de methoden"
         }
+      },
+      "user": {
+        "title": "EnOcean BLE-schakelaar toevoegen",
+        "description": "**[Open de toevoegpagina]({scan_url})** om de QR-code op het modulelabel te scannen met de camera (in de Home Assistant-app: de eigen scanner) of vanaf een foto. Op een knop drukken is niet nodig: de eerste druk van de schakelaar bevestigt zijn sleutel.\n\nOf plak hieronder de tekst van de QR-code.",
+        "data": {
+          "qr_code": "Tekst van de QR-code"
+        },
+        "data_description": {
+          "qr_code": "Voorbeeld: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215"
+        }
       }
     },
     "progress": {
@@ -51,8 +61,7 @@
     "abort": {
       "already_configured": "Deze schakelaar is al geconfigureerd.",
       "no_bluetooth_discovery": "Deze configuratie moet gestart worden vanaf een ontdekt Bluetooth-apparaat.",
-      "not_enocean_prefix": "Dit ontdekte apparaat gebruikt niet de EnOcean BLE MAC-prefix (E2:15).",
-      "discovery_required": "Druk op een willekeurige knop van de schakelaar: hij verschijnt dan als ontdekt apparaat in Instellingen → Apparaten en diensten, waar je hem kunt toevoegen."
+      "not_enocean_prefix": "Dit ontdekte apparaat gebruikt niet de EnOcean BLE MAC-prefix (E2:15)."
     },
     "error": {
       "invalid_qr": "In deze tekst is geen EnOcean-schakelaaradres (30SE215…) en beveiligingssleutel van 32 tekens (+Z…) gevonden.",
@@ -61,6 +70,12 @@
       "qr_mac_mismatch": "Deze QR-code hoort bij een andere schakelaar dan de ontdekte.",
       "qr_key_invalid": "De sleutel in deze QR-code past niet bij de telegrammen van deze schakelaar. Mogelijk is hij opnieuw geconfigureerd (bijvoorbeeld door een ander systeem).",
       "qr_no_telegram": "Er is nog geen telegram van deze schakelaar ontvangen. Druk op een van de knoppen en probeer het opnieuw."
+    }
+  },
+  "issues": {
+    "key_mismatch": {
+      "title": "EnOcean-schakelaar {name}: beveiligingssleutel klopt niet",
+      "description": "De beveiligingssleutel uit de QR-code van {name} ({mac}) past niet bij de telegrammen van deze schakelaar, dus zijn knoppen worden genegeerd. Mogelijk is de schakelaar opnieuw geconfigureerd (bijvoorbeeld door een ander systeem), of hoort de QR-code bij een andere module. Verwijder de schakelaar en voeg hem opnieuw toe met de knoppenreeks of de juiste QR-code."
     }
   }
 }

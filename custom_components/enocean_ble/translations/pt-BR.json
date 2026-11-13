@@ -43,6 +43,16 @@
           "commissioning": "Tentar novamente",
           "bluetooth_method": "Voltar aos métodos"
         }
+      },
+      "user": {
+        "title": "Adicionar interruptor EnOcean BLE",
+        "description": "**[Abra a página de adição]({scan_url})** para escanear o código QR da etiqueta do módulo com a câmera (no app Home Assistant: o próprio leitor) ou a partir de uma foto. Não é preciso apertar nada: o primeiro aperto do interruptor confirma a chave.\n\nOu cole abaixo o texto do código QR.",
+        "data": {
+          "qr_code": "Texto do código QR"
+        },
+        "data_description": {
+          "qr_code": "Exemplo: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215"
+        }
       }
     },
     "progress": {
@@ -51,8 +61,7 @@
     "abort": {
       "no_bluetooth_discovery": "Esta configuração deve ser iniciada a partir de um dispositivo Bluetooth descoberto.",
       "not_enocean_prefix": "Este dispositivo descoberto não usa o prefixo MAC EnOcean BLE (E2:15).",
-      "already_configured": "Este interruptor já está configurado.",
-      "discovery_required": "Pressione qualquer botão do interruptor: ele aparecerá como dispositivo descoberto em Configurações → Dispositivos e serviços, onde você pode adicioná-lo."
+      "already_configured": "Este interruptor já está configurado."
     },
     "error": {
       "commissioning_not_detected": "Nenhum telegrama de comissionamento foi recebido em 2 minutos. Tente novamente. Se continuar sem funcionar após várias tentativas, você pode tentar um reset de fábrica. Leia primeiro o aviso de reset na documentação.",
@@ -61,6 +70,12 @@
       "qr_mac_mismatch": "Este código QR pertence a outro interruptor, diferente do descoberto.",
       "qr_key_invalid": "A chave deste código QR não corresponde aos telegramas recebidos deste interruptor. Ele pode ter sido reconfigurado (por exemplo, por outro sistema).",
       "qr_no_telegram": "Nenhum telegrama foi recebido deste interruptor ainda. Pressione um dos botões e tente novamente."
+    }
+  },
+  "issues": {
+    "key_mismatch": {
+      "title": "Interruptor EnOcean {name}: a chave de segurança não confere",
+      "description": "A chave de segurança do código QR de {name} ({mac}) não confere com os telegramas deste interruptor, então os apertos são ignorados. O interruptor pode ter sido reconfigurado (por exemplo por outro sistema) ou o código QR é de outro módulo. Exclua o interruptor e adicione-o novamente com a sequência de botões ou o código QR correto."
     }
   }
 }

@@ -43,6 +43,16 @@
           "commissioning": "Try again",
           "bluetooth_method": "Back to the methods"
         }
+      },
+      "user": {
+        "title": "Add EnOcean BLE switch",
+        "description": "**[Open the add page]({scan_url})** to scan the QR code on the module label with the camera (in the Home Assistant app: its own scanner) or from a photo. No button press is needed: the switch's first press confirms its key.\n\nOr paste the QR code text below.",
+        "data": {
+          "qr_code": "QR code text"
+        },
+        "data_description": {
+          "qr_code": "Example: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215"
+        }
       }
     },
     "progress": {
@@ -51,8 +61,7 @@
     "abort": {
       "already_configured": "This switch is already configured.",
       "no_bluetooth_discovery": "This setup must start from a discovered Bluetooth device.",
-      "not_enocean_prefix": "This discovered device does not use the EnOcean BLE MAC prefix (E2:15).",
-      "discovery_required": "Press any button on the switch: it then appears as a discovered device in Settings → Devices & services, where you can add it."
+      "not_enocean_prefix": "This discovered device does not use the EnOcean BLE MAC prefix (E2:15)."
     },
     "error": {
       "invalid_qr": "No EnOcean switch address (30SE215…) and 32-character security key (+Z…) were found in this text.",
@@ -61,6 +70,12 @@
       "qr_mac_mismatch": "This QR code belongs to another switch than the one that was discovered.",
       "qr_key_invalid": "The key in this QR code does not match the telegrams received from this switch. It may have been reconfigured (for example by another system).",
       "qr_no_telegram": "No telegram has been received from this switch yet. Press one of its buttons, then try again."
+    }
+  },
+  "issues": {
+    "key_mismatch": {
+      "title": "EnOcean switch {name}: security key does not match",
+      "description": "The security key from the QR code of {name} ({mac}) does not match the telegrams this switch sends, so its button presses are ignored. The switch may have been reconfigured (for example by another system), or the QR code belongs to another module. Delete the switch and add it again with the button sequence or the right QR code."
     }
   }
 }

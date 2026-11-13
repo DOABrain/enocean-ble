@@ -9,8 +9,18 @@ Commission one EnOcean BLE switch from Bluetooth discovery and create one config
 
 ## Current Flow (Implemented)
 
-`user` (Add integration) aborts with `discovery_required`: a switch is always added from its
-Bluetooth discovery (press any button on it).
+`user` (Add device, or the add page in the sidebar): form with `qr_code`, adds a switch from its
+module label QR code **before any button press** (scan first). The description links to the add
+page (`/enocean-ble-scan?scan=1`, starts the camera).
+- Sets the MAC as unique ID; `already_configured` if it exists. Creating the entry also ends a
+  discovery flow of the same switch (same unique ID).
+- If a telegram of the switch is already known (Bluetooth cache), the key is checked now
+  (`qr_key_invalid` on mismatch). Otherwise the entry is created with `key_verified: false`:
+  the first data telegram verifies the key (entry updated to verified), and after
+  `KEY_MISMATCH_THRESHOLD` consecutive MIC failures a Repairs issue `key_mismatch` is raised
+  (removed again once a telegram verifies).
+
+Discovered switches (press any button) go through:
 
 1. `bluetooth` (discovery)
 - Starts from Bluetooth discovery.

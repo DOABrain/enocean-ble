@@ -43,6 +43,16 @@
           "commissioning": "Erneut versuchen",
           "bluetooth_method": "Zurück zu den Methoden"
         }
+      },
+      "user": {
+        "title": "EnOcean BLE-Schalter hinzufügen",
+        "description": "**[Hinzufügen-Seite öffnen]({scan_url})**, um den QR-Code auf dem Modulaufkleber mit der Kamera (in der Home Assistant App: deren eigener Scanner) oder von einem Foto zu scannen. Kein Tastendruck nötig: der erste Tastendruck des Schalters bestätigt seinen Schlüssel.\n\nOder füge unten den Text des QR-Codes ein.",
+        "data": {
+          "qr_code": "Text des QR-Codes"
+        },
+        "data_description": {
+          "qr_code": "Beispiel: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215"
+        }
       }
     },
     "progress": {
@@ -51,8 +61,7 @@
     "abort": {
       "no_bluetooth_discovery": "Dieses Setup muss mit einem per Bluetooth gefundenen Gerät gestartet werden.",
       "not_enocean_prefix": "Dieses gefundene Gerät verwendet nicht den EnOcean BLE MAC-Präfix (E2:15).",
-      "already_configured": "Dieser Schalter ist bereits eingerichtet.",
-      "discovery_required": "Drücke eine beliebige Taste am Schalter: Er erscheint dann als erkanntes Gerät unter Einstellungen → Geräte & Dienste, wo du ihn hinzufügen kannst."
+      "already_configured": "Dieser Schalter ist bereits eingerichtet."
     },
     "error": {
       "commissioning_not_detected": "Innerhalb von 2 Minuten wurde kein Kommissionierungs-Telegramm empfangen. Versuchen Sie es erneut. Wenn es nach mehreren Versuchen weiterhin nicht funktioniert, können Sie einen Werksreset versuchen. Lesen Sie vorher den Reset-Hinweis in der Dokumentation.",
@@ -61,6 +70,12 @@
       "qr_mac_mismatch": "Dieser QR-Code gehört zu einem anderen Schalter als dem erkannten.",
       "qr_key_invalid": "Der Schlüssel in diesem QR-Code passt nicht zu den Telegrammen dieses Schalters. Er wurde möglicherweise neu konfiguriert (z. B. von einem anderen System).",
       "qr_no_telegram": "Von diesem Schalter wurde noch kein Telegramm empfangen. Drücke eine seiner Tasten und versuche es erneut."
+    }
+  },
+  "issues": {
+    "key_mismatch": {
+      "title": "EnOcean-Schalter {name}: Sicherheitsschlüssel passt nicht",
+      "description": "Der Sicherheitsschlüssel aus dem QR-Code von {name} ({mac}) passt nicht zu den Telegrammen dieses Schalters, daher werden seine Tastendrücke ignoriert. Der Schalter wurde vielleicht neu konfiguriert (zum Beispiel von einem anderen System) oder der QR-Code gehört zu einem anderen Modul. Lösche den Schalter und füge ihn mit der Tastenfolge oder dem richtigen QR-Code erneut hinzu."
     }
   }
 }

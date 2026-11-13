@@ -52,12 +52,61 @@ async def _discovered_flow(hass: Any, cached: list[SimpleNamespace]) -> tuple[En
     return flow, result
 
 
-async def test_user_step_requires_discovery(hass: Any) -> None:
+def _user_flow(hass: Any) -> EnOceanBleConfigFlow:
     flow = EnOceanBleConfigFlow()
     flow.hass = hass
-    result = await flow.async_step_user()
-    assert result["type"] == FlowResultType.ABORT
-    assert result["reason"] == "discovery_required"
+    flow.handler = DOMAIN
+    flow.flow_id = "user-flow"
+    flow.context = {"source": "user"}
+    return flow
+
+
+async def test_user_step_shows_qr_form_with_add_page_link(hass: Any) -> None:
+    flow = _user_flow(hass)
+    with patch.object(config_flow_module, "async_register_scan_panel", AsyncMock()):
+        result = await flow.async_step_user()
+    assert result["type"] == FlowResultType.FORM
+    assert result["step_id"] == "user"
+    placeholders = result["description_placeholders"]
+    assert placeholders is not None
+    assert placeholders["scan_url"] == "/enocean-ble-scan?scan=1"
+
+
+async def test_user_step_scan_first_creates_unverified_entry(hass: Any) -> None:
+    """No telegram known yet: added now, the first press verifies the key."""
+    flow = _user_flow(hass)
+    with patch.object(config_flow_module, "async_discovered_service_info", return_value=[]):
+        result = await flow.async_step_user({"qr_code": QR})
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert result["data"] == {CONF_MAC_ADDRESS: MAC, CONF_SECURITY_KEY: KEY, "key_verified": False}
+
+
+async def test_user_step_verifies_now_when_a_telegram_is_known(hass: Any) -> None:
+    flow = _user_flow(hass)
+    with patch.object(config_flow_module, "async_discovered_service_info", return_value=[_service_info()]):
+        result = await flow.async_step_user({"qr_code": QR})
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert result["data"] == {CONF_MAC_ADDRESS: MAC, CONF_SECURITY_KEY: KEY}
+
+
+@pytest.mark.parametrize(
+    ("raw", "cached", "error"),
+    [
+        ("not a qr code", [], "invalid_qr"),
+        (OTHER_KEY_QR, [DATA_TELEGRAM], "qr_key_invalid"),
+    ],
+)
+async def test_user_step_errors(hass: Any, raw: str, cached: list[bytes], error: str) -> None:
+    flow = _user_flow(hass)
+    infos = [_service_info(payload) for payload in cached]
+    with (
+        patch.object(config_flow_module, "async_discovered_service_info", return_value=infos),
+        patch.object(config_flow_module, "async_register_scan_panel", AsyncMock()),
+    ):
+        result = await flow.async_step_user({"qr_code": raw})
+    assert result["type"] == FlowResultType.FORM
+    assert result["step_id"] == "user"
+    assert result["errors"] == {"base": error}
 
 
 async def test_discovery_shows_method_menu(hass: Any) -> None:

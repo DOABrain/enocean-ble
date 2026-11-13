@@ -1,9 +1,12 @@
 /*
- * EnOcean BLE - scan page for the module label QR code.
+ * EnOcean BLE - add page (sidebar "EnOcean BLE", admin only).
  *
- * Hidden, admin-only Home Assistant panel: /enocean-ble-scan?flow_id=<flow_id>
- * (linked from the "Scan the QR code" step of a discovered switch). Without a
- * flow_id it lists the discovered switches waiting to be added.
+ * /enocean-ble-scan          scan a new switch's label QR code (no button press
+ *                            needed: a "user" config flow, the first press then
+ *                            confirms the key), or pick a discovered switch
+ * /enocean-ble-scan?scan=1   same, and start the camera (from "Add device")
+ * /enocean-ble-scan?flow_id= finish adding a discovered switch: QR code or manual
+ *                            commissioning (button sequence)
  *
  * Reading the code, in order of preference:
  *  1. Home Assistant app: its native scanner (external bus "bar_code/scan").
@@ -113,9 +116,10 @@ class EnOceanBleScanPanel extends HTMLElement {
     } catch (_err) {
       // Untranslated error codes are still shown.
     }
-    const flowId = new URLSearchParams(window.location.search).get("flow_id");
+    const params = new URLSearchParams(window.location.search);
+    const flowId = params.get("flow_id");
     if (flowId) await this._openFlow(flowId);
-    else await this._showPending();
+    else await this._showHome(params.get("scan") === "1");
   }
 
   _render() {
@@ -155,26 +159,49 @@ class EnOceanBleScanPanel extends HTMLElement {
 
   // ---------------------------------------------------------------- flows
 
-  async _showPending() {
-    let flows = [];
-    try {
-      flows = (await this._hass.callWS({ type: "config_entries/flow/progress" })).filter(
-        (flow) => flow.handler === DOMAIN
-      );
-    } catch (err) {
-      this._content(`<div class="card"><p>${errorMessage(err)}</p></div>`);
-      return;
-    }
+  // Home: scan a new switch (no button press needed), or pick a discovered one.
+  async _showHome(autoScan) {
+    this._stopWatching();
+    this._flowId = null;
+    this._placeholders = null;
     const content = this._content(`
       <div class="card">
         <h2>Add an EnOcean switch</h2>
-        <p>Pick the switch to add. A switch appears here after you press one of its buttons.</p>
+        <p>Remove the rocker and scan the QR code on the EnOcean module label. No button press
+          is needed; the switch's first press confirms its key.</p>
+        <div class="actions">
+          <button id="scan">Scan with the camera</button>
+          <button id="photo" class="secondary">Take or choose a photo</button>
+          <input id="file" type="file" accept="image/*" capture="environment" hidden>
+        </div>
+        <div id="status" class="status"></div>
+      </div>
+      <div class="card">
+        <h2>Or paste the QR code text</h2>
+        <textarea id="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+          placeholder="30SE215…+Z…+30P…"></textarea>
+        <button id="add">Add switch</button>
+      </div>
+      <div class="card">
+        <h2>Discovered switches</h2>
+        <p>Switches that sent a telegram but are not added yet. Pick one to add it, also with the
+          button sequence.</p>
         <ul id="flows"></ul>
       </div>`);
+    this._wireScanControls(content);
+    if (autoScan) this._autoScanOnce();
+    let flows = [];
+    try {
+      flows = (await this._hass.callWS({ type: "config_entries/flow/progress" })).filter(
+        (flow) => flow.handler === DOMAIN && flow.context && flow.context.source === "bluetooth"
+      );
+    } catch (_err) {
+      flows = [];
+    }
     const list = content.querySelector("#flows");
     if (!flows.length) {
       const li = document.createElement("li");
-      li.textContent = "No discovered switch is waiting. Press a button on the switch, then reload this page.";
+      li.textContent = "None right now. A switch appears here after you press one of its buttons.";
       list.appendChild(li);
       return;
     }
@@ -211,7 +238,7 @@ class EnOceanBleScanPanel extends HTMLElement {
     this._content(`
       <div class="card"><h2>Nothing to add</h2>
         <p>This switch is no longer waiting to be added (already added, or the setup was closed).</p>
-        <p><a href="/enocean-ble-scan">Show discovered switches</a></p></div>`);
+        <p><a href="/enocean-ble-scan">Back to EnOcean BLE</a></p></div>`);
   }
 
   // Show the view for wherever the config flow is. The page drives the same flow as the
@@ -230,7 +257,7 @@ class EnOceanBleScanPanel extends HTMLElement {
     if (step.type === "abort") {
       this._stopWatching();
       this._content(`<div class="card"><h2>Not added</h2><p id="reason"></p>
-        <p><a href="/enocean-ble-scan">Show discovered switches</a></p></div>`);
+        <p><a href="/enocean-ble-scan">Back to EnOcean BLE</a></p></div>`);
       this._el("reason").textContent =
         this._hass.localize(`component.${DOMAIN}.config.abort.${step.reason}`) || step.reason;
       return;
@@ -295,10 +322,7 @@ class EnOceanBleScanPanel extends HTMLElement {
       </div>`);
     content.querySelector("#name").textContent = `Add ${ph.name || "EnOcean switch"}`;
     content.querySelector("#mac").textContent = ph.mac || "";
-    content.querySelector("#scan").addEventListener("click", () => this._scan());
-    content.querySelector("#photo").addEventListener("click", () => content.querySelector("#file").click());
-    content.querySelector("#file").addEventListener("change", (ev) => this._scanPhoto(ev));
-    content.querySelector("#add").addEventListener("click", () => this._submit(content.querySelector("#text").value));
+    this._wireScanControls(content);
     content.querySelector("#commission").addEventListener("click", () => this._startCommissioning());
   }
 
@@ -313,6 +337,13 @@ class EnOceanBleScanPanel extends HTMLElement {
     if (this._external() || (touch && navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
       this._scan();
     }
+  }
+
+  _wireScanControls(content) {
+    content.querySelector("#scan").addEventListener("click", () => this._scan());
+    content.querySelector("#photo").addEventListener("click", () => content.querySelector("#file").click());
+    content.querySelector("#file").addEventListener("change", (ev) => this._scanPhoto(ev));
+    content.querySelector("#add").addEventListener("click", () => this._submit(content.querySelector("#text").value));
   }
 
   // ---------------------------------------------------------------- manual commissioning
@@ -445,7 +476,11 @@ class EnOceanBleScanPanel extends HTMLElement {
 
   async _submit(raw) {
     const text = String(raw || "").trim();
-    if (!text || this._busy || !this._flowId) return;
+    if (!text || this._busy) return;
+    if (!this._flowId) {
+      await this._submitNew(text);
+      return;
+    }
     this._busy = true;
     this._status("info", "Checking the QR code…");
     try {
@@ -464,11 +499,45 @@ class EnOceanBleScanPanel extends HTMLElement {
     }
   }
 
+  // A switch scanned from the home view (no discovery): its own "user" flow, which
+  // checks the key now if a telegram of the switch is known, else on its first press.
+  async _submitNew(text) {
+    this._busy = true;
+    this._status("info", "Checking the QR code…");
+    let flowId = null;
+    try {
+      const start = await this._hass.callApi("POST", "config/config_entries/flow", {
+        handler: DOMAIN,
+        show_advanced_options: false,
+      });
+      flowId = start.flow_id;
+      const result = await this._hass.callApi("POST", `config/config_entries/flow/${flowId}`, {
+        qr_code: text,
+      });
+      if (result.type === "create_entry") {
+        flowId = null;
+        this._showDone(result);
+      } else if (result.type === "abort") {
+        flowId = null;
+        this._status("error", this._hass.localize(`component.${DOMAIN}.config.abort.${result.reason}`) || result.reason);
+      } else {
+        const code = (result.errors && result.errors.base) || "invalid_qr";
+        this._status("error", this._localizeError(code));
+      }
+    } catch (err) {
+      this._status("error", `Could not add the switch: ${errorMessage(err)}`);
+    } finally {
+      if (flowId) this._hass.callApi("DELETE", `config/config_entries/flow/${flowId}`).catch(() => {});
+      this._busy = false;
+    }
+  }
+
   _showDone(result) {
     const content = this._content(`
       <div class="card">
         <h2>Switch added</h2>
-        <p><span id="title"></span> has been added. Press one of its buttons to test it.</p>
+        <p><span id="title"></span> has been added. Press one of its buttons: that also confirms
+          its key.</p>
         <p><a href="/config/integrations/integration/${DOMAIN}">Open EnOcean BLE</a> ·
           <a href="/enocean-ble-scan">Add another switch</a></p>
       </div>`);

@@ -43,6 +43,16 @@
           "commissioning": "Försök igen",
           "bluetooth_method": "Tillbaka till metoderna"
         }
+      },
+      "user": {
+        "title": "Lägg till EnOcean BLE-brytare",
+        "description": "**[Öppna sidan för att lägga till]({scan_url})** för att skanna QR-koden på modulens etikett med kameran (i Home Assistant-appen: dess egen skanner) eller från ett foto. Ingen knapptryckning behövs: brytarens första tryck bekräftar dess nyckel.\n\nEller klistra in QR-kodens text nedan.",
+        "data": {
+          "qr_code": "QR-kodens text"
+        },
+        "data_description": {
+          "qr_code": "Exempel: 30SE21500001234+Z0123456789ABCDEF0123456789ABCDEF+30PS3221-A215"
+        }
       }
     },
     "progress": {
@@ -51,8 +61,7 @@
     "abort": {
       "no_bluetooth_discovery": "Denna konfiguration måste startas från en upptäckt Bluetooth-enhet.",
       "not_enocean_prefix": "Den upptäckta enheten använder inte EnOcean BLE MAC-prefix (E2:15).",
-      "already_configured": "Den här brytaren är redan konfigurerad.",
-      "discovery_required": "Tryck på valfri knapp på brytaren: den visas då som en upptäckt enhet under Inställningar → Enheter och tjänster, där du kan lägga till den."
+      "already_configured": "Den här brytaren är redan konfigurerad."
     },
     "error": {
       "commissioning_not_detected": "Ingen commissioning-telegram togs emot inom 2 minuter. Försök igen. Om det fortfarande inte fungerar efter flera försök kan du prova en fabriksåterställning. Läs först reset-varningen i dokumentationen.",
@@ -61,6 +70,12 @@
       "qr_mac_mismatch": "Den här QR-koden tillhör en annan brytare än den som upptäcktes.",
       "qr_key_invalid": "Nyckeln i den här QR-koden matchar inte de telegram som tagits emot från brytaren. Den kan ha konfigurerats om (till exempel av ett annat system).",
       "qr_no_telegram": "Inget telegram har tagits emot från den här brytaren än. Tryck på en av dess knappar och försök igen."
+    }
+  },
+  "issues": {
+    "key_mismatch": {
+      "title": "EnOcean-brytare {name}: säkerhetsnyckeln stämmer inte",
+      "description": "Säkerhetsnyckeln från QR-koden för {name} ({mac}) stämmer inte med brytarens telegram, så dess tryck ignoreras. Brytaren kan ha konfigurerats om (till exempel av ett annat system) eller så hör QR-koden till en annan modul. Ta bort brytaren och lägg till den igen med knappsekvensen eller rätt QR-kod."
     }
   }
 }
