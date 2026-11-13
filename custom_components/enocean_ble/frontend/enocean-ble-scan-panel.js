@@ -246,6 +246,7 @@ class EnOceanBleScanPanel extends HTMLElement {
       this._stopWatching();
       this._flow = step;
       this._showMethods();
+      this._autoScanOnce();
       return;
     }
     if (step.type === "progress") {
@@ -299,6 +300,19 @@ class EnOceanBleScanPanel extends HTMLElement {
     content.querySelector("#file").addEventListener("change", (ev) => this._scanPhoto(ev));
     content.querySelector("#add").addEventListener("click", () => this._submit(content.querySelector("#text").value));
     content.querySelector("#commission").addEventListener("click", () => this._startCommissioning());
+  }
+
+  // Opened for a switch (from the setup dialog's link): go straight to the camera, once.
+  // In the HA app its native scanner; in a browser on a phone/tablet the live camera.
+  // Not on a desktop (no camera aimed at a label there). Cancelling the scanner leaves
+  // the page with all the other ways to add the switch.
+  _autoScanOnce() {
+    if (this._autoScanned) return;
+    this._autoScanned = true;
+    const touch = navigator.maxTouchPoints > 0 || window.matchMedia("(pointer: coarse)").matches;
+    if (this._external() || (touch && navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
+      this._scan();
+    }
   }
 
   // ---------------------------------------------------------------- manual commissioning

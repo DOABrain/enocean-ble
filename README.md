@@ -36,7 +36,8 @@ It provides:
    (Settings -> Devices & Services).
 2. Click `Add` when it appears. The easiest is the **Open the add page** link at the top: one page
    (inside Home Assistant, also in the app) to scan the QR code, use a photo, paste the text or run
-   the button sequence. Or choose a method in the dialog:
+   the button sequence. On a phone or tablet it opens the camera right away (in the app: the app's
+   scanner); cancel it to use the other ways. Or choose a method in the dialog:
    - **Scan the QR code with the camera**
    - **Enter the QR code text**
    - **Manual commissioning (button sequence)**
